@@ -1,0 +1,2264 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+  <meta charset="utf-8" />
+  <title>Painel Financeiro - Controle Mensal</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+  <!-- TailwindCSS CDN -->
+  <script src="https://cdn.tailwindcss.com"></script>
+
+  <!-- Font Awesome -->
+  <link
+    rel="stylesheet"
+    href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css"
+    integrity="sha512-DTOQO9RWCH3ppGqcWaEA1BIZOC6xxalwEsw9c2QQeAIftl+Vegovlnee1c9QX4TctnWMn13TZye+giMm8e2LwA=="
+    crossorigin="anonymous"
+    referrerpolicy="no-referrer"
+  />
+
+  <!-- Chart.js para gráficos da visão anual -->
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
+
+  <script>
+    tailwind.config = {
+      theme: { extend: {} }
+    }
+  </script>
+</head>
+<body class="min-h-screen bg-gray-50 flex text-gray-900">
+
+  <!-- SIDEBAR -->
+  <aside class="w-64 bg-gray-900 text-gray-100 flex flex-col">
+    <div class="px-6 py-4 border-b border-gray-800 flex items-center justify-between">
+      <div class="flex items-center gap-2">
+        <div class="w-8 h-8 rounded-xl bg-indigo-500 flex items-center justify-center">
+          <i class="fa-solid fa-wallet text-white text-sm"></i>
+        </div>
+        <div>
+          <p class="font-semibold text-sm">Painel Financeiro</p>
+          <p class="text-xs text-gray-400">Controle mensal</p>
+        </div>
+      </div>
+    </div>
+
+    <div class="px-4 pt-4 pb-2">
+      <button
+        id="btnAnnual"
+        class="w-full flex items-center justify-between text-sm px-3 py-2 rounded-lg border border-gray-700 bg-gray-800 hover:bg-gray-700 transition"
+      >
+        <span class="flex items-center gap-2">
+          <i class="fa-solid fa-chart-pie text-indigo-400"></i>
+          <span>Visão Anual</span>
+        </span>
+        <i class="fa-solid fa-chevron-right text-xs text-gray-400"></i>
+      </button>
+    </div>
+
+    <div class="px-4 py-3">
+      <p class="text-xs uppercase tracking-wide text-gray-500 mb-2">Meses do ano</p>
+      <div class="space-y-1 text-sm">
+        <button data-month-index="0" class="month-btn w-full flex justify-between items-center px-3 py-2 rounded-lg hover:bg-gray-800 transition">
+          <span>Janeiro</span><span class="text-[10px] text-gray-500">01</span>
+        </button>
+        <button data-month-index="1" class="month-btn w-full flex justify-between items-center px-3 py-2 rounded-lg hover:bg-gray-800 transition">
+          <span>Fevereiro</span><span class="text-[10px] text-gray-500">02</span>
+        </button>
+        <button data-month-index="2" class="month-btn w-full flex justify-between items-center px-3 py-2 rounded-lg hover:bg-gray-800 transition">
+          <span>Março</span><span class="text-[10px] text-gray-500">03</span>
+        </button>
+        <button data-month-index="3" class="month-btn w-full flex justify-between items-center px-3 py-2 rounded-lg hover:bg-gray-800 transition">
+          <span>Abril</span><span class="text-[10px] text-gray-500">04</span>
+        </button>
+        <button data-month-index="4" class="month-btn w-full flex justify-between items-center px-3 py-2 rounded-lg hover:bg-gray-800 transition">
+          <span>Maio</span><span class="text-[10px] text-gray-500">05</span>
+        </button>
+        <button data-month-index="5" class="month-btn w-full flex justify-between items-center px-3 py-2 rounded-lg hover:bg-gray-800 transition">
+          <span>Junho</span><span class="text-[10px] text-gray-500">06</span>
+        </button>
+        <button data-month-index="6" class="month-btn w-full flex justify-between items-center px-3 py-2 rounded-lg hover:bg-gray-800 transition">
+          <span>Julho</span><span class="text-[10px] text-gray-500">07</span>
+        </button>
+        <button data-month-index="7" class="month-btn w-full flex justify-between items-center px-3 py-2 rounded-lg hover:bg-gray-800 transition">
+          <span>Agosto</span><span class="text-[10px] text-gray-500">08</span>
+        </button>
+        <button data-month-index="8" class="month-btn w-full flex justify-between items-center px-3 py-2 rounded-lg hover:bg-gray-800 transition">
+          <span>Setembro</span><span class="text-[10px] text-gray-500">09</span>
+        </button>
+        <button data-month-index="9" class="month-btn w-full flex justify-between items-center px-3 py-2 rounded-lg hover:bg-gray-800 transition">
+          <span>Outubro</span><span class="text-[10px] text-gray-500">10</span>
+        </button>
+        <button data-month-index="10" class="month-btn w-full flex justify-between items-center px-3 py-2 rounded-lg hover:bg-gray-800 transition">
+          <span>Novembro</span><span class="text-[10px] text-gray-500">11</span>
+        </button>
+        <button data-month-index="11" class="month-btn w-full flex justify-between items-center px-3 py-2 rounded-lg hover:bg-gray-800 transition">
+          <span>Dezembro</span><span class="text-[10px] text-gray-500">12</span>
+        </button>
+      </div>
+    </div>
+
+    <div class="mt-auto px-4 py-4 border-t border-gray-800 text-xs text-gray-500">
+      <p>Dados salvos em <span class="font-semibold text-gray-300">LocalStorage</span>.</p>
+    </div>
+  </aside>
+
+  <!-- MAIN -->
+  <main class="flex-1 p-4 lg:p-8 space-y-6 overflow-x-hidden">
+    <!-- Header com filtro de ano -->
+    <header class="flex flex-col md:flex-row md:items-center md:justify-between gap-3">
+      <div>
+        <h1 class="text-2xl font-semibold text-gray-900 flex items-center gap-2">
+          <i class="fa-solid fa-gauge-high text-indigo-500"></i>
+          <span id="viewTitle">Resumo de Janeiro</span>
+        </h1>
+        <p class="text-sm text-gray-500" id="viewSubtitle">
+          Totais calculados com base nas transações do mês selecionado.
+        </p>
+      </div>
+      <div class="flex flex-col items-start md:items-end gap-2">
+        <div class="flex flex-col items-start md:items-end">
+          <label for="yearFilter" class="text-[11px] font-medium text-gray-500 uppercase tracking-wide">
+            Ano
+          </label>
+          <select
+            id="yearFilter"
+            class="mt-1 w-40 rounded-lg border border-gray-200 px-2 py-1 text-xs bg-white focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500"
+          >
+            <!-- opções via JS -->
+          </select>
+        </div>
+        <div class="flex items-center gap-2 text-xs text-gray-500">
+          <div class="flex items-center gap-1"><span class="inline-block w-2 h-2 rounded-full bg-emerald-500"></span> Receita</div>
+          <div class="flex items-center gap-1"><span class="inline-block w-2 h-2 rounded-full bg-blue-500"></span> Investimento</div>
+          <div class="flex items-center gap-1"><span class="inline-block w-2 h-2 rounded-full bg-amber-400"></span> Fixa</div>
+          <div class="flex items-center gap-1"><span class="inline-block w-2 h-2 rounded-full bg-orange-500"></span> Variável</div>
+        </div>
+      </div>
+    </header>
+
+    <!-- VISÃO MENSAL -->
+    <div id="monthlyView" class="space-y-6">
+      <!-- 1) RESUMO CARDS (COM SALDO LÍQUIDO) -->
+      <section class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-5 gap-4">
+        <!-- Receitas -->
+        <div class="bg-white rounded-xl shadow-sm border border-gray-100 flex flex-col p-4 border-l-4 border-l-emerald-500">
+          <div class="flex items-center justify-between mb-2">
+            <div>
+              <p class="text-xs uppercase tracking-wide text-gray-500">Receitas</p>
+              <p class="text-sm text-gray-900 font-semibold" id="totalReceitas">R$ 0,00</p>
+            </div>
+            <div class="w-10 h-10 rounded-full bg-emerald-50 flex items-center justify-center">
+              <i class="fa-solid fa-arrow-trend-up text-emerald-500"></i>
+            </div>
+          </div>
+          <p class="text-[11px] text-gray-500 mt-0.5" id="deltaReceitas"></p>
+          <p class="text-xs text-gray-500 mt-1">Entradas no período selecionado.</p>
+        </div>
+
+        <!-- Investimentos -->
+        <div class="bg-white rounded-xl shadow-sm border border-gray-100 flex flex-col p-4 border-l-4 border-l-blue-500">
+          <div class="flex items-center justify-between mb-2">
+            <div>
+              <p class="text-xs uppercase tracking-wide text-gray-500">Investimentos</p>
+              <p class="text-sm text-gray-900 font-semibold" id="totalInvestimentos">R$ 0,00</p>
+            </div>
+            <div class="w-10 h-10 rounded-full bg-blue-50 flex items-center justify-center">
+              <i class="fa-solid fa-vault text-blue-500"></i>
+            </div>
+          </div>
+          <p class="text-[11px] text-gray-500 mt-0.5" id="deltaInvestimentos"></p>
+          <p class="text-xs text-gray-500 mt-1">Aportes e aplicações.</p>
+        </div>
+
+        <!-- Despesas Fixas -->
+        <div class="bg-white rounded-xl shadow-sm border border-gray-100 flex flex-col p-4 border-l-4 border-l-amber-400">
+          <div class="flex items-center justify-between mb-2">
+            <div>
+              <p class="text-xs uppercase tracking-wide text-gray-500">Despesas Fixas</p>
+              <p class="text-sm text-gray-900 font-semibold" id="totalFixas">R$ 0,00</p>
+            </div>
+            <div class="w-10 h-10 rounded-full bg-amber-50 flex items-center justify-center">
+              <i class="fa-solid fa-house-chimney text-amber-400"></i>
+            </div>
+          </div>
+          <p class="text-[11px] text-gray-500 mt-0.5" id="deltaFixas"></p>
+          <p class="text-xs text-gray-500 mt-1">Contas recorrentes.</p>
+        </div>
+
+        <!-- Despesas Variáveis -->
+        <div class="bg-white rounded-xl shadow-sm border border-gray-100 flex flex-col p-4 border-l-4 border-l-orange-500">
+          <div class="flex items-center justify-between mb-2">
+            <div>
+              <p class="text-xs uppercase tracking-wide text-gray-500">Despesas Variáveis</p>
+              <p class="text-sm text-gray-900 font-semibold" id="totalVariaveis">R$ 0,00</p>
+            </div>
+            <div class="w-10 h-10 rounded-full bg-orange-50 flex items-center justify-center">
+              <i class="fa-solid fa-cart-shopping text-orange-500"></i>
+            </div>
+          </div>
+          <p class="text-[11px] text-gray-500 mt-0.5" id="deltaVariaveis"></p>
+          <p class="text-xs text-gray-500 mt-1">Compras e gastos eventuais.</p>
+        </div>
+
+        <!-- Saldo Líquido -->
+        <div id="cardSaldo" class="bg-white rounded-xl shadow-sm border border-gray-100 flex flex-col p-4 border-l-4 border-l-slate-500">
+          <div class="flex items-center justify-between mb-2">
+            <div>
+              <p class="text-xs uppercase tracking-wide text-gray-500">Saldo Líquido</p>
+              <p class="text-sm text-gray-900 font-semibold" id="totalSaldo">R$ 0,00</p>
+            </div>
+            <div class="w-10 h-10 rounded-full bg-slate-50 flex items-center justify-center">
+              <i class="fa-solid fa-scale-balanced text-slate-600"></i>
+            </div>
+          </div>
+          <p class="text-[11px] text-gray-500 mt-0.5" id="deltaSaldo"></p>
+          <p class="text-xs text-gray-500 mt-1">Receitas - Despesas - Investimentos.</p>
+        </div>
+      </section>
+
+      <!-- 2) CARTÕES -->
+      <section class="space-y-3">
+        <div class="flex items-center justify-between">
+          <h2 class="text-lg font-semibold text-gray-900 flex items-center gap-2">
+            <i class="fa-solid fa-credit-card text-indigo-500"></i>
+            Faturas dos Cartões
+          </h2>
+        </div>
+
+        <div class="grid grid-cols-1 lg:grid-cols-3 gap-4">
+          <!-- Total de Faturas -->
+          <div class="lg:col-span-1 bg-white rounded-xl shadow-sm border border-gray-100 p-4 flex flex-col justify-between">
+            <div class="flex items-center justify-between mb-2">
+              <div>
+                <p class="text-xs uppercase tracking-wide text-gray-500">Total de Faturas</p>
+                <p class="text-lg font-semibold text-gray-900" id="totalFaturas">R$ 0,00</p>
+              </div>
+              <div class="w-10 h-10 rounded-full bg-rose-50 flex items-center justify-center">
+                <i class="fa-solid fa-file-invoice-dollar text-rose-500"></i>
+              </div>
+            </div>
+            <p class="text-xs text-gray-500">
+              Soma de todas as despesas no cartão no período selecionado.
+            </p>
+          </div>
+
+          <!-- Cards individuais -->
+          <div class="lg:col-span-2 grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-5 gap-3">
+            <!-- Caixa -->
+            <div class="bg-white rounded-xl shadow-sm border border-gray-100 p-3 flex flex-col gap-1">
+              <div class="flex items-center justify-between">
+                <p class="text-xs text-gray-500">Caixa</p>
+                <i class="fa-solid fa-credit-card text-sky-600 text-sm"></i>
+              </div>
+              <p class="text-sm font-semibold text-gray-900" id="cardCaixa">R$ 0,00</p>
+              <button
+                class="card-status-btn mt-1 inline-flex items-center px-2.5 py-1 rounded-full border text-[10px] font-medium"
+                data-card="caixa"
+              ></button>
+            </div>
+
+            <!-- Inter Débora -->
+            <div class="bg-white rounded-xl shadow-sm border border-gray-100 p-3 flex flex-col gap-1">
+              <div class="flex items-center justify-between">
+                <p class="text-xs text-gray-500">Inter (Débora)</p>
+                <i class="fa-solid fa-credit-card text-orange-500 text-sm"></i>
+              </div>
+              <p class="text-sm font-semibold text-gray-900" id="cardInterD">R$ 0,00</p>
+              <button
+                class="card-status-btn mt-1 inline-flex items-center px-2.5 py-1 rounded-full border text-[10px] font-medium"
+                data-card="inter_debora"
+              ></button>
+            </div>
+
+            <!-- Inter Cristiano -->
+            <div class="bg-white rounded-xl shadow-sm border border-gray-100 p-3 flex flex-col gap-1">
+              <div class="flex items-center justify-between">
+                <p class="text-xs text-gray-500">Inter (Cristiano)</p>
+                <i class="fa-solid fa-credit-card text-orange-500 text-sm"></i>
+              </div>
+              <p class="text-sm font-semibold text-gray-900" id="cardInterC">R$ 0,00</p>
+              <button
+                class="card-status-btn mt-1 inline-flex items-center px-2.5 py-1 rounded-full border text-[10px] font-medium"
+                data-card="inter_cristiano"
+              ></button>
+            </div>
+
+            <!-- Nubank -->
+            <div class="bg-white rounded-xl shadow-sm border border-gray-100 p-3 flex flex-col gap-1">
+              <div class="flex items-center justify-between">
+                <p class="text-xs text-gray-500">Nubank</p>
+                <i class="fa-solid fa-credit-card text-purple-600 text-sm"></i>
+              </div>
+              <p class="text-sm font-semibold text-gray-900" id="cardNubank">R$ 0,00</p>
+              <button
+                class="card-status-btn mt-1 inline-flex items-center px-2.5 py-1 rounded-full border text-[10px] font-medium"
+                data-card="nubank"
+              ></button>
+            </div>
+
+            <!-- C6 -->
+            <div class="bg-white rounded-xl shadow-sm border border-gray-100 p-3 flex flex-col gap-1">
+              <div class="flex items-center justify-between">
+                <p class="text-xs text-gray-500">C6 Bank</p>
+                <i class="fa-solid fa-credit-card text-gray-900 text-sm"></i>
+              </div>
+              <p class="text-sm font-semibold text-gray-900" id="cardC6">R$ 0,00</p>
+              <button
+                class="card-status-btn mt-1 inline-flex items-center px-2.5 py-1 rounded-full border text-[10px] font-medium"
+                data-card="c6"
+              ></button>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- 3) FORMULÁRIOS DE LANÇAMENTO -->
+      <section class="grid grid-cols-1 lg:grid-cols-2 gap-4">
+        <!-- Card Nova Receita -->
+        <form id="formReceita" class="bg-white rounded-xl shadow-sm border border-emerald-200 p-4 flex flex-col gap-3">
+          <div class="flex items-center justify-between">
+            <div>
+              <h2 class="text-sm font-semibold text-gray-900 flex items-center gap-2">
+                <span class="inline-flex w-6 h-6 rounded-full bg-emerald-50 items-center justify-center">
+                  <i class="fa-solid fa-arrow-trend-up text-emerald-500 text-xs"></i>
+                </span>
+                Nova Receita
+              </h2>
+              <p class="text-xs text-gray-500">Entrada de fundos no período selecionado.</p>
+            </div>
+          </div>
+
+          <div class="space-y-2 text-xs">
+            <div class="space-y-1">
+              <label for="recDesc" class="font-medium text-gray-700">Descrição</label>
+              <input id="recDesc" type="text" required
+                class="w-full rounded-lg border border-gray-200 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500"
+                placeholder="Ex: Salário, Freelancer..." />
+            </div>
+            <div class="grid grid-cols-2 gap-3">
+              <div class="space-y-1">
+                <label for="recValor" class="font-medium text-gray-700">Valor (R$)</label>
+                <input id="recValor" type="number" step="0.01" min="0" required
+                  class="w-full rounded-lg border border-gray-200 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500"
+                  placeholder="0,00" />
+              </div>
+              <div class="space-y-1">
+                <label for="recData" class="font-medium text-gray-700">Data</label>
+                <input id="recData" type="date" required
+                  class="w-full rounded-lg border border-gray-200 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500" />
+              </div>
+            </div>
+            <div class="space-y-1">
+              <label for="recCategoria" class="font-medium text-gray-700">Categoria da Receita</label>
+              <select id="recCategoria" class="w-full rounded-lg border border-gray-200 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500">
+                <option value="salario">Salário</option>
+                <option value="freelancer">Freelancer / Extra</option>
+                <option value="decimo">13º / Bônus</option>
+                <option value="reembolso">Reembolso</option>
+                <option value="outros">Outros</option>
+              </select>
+            </div>
+          </div>
+
+          <div class="pt-2 flex justify-end">
+            <button type="submit"
+              class="inline-flex items-center gap-2 px-4 py-2 text-xs font-semibold rounded-lg bg-emerald-600 text-white hover:bg-emerald-700">
+              <i class="fa-solid fa-plus text-[11px]"></i>
+              Lançar Receita
+            </button>
+          </div>
+        </form>
+
+        <!-- Card Nova Despesa / Investimento -->
+        <form id="formDespesa" class="bg-white rounded-xl shadow-sm border border-orange-200 p-4 flex flex-col gap-3">
+          <div class="flex items-center justify-between">
+            <div>
+              <h2 class="text-sm font-semibold text-gray-900 flex items-center gap-2">
+                <span class="inline-flex w-6 h-6 rounded-full bg-orange-50 items-center justify-center">
+                  <i class="fa-solid fa-arrow-trend-down text-orange-500 text-xs"></i>
+                </span>
+                Nova Despesa / Investimento
+              </h2>
+              <p class="text-xs text-gray-500">Saída de fundos, incluindo despesas e aportes.</p>
+            </div>
+          </div>
+
+          <div class="space-y-2 text-xs">
+            <div class="space-y-1">
+              <label for="despDesc" class="font-medium text-gray-700">Descrição</label>
+              <input id="despDesc" type="text" required
+                class="w-full rounded-lg border border-gray-200 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-orange-500"
+                placeholder="Ex: Aluguel, Supermercado, Aporte..." />
+            </div>
+            <div class="grid grid-cols-2 gap-3">
+              <div class="space-y-1">
+                <label for="despValor" class="font-medium text-gray-700">Valor (R$)</label>
+                <input id="despValor" type="number" step="0.01" min="0" required
+                  class="w-full rounded-lg border border-gray-200 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-orange-500"
+                  placeholder="0,00" />
+              </div>
+              <div class="space-y-1">
+                <label for="despData" class="font-medium text-gray-700">Data</label>
+                <input id="despData" type="date" required
+                  class="w-full rounded-lg border border-gray-200 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-orange-500" />
+              </div>
+            </div>
+            <div class="space-y-1">
+              <label for="despCategoria" class="font-medium text-gray-700">Tipo (Fixa / Variável / Investimento)</label>
+              <select id="despCategoria" required
+                class="w-full rounded-lg border border-gray-200 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-orange-500">
+                <option value="fixa">Despesa Fixa</option>
+                <option value="variavel">Despesa Variável</option>
+                <option value="investimento">Investimento</option>
+              </select>
+            </div>
+            <div class="space-y-1">
+              <label for="despSubCategoria" class="font-medium text-gray-700">Categoria detalhada</label>
+              <select id="despSubCategoria" required
+                class="w-full rounded-lg border border-gray-200 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-orange-500">
+                <!-- opções via JS -->
+              </select>
+            </div>
+
+            <div class="flex items-center gap-2 pt-1">
+              <input id="despIsCartao" type="checkbox"
+                class="rounded border-gray-300 text-indigo-600 focus:ring-indigo-500" />
+              <label for="despIsCartao" class="text-xs text-gray-700">Pagamento via Cartão de Crédito?</label>
+            </div>
+
+            <div id="despCartaoFields" class="space-y-2 pt-1 hidden">
+              <div class="space-y-1">
+                <label for="despCartao" class="font-medium text-gray-700">Cartão</label>
+                <select id="despCartao"
+                  class="w-full rounded-lg border border-gray-200 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500">
+                  <option value="caixa">Caixa</option>
+                  <option value="inter_debora">Inter (Débora)</option>
+                  <option value="inter_cristiano">Inter (Cristiano)</option>
+                  <option value="nubank">Nubank</option>
+                  <option value="c6">C6 Bank</option>
+                </select>
+              </div>
+              <div id="despParcelasWrapper" class="space-y-1">
+                <label for="despParcelas" class="font-medium text-gray-700">Número de Parcelas</label>
+                <input id="despParcelas" type="number" min="1" max="48" value="1"
+                  class="w-full rounded-lg border border-gray-200 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500" />
+                <p class="text-[11px] text-gray-400">Compras parceladas serão distribuídas automaticamente pelos meses futuros.</p>
+              </div>
+            </div>
+          </div>
+
+          <div class="pt-2 flex justify-end">
+            <button type="submit"
+              class="inline-flex items-center gap-2 px-4 py-2 text-xs font-semibold rounded-lg bg-orange-600 text-white hover:bg-orange-700">
+              <i class="fa-solid fa-plus text-[11px]"></i>
+              Lançar Saída
+            </button>
+          </div>
+        </form>
+      </section>
+
+      <!-- 4) TABELAS DE TRANSAÇÕES -->
+      <section class="space-y-4">
+        <div class="bg-white rounded-xl shadow-sm border border-gray-100">
+          <div class="px-4 py-3 border-b border-gray-100 flex items-center justify-between">
+            <div>
+              <h2 class="text-sm font-semibold text-gray-900">Receitas</h2>
+              <p class="text-xs text-gray-500">Entradas detalhadas no período.</p>
+            </div>
+          </div>
+          <div class="overflow-x-auto">
+            <table class="min-w-full text-sm">
+              <thead class="bg-gray-50 border-b border-gray-100">
+                <tr class="text-xs text-gray-500 uppercase tracking-wide">
+                  <th class="text-left px-4 py-2">Data</th>
+                  <th class="text-left px-4 py-2">Descrição</th>
+                  <th class="text-left px-4 py-2">Categoria</th>
+                  <th class="text-left px-4 py-2">Pagamento</th>
+                  <th class="text-right px-4 py-2">Valor</th>
+                  <th class="text-center px-4 py-2">Status</th>
+                  <th class="text-center px-4 py-2">Ação</th>
+                </tr>
+              </thead>
+              <tbody id="tbodyReceitas" class="divide-y divide-gray-100"></tbody>
+            </table>
+          </div>
+        </div>
+
+        <div class="bg-white rounded-xl shadow-sm border border-gray-100">
+          <div class="px-4 py-3 border-b border-gray-100 flex items-center justify-between">
+            <div>
+              <h2 class="text-sm font-semibold text-gray-900">Despesas Fixas</h2>
+              <p class="text-xs text-gray-500">Contas recorrentes registradas para todos os meses.</p>
+            </div>
+          </div>
+          <div class="overflow-x-auto">
+            <table class="min-w-full text-sm">
+              <thead class="bg-gray-50 border-b border-gray-100">
+                <tr class="text-xs text-gray-500 uppercase tracking-wide">
+                  <th class="text-left px-4 py-2">Data</th>
+                  <th class="text-left px-4 py-2">Descrição</th>
+                  <th class="text-left px-4 py-2">Categoria</th>
+                  <th class="text-left px-4 py-2">Pagamento</th>
+                  <th class="text-right px-4 py-2">Valor</th>
+                  <th class="text-center px-4 py-2">Status</th>
+                  <th class="text-center px-4 py-2">Ação</th>
+                </tr>
+              </thead>
+              <tbody id="tbodyFixas" class="divide-y divide-gray-100"></tbody>
+            </table>
+          </div>
+        </div>
+
+        <div class="bg-white rounded-xl shadow-sm border border-gray-100">
+          <div class="px-4 py-3 border-b border-gray-100 flex items-center justify-between">
+            <div>
+              <h2 class="text-sm font-semibold text-gray-900">Despesas Variáveis</h2>
+              <p class="text-xs text-gray-500">Compras, gastos eventuais e investimentos.</p>
+            </div>
+          </div>
+          <div class="overflow-x-auto">
+            <table class="min-w-full text-sm">
+              <thead class="bg-gray-50 border-b border-gray-100">
+                <tr class="text-xs text-gray-500 uppercase tracking-wide">
+                  <th class="text-left px-4 py-2">Data</th>
+                  <th class="text-left px-4 py-2">Descrição</th>
+                  <th class="text-left px-4 py-2">Categoria</th>
+                  <th class="text-left px-4 py-2">Pagamento</th>
+                  <th class="text-right px-4 py-2">Valor</th>
+                  <th class="text-center px-4 py-2">Status</th>
+                  <th class="text-center px-4 py-2">Ação</th>
+                </tr>
+              </thead>
+              <tbody id="tbodyVariaveis" class="divide-y divide-gray-100"></tbody>
+            </table>
+          </div>
+        </div>
+      </section>
+    </div>
+
+    <!-- VISÃO ANUAL -->
+    <div id="annualView" class="space-y-4 hidden">
+      <section class="bg-white rounded-xl shadow-sm border border-gray-100">
+        <div class="px-4 py-3 border-b border-gray-100 flex items-center justify-between">
+          <div>
+            <h2 class="text-sm font-semibold text-gray-900">Resumo Anual</h2>
+            <p class="text-xs text-gray-500">
+              Visão consolidada por mês: Receitas, Despesas, Investimentos e Saldo.
+            </p>
+          </div>
+          <div class="flex items-center gap-2">
+            <button
+              id="btnExportCsv"
+              class="inline-flex items-center gap-1 px-3 py-1.5 rounded-lg border border-gray-200 text-[11px] font-semibold text-gray-700 hover:bg-gray-50"
+            >
+              <i class="fa-solid fa-file-csv text-xs"></i>
+              CSV
+            </button>
+            <button
+              id="btnExportExcel"
+              class="inline-flex items-center gap-1 px-3 py-1.5 rounded-lg border border-emerald-200 text-[11px] font-semibold text-emerald-700 bg-emerald-50 hover:bg-emerald-100"
+            >
+              <i class="fa-solid fa-file-excel text-xs"></i>
+              Excel
+            </button>
+          </div>
+        </div>
+
+        <!-- Cards de indicadores anuais (inclui card de investimentos) -->
+        <div class="px-4 pt-4 grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-3">
+          <div class="bg-emerald-50 border border-emerald-100 rounded-xl px-3 py-3 flex flex-col">
+            <p class="text-[11px] font-medium text-emerald-700 uppercase tracking-wide">Receitas no ano</p>
+            <p id="annualTotalReceitas" class="mt-1 text-lg font-semibold text-emerald-900">R$ 0,00</p>
+          </div>
+          <div class="bg-orange-50 border border-orange-100 rounded-xl px-3 py-3 flex flex-col">
+            <p class="text-[11px] font-medium text-orange-700 uppercase tracking-wide">Despesas no ano</p>
+            <p id="annualTotalDespesas" class="mt-1 text-lg font-semibold text-orange-900">R$ 0,00</p>
+          </div>
+          <div class="bg-blue-50 border border-blue-100 rounded-xl px-3 py-3 flex flex-col">
+            <p class="text-[11px] font-medium text-blue-700 uppercase tracking-wide">Total investido</p>
+            <p id="annualTotalInvest" class="mt-1 text-lg font-semibold text-blue-900">R$ 0,00</p>
+          </div>
+          <div class="bg-slate-50 border border-slate-100 rounded-xl px-3 py-3 flex flex-col">
+            <p class="text-[11px] font-medium text-slate-700 uppercase tracking-wide">Saldo do ano</p>
+            <p id="annualTotalSaldo" class="mt-1 text-lg font-semibold text-slate-900">R$ 0,00</p>
+          </div>
+        </div>
+
+        <!-- Card específico de Investimentos -->
+        <div class="px-4 pt-2">
+          <div class="bg-white border border-blue-100 rounded-xl px-3 py-3 flex flex-col md:flex-row md:items-center md:justify-between gap-3">
+            <div>
+              <p class="text-[11px] font-semibold text-blue-700 uppercase tracking-wide">
+                Resumo de Investimentos do Ano
+              </p>
+              <p class="text-[11px] text-gray-500">
+                Total aplicado, maior aporte único e mês com maior volume investido.
+              </p>
+            </div>
+            <div class="flex flex-wrap gap-3 text-[11px]">
+              <div>
+                <p class="text-gray-500">Total investido</p>
+                <p id="annualCardInvestTotal" class="font-semibold text-blue-800">R$ 0,00</p>
+              </div>
+              <div>
+                <p class="text-gray-500">Maior aporte</p>
+                <p id="annualCardInvestMax" class="font-semibold text-blue-800">R$ 0,00</p>
+              </div>
+              <div>
+                <p class="text-gray-500">Mês de maior aporte</p>
+                <p id="annualCardInvestBestMonth" class="font-semibold text-blue-800">-</p>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Tabela anual -->
+        <div class="overflow-x-auto mt-4">
+          <table class="min-w-full text-sm">
+            <thead class="bg-gray-50 border-b border-gray-100">
+              <tr class="text-xs text-gray-500 uppercase tracking-wide">
+                <th class="text-left px-4 py-2">Mês</th>
+                <th class="text-right px-4 py-2">Receitas Totais</th>
+                <th class="text-right px-4 py-2">Despesas Totais</th>
+                <th class="text-right px-4 py-2">Investimentos</th>
+                <th class="text-right px-4 py-2">Saldo Mensal</th>
+              </tr>
+            </thead>
+            <tbody id="annualBody" class="divide-y divide-gray-100"></tbody>
+          </table>
+        </div>
+
+        <!-- Dash de gráficos anuais -->
+        <div class="grid grid-cols-1 xl:grid-cols-2 gap-4 p-4 border-t border-gray-100">
+          <div class="h-64 flex flex-col">
+            <div class="flex items-center justify-between mb-2">
+              <div>
+                <h3 class="text-xs font-semibold text-gray-800 uppercase tracking-wide">
+                  Comparativo Mensal
+                </h3>
+                <p class="text-[11px] text-gray-500">
+                  Receitas x Despesas x Investimentos por mês.
+                </p>
+              </div>
+            </div>
+            <div class="flex-1">
+              <canvas id="chartAnnualBars"></canvas>
+            </div>
+          </div>
+
+          <div class="h-64 flex flex-col">
+            <div class="flex items-center justify-between mb-2">
+              <div>
+                <h3 class="text-xs font-semibold text-gray-800 uppercase tracking-wide">
+                  Evolução do Saldo
+                </h3>
+                <p class="text-[11px] text-gray-500">
+                  Saldo líquido de cada mês ao longo do ano.
+                </p>
+              </div>
+            </div>
+            <div class="flex-1">
+              <canvas id="chartAnnualSaldo"></canvas>
+            </div>
+          </div>
+        </div>
+
+        <!-- Resumo de investimentos por tipo -->
+        <div class="border-t border-gray-100 p-4">
+          <div class="flex items-center justify-between mb-2">
+            <div>
+              <h3 class="text-xs font-semibold text-gray-800 uppercase tracking-wide">
+                Resumo de Investimentos por Tipo
+              </h3>
+              <p class="text-[11px] text-gray-500">
+                Baseado nas transações de investimento do período selecionado.
+              </p>
+            </div>
+          </div>
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mt-2">
+            <div class="h-64 flex flex-col">
+              <div class="flex-1">
+                <canvas id="chartInvestTypes"></canvas>
+              </div>
+            </div>
+            <div class="overflow-x-auto">
+              <table class="min-w-full text-sm">
+                <thead class="bg-gray-50 border-b border-gray-100">
+                  <tr class="text-xs text-gray-500 uppercase tracking-wide">
+                    <th class="text-left px-4 py-2">Tipo de Investimento</th>
+                    <th class="text-right px-4 py-2">Valor Aplicado</th>
+                    <th class="text-right px-4 py-2">% do Total</th>
+                  </tr>
+                </thead>
+                <tbody id="annualInvestBody" class="divide-y divide-gray-100"></tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+      </section>
+    </div>
+  </main>
+
+  <!-- MODAL EDIÇÃO -->
+  <div id="editModal" class="fixed inset-0 z-50 hidden bg-black/40 items-center justify-center">
+    <div class="bg-white rounded-xl shadow-lg w-full max-w-md mx-4 p-4 space-y-3">
+      <div class="flex items-center justify-between">
+        <div>
+          <h2 class="text-sm font-semibold text-gray-900 flex items-center gap-2">
+            <i class="fa-solid fa-pen-to-square text-indigo-500"></i>
+            Editar Lançamento
+          </h2>
+          <p class="text-xs text-gray-500">Atualize os dados desta transação.</p>
+        </div>
+        <button id="btnEditClose" class="w-7 h-7 rounded-full flex items-center justify-center text-gray-400 hover:bg-gray-100">
+          <i class="fa-solid fa-xmark text-xs"></i>
+        </button>
+      </div>
+
+      <form id="formEdit" class="space-y-2 text-xs">
+        <div class="space-y-1">
+          <label for="editDesc" class="font-medium text-gray-700">Descrição</label>
+          <input id="editDesc" type="text" required
+            class="w-full rounded-lg border border-gray-200 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500" />
+        </div>
+
+        <div class="grid grid-cols-2 gap-3">
+          <div class="space-y-1">
+            <label for="editValor" class="font-medium text-gray-700">Valor (R$)</label>
+            <input id="editValor" type="number" step="0.01" min="0" required
+              class="w-full rounded-lg border border-gray-200 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500" />
+          </div>
+          <div class="space-y-1">
+            <label for="editData" class="font-medium text-gray-700">Data</label>
+            <input id="editData" type="date" required
+              class="w-full rounded-lg border border-gray-200 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500" />
+          </div>
+        </div>
+
+        <div class="space-y-1">
+          <label for="editMainCategory" class="font-medium text-gray-700">Tipo</label>
+          <select id="editMainCategory"
+            class="w-full rounded-lg border border-gray-200 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500">
+            <option value="receita">Receita</option>
+            <option value="investimento">Investimento</option>
+            <option value="fixa">Despesa Fixa</option>
+            <option value="variavel">Despesa Variável</option>
+          </select>
+        </div>
+
+        <div class="space-y-1">
+          <label for="editSubCategory" class="font-medium text-gray-700">Categoria detalhada</label>
+          <select id="editSubCategory"
+            class="w-full rounded-lg border border-gray-200 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500">
+          </select>
+        </div>
+
+        <div id="editPaymentContainer" class="space-y-2 pt-1">
+          <div class="flex items-center gap-2">
+            <input id="editIsCartao" type="checkbox"
+              class="rounded border-gray-300 text-indigo-600 focus:ring-indigo-500" />
+            <label for="editIsCartao" class="text-xs text-gray-700">Pagamento via Cartão de Crédito?</label>
+          </div>
+
+          <div id="editCartaoFields" class="space-y-2 pt-1 hidden">
+            <div class="space-y-1">
+              <label for="editCartao" class="font-medium text-gray-700">Cartão</label>
+              <select id="editCartao"
+                class="w-full rounded-lg border border-gray-200 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500">
+                <option value="caixa">Caixa</option>
+                <option value="inter_debora">Inter (Débora)</option>
+                <option value="inter_cristiano">Inter (Cristiano)</option>
+                <option value="nubank">Nubank</option>
+                <option value="c6">C6 Bank</option>
+              </select>
+            </div>
+          </div>
+        </div>
+
+        <div id="editParcelScope" class="hidden border-t border-gray-100 pt-2 mt-2">
+          <p class="text-[11px] text-gray-500 mb-2">
+            Este lançamento faz parte de uma compra parcelada. O que você deseja editar?
+          </p>
+          <div class="flex gap-2">
+            <button type="button" id="btnScopeSingle"
+              class="px-3 py-1 rounded-full text-[11px] font-medium bg-indigo-50 text-indigo-600 border border-indigo-200">
+              Apenas esta parcela
+            </button>
+            <button type="button" id="btnScopeAll"
+              class="px-3 py-1 rounded-full text-[11px] font-medium bg-gray-100 text-gray-600 border border-gray-200">
+              Todas as parcelas
+            </button>
+          </div>
+        </div>
+
+        <div class="pt-3 flex justify-end gap-2">
+          <button type="button" id="btnEditCancel"
+            class="px-4 py-2 text-xs font-semibold rounded-lg border border-gray-200 text-gray-600 hover:bg-gray-50">
+            Cancelar
+          </button>
+          <button type="submit"
+            class="px-4 py-2 text-xs font-semibold rounded-lg bg-indigo-600 text-white hover:bg-indigo-700 flex items-center gap-2">
+            <i class="fa-solid fa-floppy-disk text-[11px]"></i>
+            Salvar alterações
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- SCRIPT -->
+  <script>
+    (function () {
+      const STORAGE_KEY = 'financeDashboard_transactions';
+      const INVOICE_KEY = 'financeDashboard_invoicesPaid';
+
+      const CATEGORY_LABELS = {
+        receita: 'Receita',
+        investimento: 'Investimento',
+        fixa: 'Despesa Fixa',
+        variavel: 'Despesa Variável'
+      };
+
+      const RECEITA_SUBCATEGORIES = {
+        salario: 'Salário',
+        freelancer: 'Freelancer / Extra',
+        decimo: '13º / Bônus',
+        reembolso: 'Reembolso',
+        outros: 'Outros'
+      };
+
+      const DESPESA_SUBCATEGORIES = {
+        moradia: 'Moradia',
+        alimentacao: 'Alimentação',
+        transporte: 'Transporte',
+        lazer: 'Lazer',
+        saude: 'Saúde',
+        educacao: 'Educação',
+        outros: 'Outros'
+      };
+
+      const INVEST_SUBCATEGORIES = {
+        renda_fixa: 'Renda Fixa',
+        renda_variavel: 'Renda Variável',
+        tesouro: 'Tesouro Direto',
+        fundos: 'Fundos de Investimento',
+        previdencia: 'Previdência',
+        cripto: 'Criptomoedas',
+        outros: 'Outros Investimentos'
+      };
+
+      const SUBCATEGORY_COLOR_CLASSES = {
+        moradia: 'bg-emerald-50 text-emerald-700 border-emerald-200',
+        alimentacao: 'bg-orange-50 text-orange-700 border-orange-200',
+        transporte: 'bg-sky-50 text-sky-700 border-sky-200',
+        lazer: 'bg-purple-50 text-purple-700 border-purple-200',
+        saude: 'bg-rose-50 text-rose-700 border-rose-200',
+        educacao: 'bg-indigo-50 text-indigo-700 border-indigo-200',
+        outros: 'bg-gray-50 text-gray-700 border-gray-200',
+        salario: 'bg-emerald-50 text-emerald-700 border-emerald-200',
+        freelancer: 'bg-sky-50 text-sky-700 border-sky-200',
+        decimo: 'bg-indigo-50 text-indigo-700 border-indigo-200',
+        reembolso: 'bg-teal-50 text-teal-700 border-teal-200',
+        renda_fixa: 'bg-blue-50 text-blue-700 border-blue-200',
+        renda_variavel: 'bg-amber-50 text-amber-700 border-amber-200',
+        tesouro: 'bg-lime-50 text-lime-700 border-lime-200',
+        fundos: 'bg-cyan-50 text-cyan-700 border-cyan-200',
+        previdencia: 'bg-emerald-50 text-emerald-700 border-emerald-200',
+        cripto: 'bg-purple-50 text-purple-700 border-purple-200'
+      };
+
+      const CARD_LABELS = {
+        caixa: 'Caixa',
+        inter_debora: 'Inter (Débora)',
+        inter_cristiano: 'Inter (Cristiano)',
+        nubank: 'Nubank',
+        c6: 'C6 Bank'
+      };
+
+      const MONTH_NAMES = [
+        'Janeiro','Fevereiro','Março','Abril','Maio','Junho',
+        'Julho','Agosto','Setembro','Outubro','Novembro','Dezembro'
+      ];
+
+      const state = {
+        transactions: [],
+        invoicesPaid: {},
+        selectedMonth: new Date().getMonth(),
+        selectedYear: 'all',   // 'all' ou número do ano
+        editingId: null,
+        editingMode: 'single',
+        editingGroupId: null
+      };
+
+      // Referências aos gráficos da visão anual
+      let annualBarChart = null;
+      let annualLineChart = null;
+      let investPieChart = null;
+
+      // ----- Utils -----
+      function saveTransactions() {
+        localStorage.setItem(STORAGE_KEY, JSON.stringify(state.transactions));
+      }
+      function saveInvoices() {
+        localStorage.setItem(INVOICE_KEY, JSON.stringify(state.invoicesPaid));
+      }
+
+      function loadTransactions() {
+        try {
+          const raw = localStorage.getItem(STORAGE_KEY);
+          if (raw) {
+            const parsed = JSON.parse(raw);
+            if (Array.isArray(parsed)) {
+              parsed.forEach(t => { if (typeof t.paid === 'undefined') t.paid = false; });
+              state.transactions = parsed;
+            }
+          }
+        } catch (e) {
+          console.error('Erro ao carregar LocalStorage', e);
+          state.transactions = [];
+        }
+      }
+
+      function loadInvoices() {
+        try {
+          const raw = localStorage.getItem(INVOICE_KEY);
+          if (raw) {
+            const parsed = JSON.parse(raw);
+            if (parsed && typeof parsed === 'object') {
+              state.invoicesPaid = parsed;
+            }
+          }
+        } catch (e) {
+          console.error('Erro ao carregar invoices', e);
+          state.invoicesPaid = {};
+        }
+      }
+
+      function formatCurrency(value) {
+        return new Intl.NumberFormat('pt-BR', {
+          style: 'currency',
+          currency: 'BRL'
+        }).format(value || 0);
+      }
+
+      function formatDate(dateStr) {
+        const d = new Date(dateStr);
+        if (isNaN(d.getTime())) return '-';
+        return d.toLocaleDateString('pt-BR');
+      }
+
+      function generateId() {
+        return 'tx_' + Date.now().toString(36) + '_' + Math.random().toString(36).slice(2);
+      }
+
+      function getYearForSelectedMonth() {
+        if (state.selectedYear !== 'all') return state.selectedYear;
+        const txs = state.transactions.filter((t) => {
+          const d = new Date(t.date);
+          if (isNaN(d.getTime())) return false;
+          return d.getMonth() === state.selectedMonth;
+        });
+        if (txs.length) {
+          const d = new Date(txs[0].date);
+          if (!isNaN(d.getTime())) return d.getFullYear();
+        }
+        return new Date().getFullYear();
+      }
+
+      function keyInvoice(year, month, card) {
+        return `${year}-${month}-${card}`;
+      }
+
+      // Filtra por mês e ano selecionados (quando aplicável)
+      function getFilteredTransactions() {
+        return state.transactions.filter((t) => {
+          const d = new Date(t.date);
+          if (isNaN(d.getTime())) return false;
+
+          if (state.selectedMonth !== null && d.getMonth() !== state.selectedMonth) return false;
+          if (state.selectedYear !== 'all' && d.getFullYear() !== state.selectedYear) return false;
+
+          return true;
+        });
+      }
+
+      // Totais por mês (para comparação %)
+      function getMonthTotals(monthIndex) {
+        const result = { receitas: 0, investimentos: 0, fixas: 0, variaveis: 0 };
+        state.transactions.forEach(t => {
+          const d = new Date(t.date);
+          if (isNaN(d.getTime()) || d.getMonth() !== monthIndex) return;
+          if (state.selectedYear !== 'all' && d.getFullYear() !== state.selectedYear) return;
+
+          const v = Number(t.value) || 0;
+          if (t.category === 'receita') result.receitas += v;
+          else if (t.category === 'investimento') result.investimentos += v;
+          else if (t.category === 'fixa') result.fixas += v;
+          else if (t.category === 'variavel') result.variaveis += v;
+        });
+        return result;
+      }
+
+      function populateDespesaSubcategorias() {
+        const tipo = document.getElementById('despCategoria').value;
+        const select = document.getElementById('despSubCategoria');
+        select.innerHTML = '';
+        let map;
+        if (tipo === 'investimento') map = INVEST_SUBCATEGORIES;
+        else map = DESPESA_SUBCATEGORIES;
+        Object.entries(map).forEach(([value,label]) => {
+          const opt = document.createElement('option');
+          opt.value = value;
+          opt.textContent = label;
+          select.appendChild(opt);
+        });
+      }
+
+      function updateParcelVisibility() {
+        const tipo = document.getElementById('despCategoria').value;
+        const isCartao = document.getElementById('despIsCartao').checked;
+        const wrapper = document.getElementById('despParcelasWrapper');
+        if (isCartao && tipo !== 'fixa') wrapper.classList.remove('hidden');
+        else wrapper.classList.add('hidden');
+      }
+
+      function populateEditSubcategories(mainCategory, selectedSub) {
+        const select = document.getElementById('editSubCategory');
+        select.innerHTML = '';
+        let map;
+        if (mainCategory === 'receita') map = RECEITA_SUBCATEGORIES;
+        else if (mainCategory === 'investimento') map = INVEST_SUBCATEGORIES;
+        else map = DESPESA_SUBCATEGORIES;
+        Object.entries(map).forEach(([value,label]) => {
+          const opt = document.createElement('option');
+          opt.value = value;
+          opt.textContent = label;
+          if (value === selectedSub) opt.selected = true;
+          select.appendChild(opt);
+        });
+      }
+
+      // Filtro de ano - opções do select (DINÂMICO até 2030+, ano atual primeiro)
+      function refreshYearFilterOptions() {
+        const select = document.getElementById('yearFilter');
+        if (!select) return;
+
+        const currentStored =
+          state.selectedYear === 'all' ? 'all' : String(state.selectedYear);
+
+        // Descobre menor e maior ano das transações
+        let minTxYear = null;
+        let maxTxYear = null;
+        state.transactions.forEach(t => {
+          const d = new Date(t.date);
+          if (isNaN(d.getTime())) return;
+          const y = d.getFullYear();
+          if (minTxYear === null || y < minTxYear) minTxYear = y;
+          if (maxTxYear === null || y > maxTxYear) maxTxYear = y;
+        });
+
+        const now = new Date();
+        const currentYear = now.getFullYear();
+
+        // Intervalo dinâmico:
+        // - início: primeiro ano com lançamento (ou ano atual, se ainda não houver dados)
+        // - fim: cobre último ano com dados, ano atual + 1 e pelo menos 2030
+        let minYear = minTxYear !== null ? minTxYear : currentYear;
+        let maxYear = Math.max(
+          maxTxYear !== null ? maxTxYear : currentYear,
+          currentYear + 1,
+          2030
+        );
+        if (minYear > maxYear) minYear = maxYear;
+
+        // Monta lista de anos em ordem crescente
+        const years = [];
+        for (let y = minYear; y <= maxYear; y++) years.push(y);
+
+        // Reordena para deixar o ano atual primeiro (se estiver no range)
+        const orderedYears = [];
+        if (years.includes(currentYear)) {
+          orderedYears.push(currentYear);
+        }
+        years.forEach(y => {
+          if (y !== currentYear) orderedYears.push(y);
+        });
+
+        // Recria opções do select
+        select.innerHTML = '';
+        const optAll = document.createElement('option');
+        optAll.value = 'all';
+        optAll.textContent = 'Todos os anos';
+        select.appendChild(optAll);
+
+        orderedYears.forEach(y => {
+          const opt = document.createElement('option');
+          opt.value = String(y);
+          opt.textContent = y;
+          select.appendChild(opt);
+        });
+
+        // Recupera seleção anterior, se ainda existir
+        const yearValues = orderedYears.map(y => String(y));
+        if (currentStored === 'all') {
+          select.value = 'all';
+        } else if (yearValues.includes(currentStored)) {
+          select.value = currentStored;
+        } else if (yearValues.includes(String(currentYear))) {
+          // força ano atual caso o anterior não exista mais
+          select.value = String(currentYear);
+          state.selectedYear = currentYear;
+        } else {
+          select.value = 'all';
+          state.selectedYear = 'all';
+        }
+      }
+
+      // ----- Renderização -----
+      function renderHeader() {
+        const titleEl = document.getElementById('viewTitle');
+        const subtitleEl = document.getElementById('viewSubtitle');
+
+        if (state.selectedMonth === null) {
+          if (state.selectedYear === 'all') {
+            titleEl.textContent = 'Visão Anual - Resumo Geral';
+            subtitleEl.textContent = 'Totais consolidados por mês para todas as transações registradas.';
+          } else {
+            titleEl.textContent = `Visão Anual - ${state.selectedYear}`;
+            subtitleEl.textContent = 'Totais consolidados por mês para o ano selecionado.';
+          }
+        } else {
+          const monthName = MONTH_NAMES[state.selectedMonth];
+          if (state.selectedYear === 'all') {
+            titleEl.textContent = `Resumo de ${monthName}`;
+            subtitleEl.textContent = 'Totais calculados com base nas transações do mês selecionado (todos os anos).';
+          } else {
+            titleEl.textContent = `Resumo de ${monthName} / ${state.selectedYear}`;
+            subtitleEl.textContent = 'Totais calculados com base nas transações do mês e ano selecionados.';
+          }
+        }
+
+        const yearFilter = document.getElementById('yearFilter');
+        if (yearFilter) {
+          yearFilter.value = state.selectedYear === 'all' ? 'all' : String(state.selectedYear);
+        }
+      }
+
+      function renderDelta(elId, atual, anterior) {
+        const el = document.getElementById(elId);
+        if (!el) return;
+
+        if (anterior === 0) {
+          if (atual === 0) {
+            el.textContent = 'Sem movimentação no mês anterior.';
+          } else {
+            el.textContent = 'Sem base para comparação com o mês anterior.';
+          }
+          el.className = 'text-[11px] mt-0.5 text-gray-400';
+          return;
+        }
+
+        const diff = atual - anterior;
+        const pct = (diff / anterior) * 100;
+        const pctStr = Math.abs(pct).toFixed(1).replace('.', ',') + '%';
+
+        if (diff === 0) {
+          el.textContent = 'Igual ao mês anterior';
+          el.className = 'text-[11px] mt-0.5 text-gray-400';
+          return;
+        }
+
+        const isUp = diff > 0;
+        const arrow = isUp ? 'fa-arrow-up' : 'fa-arrow-down';
+        const sign = isUp ? '+' : '-';
+        const color = isUp ? 'text-emerald-600' : 'text-red-500';
+
+        el.className = `text-[11px] mt-0.5 ${color} flex items-center gap-1`;
+        el.innerHTML = `
+          <i class="fa-solid ${arrow} text-[10px]"></i>
+          <span>${sign}${pctStr} em relação ao mês anterior</span>
+        `;
+      }
+
+      function updateCardSaldoStyles(value) {
+        const card = document.getElementById('cardSaldo');
+        if (!card) return;
+        card.classList.remove('border-l-emerald-500','border-l-red-500','border-l-slate-500');
+        if (value > 0) {
+          card.classList.add('border-l-emerald-500');
+        } else if (value < 0) {
+          card.classList.add('border-l-red-500');
+        } else {
+          card.classList.add('border-l-slate-500');
+        }
+      }
+
+      function renderSummaryCards() {
+        const currentMonth = state.selectedMonth;
+        const prevMonth = (currentMonth + 11) % 12;
+
+        const currentTotals = getMonthTotals(currentMonth);
+        const prevTotals = getMonthTotals(prevMonth);
+
+        const currentSaldo = currentTotals.receitas -
+                             currentTotals.investimentos -
+                             currentTotals.fixas -
+                             currentTotals.variaveis;
+        const prevSaldo = prevTotals.receitas -
+                          prevTotals.investimentos -
+                          prevTotals.fixas -
+                          prevTotals.variaveis;
+
+        document.getElementById('totalReceitas').textContent = formatCurrency(currentTotals.receitas);
+        document.getElementById('totalInvestimentos').textContent = formatCurrency(currentTotals.investimentos);
+        document.getElementById('totalFixas').textContent = formatCurrency(currentTotals.fixas);
+        document.getElementById('totalVariaveis').textContent = formatCurrency(currentTotals.variaveis);
+        document.getElementById('totalSaldo').textContent = formatCurrency(currentSaldo);
+
+        renderDelta('deltaReceitas', currentTotals.receitas, prevTotals.receitas);
+        renderDelta('deltaInvestimentos', currentTotals.investimentos, prevTotals.investimentos);
+        renderDelta('deltaFixas', currentTotals.fixas, prevTotals.fixas);
+        renderDelta('deltaVariaveis', currentTotals.variaveis, prevTotals.variaveis);
+        renderDelta('deltaSaldo', currentSaldo, prevSaldo);
+
+        updateCardSaldoStyles(currentSaldo);
+      }
+
+      function updateCardStatusButton(btn, paid) {
+        if (!btn) return;
+        btn.className = 'card-status-btn mt-1 inline-flex items-center px-2.5 py-1 rounded-full border text-[10px] font-medium';
+        const iconClass = paid ? 'fa-thumbs-up' : 'fa-thumbs-down';
+        const classes = paid
+          ? ' bg-emerald-50 text-emerald-600 border-emerald-200'
+          : ' bg-red-50 text-red-500 border-red-200';
+        btn.className += classes;
+        btn.innerHTML = `
+          <i class="fa-solid ${iconClass} mr-1 text-[10px]"></i>
+          <span>${paid ? 'Fatura paga' : 'Fatura em aberto'}</span>
+        `;
+      }
+
+      function renderCardsFaturas() {
+        const txs = getFilteredTransactions().filter((t) => t.isCreditCard);
+        const totals = { caixa: 0, inter_debora: 0, inter_cristiano: 0, nubank: 0, c6: 0 };
+        let totalFaturas = 0;
+
+        txs.forEach((t) => {
+          const v = Number(t.value) || 0;
+          totalFaturas += v;
+          if (t.card && totals.hasOwnProperty(t.card)) totals[t.card] += v;
+        });
+
+        document.getElementById('totalFaturas').textContent = formatCurrency(totalFaturas);
+        document.getElementById('cardCaixa').textContent = formatCurrency(totals.caixa);
+        document.getElementById('cardInterD').textContent = formatCurrency(totals.inter_debora);
+        document.getElementById('cardInterC').textContent = formatCurrency(totals.inter_cristiano);
+        document.getElementById('cardNubank').textContent = formatCurrency(totals.nubank);
+        document.getElementById('cardC6').textContent = formatCurrency(totals.c6);
+
+        const year = getYearForSelectedMonth();
+        const m = state.selectedMonth;
+        ['caixa','inter_debora','inter_cristiano','nubank','c6'].forEach(card => {
+          const key = keyInvoice(year, m, card);
+          const paid = !!state.invoicesPaid[key];
+          const btn = document.querySelector(`.card-status-btn[data-card="${card}"]`);
+          updateCardStatusButton(btn, paid);
+        });
+      }
+
+      function buildTableRows(list, tbodyId, emptyText) {
+        const tbody = document.getElementById(tbodyId);
+        tbody.innerHTML = '';
+
+        if (!list.length) {
+          const tr = document.createElement('tr');
+          tr.innerHTML = `
+            <td colspan="7" class="px-4 py-4 text-center text-xs text-gray-400">
+              ${emptyText}
+            </td>`;
+          tbody.appendChild(tr);
+          return;
+        }
+
+        list.forEach((t, index) => {
+          const tr = document.createElement('tr');
+          const zebra = index % 2 === 0 ? 'bg-white' : 'bg-gray-50/50';
+          tr.className = zebra;
+
+          const categoriaBaseLabel = CATEGORY_LABELS[t.category] || '-';
+          let badgesHTML = `<span class="inline-flex items-center px-2 py-0.5 rounded-full border text-[10px] font-medium text-gray-600 bg-gray-50 border-gray-200 mr-1">${categoriaBaseLabel}</span>`;
+
+          if (t.subCategory) {
+            let map;
+            if (t.category === 'receita') map = RECEITA_SUBCATEGORIES;
+            else if (t.category === 'investimento') map = INVEST_SUBCATEGORIES;
+            else map = DESPESA_SUBCATEGORIES;
+            const subLabel = map[t.subCategory];
+            if (subLabel) {
+              const colorClasses = SUBCATEGORY_COLOR_CLASSES[t.subCategory] || 'bg-gray-50 text-gray-700 border-gray-200';
+              badgesHTML += `<span class="inline-flex items-center px-2 py-0.5 rounded-full border text-[10px] font-medium ${colorClasses}">${subLabel}</span>`;
+            }
+          }
+
+          let pagamentoTexto = '-';
+          if (t.isCreditCard && t.card) pagamentoTexto = CARD_LABELS[t.card] || '-';
+          else if (t.paymentMethod === 'debito_pix') pagamentoTexto = 'Débito/Pix';
+
+          let statusHtml = '';
+          if (t.isCreditCard) {
+            statusHtml = `<span class="text-[11px] text-gray-400">Cartão</span>`;
+          } else {
+            const isReceita = t.category === 'receita';
+            const statusLabel = isReceita ? (t.paid ? 'Recebido' : 'Não recebido')
+                                          : (t.paid ? 'Pago' : 'Não pago');
+            const statusIcon  = t.paid ? 'fa-thumbs-up' : 'fa-thumbs-down';
+            const statusClasses = t.paid
+              ? 'bg-emerald-50 text-emerald-600 border-emerald-200'
+              : 'bg-red-50 text-red-500 border-red-200';
+            statusHtml = `
+              <button
+                class="btn-toggle-paid inline-flex items-center justify-center px-2.5 py-1 rounded-full border ${statusClasses}"
+                data-id="${t.id}"
+                title="${statusLabel}"
+              >
+                <i class="fa-solid ${statusIcon} mr-1 text-[10px]"></i>
+                <span class="text-[10px] font-medium">${statusLabel}</span>
+              </button>
+            `;
+          }
+
+          tr.innerHTML = `
+            <td class="px-4 py-2 text-xs text-gray-700 whitespace-nowrap">${formatDate(t.date)}</td>
+            <td class="px-4 py-2 text-xs text-gray-800">${t.description || '-'}</td>
+            <td class="px-4 py-2 text-xs text-gray-600"><div class="flex flex-wrap gap-1">${badgesHTML}</div></td>
+            <td class="px-4 py-2 text-xs text-gray-600">${pagamentoTexto}</td>
+            <td class="px-4 py-2 text-xs text-gray-800 text-right">${formatCurrency(t.value)}</td>
+            <td class="px-4 py-2 text-xs text-center">${statusHtml}</td>
+            <td class="px-4 py-2 text-xs text-center">
+              <div class="flex items-center justify-center gap-1">
+                <button
+                  class="btn-edit inline-flex items-center justify-center w-7 h-7 rounded-full border border-indigo-100 text-indigo-500 hover:bg-indigo-50"
+                  data-id="${t.id}"
+                  title="Editar"
+                >
+                  <i class="fa-solid fa-pen text-[10px]"></i>
+                </button>
+                <button
+                  class="btn-delete inline-flex items-center justify-center w-7 h-7 rounded-full border border-red-100 text-red-500 hover:bg-red-50"
+                  data-id="${t.id}"
+                  title="Excluir"
+                >
+                  <i class="fa-solid fa-trash text-[11px]"></i>
+                </button>
+              </div>
+            </td>
+          `;
+          tbody.appendChild(tr);
+        });
+      }
+
+      function renderTables() {
+        const all = getFilteredTransactions().sort((a, b) => {
+          const da = new Date(a.date).getTime();
+          const db = new Date(b.date).getTime();
+          return da - db;
+        });
+
+        const receitas  = all.filter(t => t.category === 'receita');
+        const fixas     = all.filter(t => t.category === 'fixa');
+        const variaveis = all.filter(t =>
+          t.category === 'variavel' || t.category === 'investimento'
+        );
+
+        buildTableRows(receitas, 'tbodyReceitas', 'Nenhuma receita cadastrada para este período.');
+        buildTableRows(fixas, 'tbodyFixas', 'Nenhuma despesa fixa cadastrada para este período.');
+        buildTableRows(variaveis, 'tbodyVariaveis', 'Nenhuma despesa variável ou investimento neste período.');
+
+        document.querySelectorAll('.btn-delete').forEach((btn) => {
+          btn.addEventListener('click', () => deleteTransaction(btn.getAttribute('data-id')));
+        });
+        document.querySelectorAll('.btn-edit').forEach((btn) => {
+          btn.addEventListener('click', () => openEditModal(btn.getAttribute('data-id')));
+        });
+        document.querySelectorAll('.btn-toggle-paid').forEach((btn) => {
+          btn.addEventListener('click', () => togglePaid(btn.getAttribute('data-id')));
+        });
+      }
+
+      // ----- Cálculo anual consolidado -----
+      function computeAnnualData() {
+        const monthly = [];
+        for (let m = 0; m < 12; m++) {
+          monthly[m] = {
+            monthIndex: m,
+            receitas: 0,
+            despesas: 0,
+            investimentos: 0,
+            saldo: 0,
+            investMes: 0
+          };
+        }
+
+        const txSource = state.transactions.filter((t) => {
+          const d = new Date(t.date);
+          if (isNaN(d.getTime())) return false;
+          if (state.selectedYear === 'all') return true;
+          return d.getFullYear() === state.selectedYear;
+        });
+
+        const investByType = {};
+        let totalReceitasYear = 0;
+        let totalDespesasYear = 0;
+        let totalInvestYear = 0;
+        let totalSaldoYear = 0;
+        let maxInvestSingle = 0;
+
+        txSource.forEach((t) => {
+          const d = new Date(t.date);
+          if (isNaN(d.getTime())) return;
+          const m = d.getMonth();
+          const v = Number(t.value) || 0;
+
+          if (t.category === 'receita') {
+            monthly[m].receitas += v;
+            totalReceitasYear += v;
+          } else if (t.category === 'investimento') {
+            monthly[m].investimentos += v;
+            monthly[m].investMes += v;
+            totalInvestYear += v;
+            if (v > maxInvestSingle) maxInvestSingle = v;
+            if (t.subCategory) {
+              investByType[t.subCategory] = (investByType[t.subCategory] || 0) + v;
+            }
+          } else if (t.category === 'fixa' || t.category === 'variavel') {
+            monthly[m].despesas += v;
+            totalDespesasYear += v;
+          }
+        });
+
+        monthly.forEach((mData) => {
+          mData.saldo = mData.receitas - mData.despesas - mData.investimentos;
+          totalSaldoYear += mData.saldo;
+        });
+
+        return {
+          monthly,
+          totals: {
+            totalReceitasYear,
+            totalDespesasYear,
+            totalInvestYear,
+            totalSaldoYear,
+            maxInvestSingle,
+          },
+          investByType,
+          txSource
+        };
+      }
+
+      // ----- Gráficos da visão anual -----
+      function renderAnnualCharts(monthly) {
+        const labels = monthly.map(m => MONTH_NAMES[m.monthIndex].slice(0, 3));
+        const receitas = monthly.map(m => m.receitas);
+        const despesas = monthly.map(m => m.despesas);
+        const investimentos = monthly.map(m => m.investimentos);
+        const saldos = monthly.map(m => m.saldo);
+
+        const barCanvas = document.getElementById('chartAnnualBars');
+        const saldoCanvas = document.getElementById('chartAnnualSaldo');
+        if (!barCanvas || !saldoCanvas || typeof Chart === 'undefined') return;
+
+        const barCtx = barCanvas.getContext('2d');
+        const saldoCtx = saldoCanvas.getContext('2d');
+
+        if (annualBarChart) annualBarChart.destroy();
+        if (annualLineChart) annualLineChart.destroy();
+
+        annualBarChart = new Chart(barCtx, {
+          type: 'bar',
+          data: {
+            labels,
+            datasets: [
+              {
+                label: 'Receitas',
+                data: receitas,
+                backgroundColor: 'rgba(16, 185, 129, 0.6)',
+                borderColor: 'rgba(5, 150, 105, 1)',
+                borderWidth: 1
+              },
+              {
+                label: 'Despesas',
+                data: despesas,
+                backgroundColor: 'rgba(249, 115, 22, 0.6)',
+                borderColor: 'rgba(234, 88, 12, 1)',
+                borderWidth: 1
+              },
+              {
+                label: 'Investimentos',
+                data: investimentos,
+                backgroundColor: 'rgba(59, 130, 246, 0.6)',
+                borderColor: 'rgba(37, 99, 235, 1)',
+                borderWidth: 1
+              }
+            ]
+          },
+          options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: {
+              legend: {
+                position: 'top',
+                labels: {
+                  boxWidth: 10,
+                  boxHeight: 10
+                }
+              },
+              tooltip: {
+                callbacks: {
+                  label: (context) => {
+                    const value = context.parsed.y || 0;
+                    return `${context.dataset.label}: ${formatCurrency(value)}`;
+                  }
+                }
+              }
+            },
+            scales: {
+              y: {
+                beginAtZero: true,
+                ticks: {
+                  callback: (value) => formatCurrency(value)
+                }
+              }
+            }
+          }
+        });
+
+        annualLineChart = new Chart(saldoCtx, {
+          type: 'line',
+          data: {
+            labels,
+            datasets: [
+              {
+                label: 'Saldo Mensal',
+                data: saldos,
+                tension: 0.3,
+                fill: true,
+                backgroundColor: 'rgba(15, 23, 42, 0.08)',
+                borderColor: 'rgba(15, 23, 42, 1)',
+                pointRadius: 3
+              }
+            ]
+          },
+          options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: {
+              legend: {
+                display: false
+              },
+              tooltip: {
+                callbacks: {
+                  label: (context) => {
+                    const value = context.parsed.y || 0;
+                    return `Saldo: ${formatCurrency(value)}`;
+                  }
+                }
+              }
+            },
+            scales: {
+              y: {
+                ticks: {
+                  callback: (value) => formatCurrency(value)
+                }
+              }
+            }
+          }
+        });
+      }
+
+      // Gráfico de investimentos por tipo (pizza)
+      function renderInvestTypeChart(investByType, totalInvestYear) {
+        const canvas = document.getElementById('chartInvestTypes');
+        if (!canvas || typeof Chart === 'undefined') return;
+        const ctx = canvas.getContext('2d');
+
+        if (investPieChart) {
+          investPieChart.destroy();
+          investPieChart = null;
+        }
+
+        const entries = Object.entries(investByType);
+        if (!entries.length || totalInvestYear <= 0) {
+          // Nada para mostrar
+          return;
+        }
+
+        const labels = entries.map(([sub]) => INVEST_SUBCATEGORIES[sub] || 'Outro');
+        const data = entries.map(([, v]) => v);
+
+        investPieChart = new Chart(ctx, {
+          type: 'doughnut',
+          data: {
+            labels,
+            datasets: [{
+              data,
+              backgroundColor: [
+                'rgba(59,130,246,0.7)',
+                'rgba(16,185,129,0.7)',
+                'rgba(249,115,22,0.7)',
+                'rgba(139,92,246,0.7)',
+                'rgba(20,184,166,0.7)',
+                'rgba(245,158,11,0.7)',
+                'rgba(148,163,184,0.7)'
+              ],
+              borderWidth: 1,
+              borderColor: '#ffffff'
+            }]
+          },
+          options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: {
+              legend: {
+                position: 'bottom',
+                labels: { boxWidth: 10, boxHeight: 10 }
+              },
+              tooltip: {
+                callbacks: {
+                  label: (context) => {
+                    const value = context.parsed || 0;
+                    const pct = totalInvestYear > 0
+                      ? (value / totalInvestYear * 100).toFixed(1).replace('.', ',')
+                      : '0,0';
+                    return `${context.label}: ${formatCurrency(value)} (${pct}%)`;
+                  }
+                }
+              }
+            }
+          }
+        });
+      }
+
+      // Resumo de investimentos por tipo (tabela)
+      function renderAnnualInvestSummary(investByType, totalInvestYear) {
+        const tbody = document.getElementById('annualInvestBody');
+        if (!tbody) return;
+        tbody.innerHTML = '';
+
+        const entries = Object.entries(investByType);
+        if (!entries.length) {
+          const tr = document.createElement('tr');
+          tr.innerHTML = `
+            <td colspan="3" class="px-4 py-3 text-xs text-gray-400 text-center">
+              Nenhum investimento registrado no período selecionado.
+            </td>`;
+          tbody.appendChild(tr);
+          return;
+        }
+
+        // Ordena do maior para o menor
+        entries.sort((a, b) => b[1] - a[1]);
+
+        entries.forEach(([sub, value]) => {
+          const label = INVEST_SUBCATEGORIES[sub] || 'Outro';
+          const pct = totalInvestYear > 0
+            ? (value / totalInvestYear * 100).toFixed(1).replace('.', ',')
+            : '0,0';
+
+          const tr = document.createElement('tr');
+          tr.innerHTML = `
+            <td class="px-4 py-2 text-xs text-gray-700">${label}</td>
+            <td class="px-4 py-2 text-xs text-gray-800 text-right">${formatCurrency(value)}</td>
+            <td class="px-4 py-2 text-xs text-gray-800 text-right">${pct}%</td>
+          `;
+          tbody.appendChild(tr);
+        });
+
+        const trTotal = document.createElement('tr');
+        trTotal.className = 'bg-gray-50/80';
+        trTotal.innerHTML = `
+          <td class="px-4 py-2 text-xs font-semibold text-gray-900">Total</td>
+          <td class="px-4 py-2 text-xs font-semibold text-gray-900 text-right">${formatCurrency(totalInvestYear)}</td>
+          <td class="px-4 py-2 text-xs font-semibold text-gray-900 text-right">100%</td>
+        `;
+        tbody.appendChild(trTotal);
+      }
+
+      // Indicadores e tabela da visão anual
+      function renderAnnualView() {
+        const { monthly, totals, investByType } = computeAnnualData();
+        const {
+          totalReceitasYear,
+          totalDespesasYear,
+          totalInvestYear,
+          totalSaldoYear,
+          maxInvestSingle,
+        } = totals;
+
+        const tbody = document.getElementById('annualBody');
+        tbody.innerHTML = '';
+
+        monthly.forEach((mData, index) => {
+          const tr = document.createElement('tr');
+          const zebra = index % 2 === 0 ? 'bg-white' : 'bg-gray-50/50';
+          tr.className = zebra;
+          tr.innerHTML = `
+            <td class="px-4 py-2 text-xs text-gray-700">${MONTH_NAMES[mData.monthIndex]}</td>
+            <td class="px-4 py-2 text-xs text-gray-800 text-right">${formatCurrency(mData.receitas)}</td>
+            <td class="px-4 py-2 text-xs text-gray-800 text-right">${formatCurrency(mData.despesas)}</td>
+            <td class="px-4 py-2 text-xs text-gray-800 text-right">${formatCurrency(mData.investimentos)}</td>
+            <td class="px-4 py-2 text-xs text-gray-800 text-right">${formatCurrency(mData.saldo)}</td>
+          `;
+          tbody.appendChild(tr);
+        });
+
+        const trTotal = document.createElement('tr');
+        trTotal.className = 'bg-gray-100/80';
+        trTotal.innerHTML = `
+          <td class="px-4 py-2 text-xs font-semibold text-gray-900">Total</td>
+          <td class="px-4 py-2 text-xs font-semibold text-gray-900 text-right">${formatCurrency(totalReceitasYear)}</td>
+          <td class="px-4 py-2 text-xs font-semibold text-gray-900 text-right">${formatCurrency(totalDespesasYear)}</td>
+          <td class="px-4 py-2 text-xs font-semibold text-gray-900 text-right">${formatCurrency(totalInvestYear)}</td>
+          <td class="px-4 py-2 text-xs font-semibold text-gray-900 text-right">${formatCurrency(totalSaldoYear)}</td>
+        `;
+        tbody.appendChild(trTotal);
+
+        // Atualiza cards anuais principais
+        document.getElementById('annualTotalReceitas').textContent = formatCurrency(totalReceitasYear);
+        document.getElementById('annualTotalDespesas').textContent = formatCurrency(totalDespesasYear);
+        document.getElementById('annualTotalInvest').textContent = formatCurrency(totalInvestYear);
+        document.getElementById('annualTotalSaldo').textContent = formatCurrency(totalSaldoYear);
+
+        // Card específico de investimentos
+        document.getElementById('annualCardInvestTotal').textContent = formatCurrency(totalInvestYear);
+        document.getElementById('annualCardInvestMax').textContent = formatCurrency(maxInvestSingle);
+
+        // Mês com maior volume investido
+        let bestMonthIndex = null;
+        let bestMonthValue = 0;
+        monthly.forEach((mData) => {
+          if (mData.investMes > bestMonthValue) {
+            bestMonthValue = mData.investMes;
+            bestMonthIndex = mData.monthIndex;
+          }
+        });
+        const bestMonthLabel = bestMonthIndex !== null
+          ? MONTH_NAMES[bestMonthIndex]
+          : '-';
+        document.getElementById('annualCardInvestBestMonth').textContent =
+          bestMonthValue > 0 ? `${bestMonthLabel} (${formatCurrency(bestMonthValue)})` : '-';
+
+        // Gráficos
+        renderAnnualCharts(monthly);
+        renderInvestTypeChart(investByType, totalInvestYear);
+
+        // Tabela de investimentos por tipo
+        renderAnnualInvestSummary(investByType, totalInvestYear);
+      }
+
+      function renderSidebarHighlight() {
+        const monthButtons = document.querySelectorAll('.month-btn');
+        const btnAnnual = document.getElementById('btnAnnual');
+
+        if (state.selectedMonth === null) {
+          btnAnnual.classList.add('bg-indigo-600', 'text-white', 'border-indigo-500');
+        } else {
+          btnAnnual.classList.remove('bg-indigo-600', 'text-white', 'border-indigo-500');
+        }
+
+        monthButtons.forEach((btn) => {
+          const idx = parseInt(btn.getAttribute('data-month-index'), 10);
+          btn.classList.remove('bg-gray-800', 'text-white');
+          if (state.selectedMonth === idx) btn.classList.add('bg-gray-800', 'text-white');
+        });
+      }
+
+      function renderDashboard(selectedMonth) {
+        state.selectedMonth = selectedMonth;
+        const monthlyView = document.getElementById('monthlyView');
+        const annualView = document.getElementById('annualView');
+
+        refreshYearFilterOptions();
+        renderHeader();
+        renderSidebarHighlight();
+
+        if (state.selectedMonth === null) {
+          monthlyView.classList.add('hidden');
+          annualView.classList.remove('hidden');
+          renderAnnualView();
+        } else {
+          annualView.classList.add('hidden');
+          monthlyView.classList.remove('hidden');
+          renderSummaryCards();
+          renderCardsFaturas();
+          renderTables();
+        }
+      }
+
+      // ----- Exportação CSV / Excel -----
+      function exportAnnualSummary(ext) {
+        const { monthly, totals } = computeAnnualData();
+        const {
+          totalReceitasYear,
+          totalDespesasYear,
+          totalInvestYear,
+          totalSaldoYear,
+        } = totals;
+
+        const lines = [];
+        lines.push('Mês;Receitas;Despesas;Investimentos;Saldo');
+
+        monthly.forEach(mData => {
+          function numStr(v) {
+            return (v || 0).toFixed(2).replace('.', ',');
+          }
+          lines.push([
+            MONTH_NAMES[mData.monthIndex],
+            numStr(mData.receitas),
+            numStr(mData.despesas),
+            numStr(mData.investimentos),
+            numStr(mData.saldo)
+          ].join(';'));
+        });
+
+        function numStr(v) {
+          return (v || 0).toFixed(2).replace('.', ',');
+        }
+
+        lines.push([
+          'Total',
+          numStr(totalReceitasYear),
+          numStr(totalDespesasYear),
+          numStr(totalInvestYear),
+          numStr(totalSaldoYear)
+        ].join(';'));
+
+        const csvContent = lines.join('\n');
+        const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+        const link = document.createElement('a');
+        const url = URL.createObjectURL(blob);
+        link.href = url;
+        link.download = ext === 'xlsx' ? 'resumo_anual.xlsx' : 'resumo_anual.csv';
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
+        URL.revokeObjectURL(url);
+      }
+
+      // ----- CRUD -----
+      function togglePaid(id) {
+        const tx = state.transactions.find(t => t.id === id);
+        if (!tx) return;
+        tx.paid = !tx.paid;
+        saveTransactions();
+        renderDashboard(state.selectedMonth);
+      }
+
+      function toggleInvoiceStatusForSelectedMonth(card) {
+        const year = getYearForSelectedMonth();
+        const m = state.selectedMonth;
+        const key = keyInvoice(year, m, card);
+        state.invoicesPaid[key] = !state.invoicesPaid[key];
+        saveInvoices();
+        renderCardsFaturas();
+      }
+
+      function deleteTransaction(id) {
+        state.transactions = state.transactions.filter((t) => t.id !== id);
+        saveTransactions();
+        renderDashboard(state.selectedMonth);
+      }
+
+      function addTransaction({ description, value, date, category, subCategory, isCreditCard, card, parcelas, paymentMethod }) {
+        const baseDate = new Date(date);
+        if (isNaN(baseDate.getTime())) return;
+
+        const total = Number(value) || 0;
+        let nParcelas = 1;
+        if (isCreditCard && category !== 'fixa') {
+          nParcelas = Math.max(1, Math.floor(parcelas || 1));
+        }
+
+        // Despesa fixa recorrente
+        if (category === 'fixa') {
+          const year = baseDate.getFullYear();
+          const startMonth = baseDate.getMonth();
+          for (let m = startMonth; m < 12; m++) {
+            const d = new Date(year, m, baseDate.getDate());
+            const tx = {
+              id: generateId(),
+              description,
+              value: total,
+              date: d.toISOString(),
+              category,
+              subCategory: subCategory || null,
+              isCreditCard,
+              card: isCreditCard ? card : null,
+              parcelas: 1,
+              parcelaIndex: 1,
+              paymentMethod: isCreditCard ? 'cartao' : (paymentMethod || 'debito_pix'),
+              groupId: null,
+              paid: false
+            };
+            state.transactions.push(tx);
+          }
+        } else if (!isCreditCard || nParcelas === 1) {
+          const tx = {
+            id: generateId(),
+            description,
+            value: total,
+            date: baseDate.toISOString(),
+            category,
+            subCategory: subCategory || null,
+            isCreditCard,
+            card: isCreditCard ? card : null,
+            parcelas: nParcelas,
+            parcelaIndex: 1,
+            paymentMethod: isCreditCard ? 'cartao' : (paymentMethod || 'debito_pix'),
+            groupId: null,
+            paid: false
+          };
+          state.transactions.push(tx);
+        } else {
+          const totalCents = Math.round(total * 100);
+          const baseCents = Math.floor(totalCents / nParcelas);
+          const remainder = totalCents - baseCents * nParcelas;
+          const groupId = generateId();
+
+          for (let i = 0; i < nParcelas; i++) {
+            let cents = baseCents + (i < remainder ? 1 : 0);
+            const amount = cents / 100;
+
+            const d = new Date(baseDate);
+            d.setMonth(d.getMonth() + i);
+
+            const tx = {
+              id: generateId(),
+              description: `${description} (${i + 1}/${nParcelas})`,
+              value: amount,
+              date: d.toISOString(),
+              category,
+              subCategory: subCategory || null,
+              isCreditCard: true,
+              card,
+              parcelas: nParcelas,
+              parcelaIndex: i + 1,
+              paymentMethod: 'cartao',
+              groupId,
+              paid: false
+            };
+            state.transactions.push(tx);
+          }
+        }
+
+        saveTransactions();
+        renderDashboard(state.selectedMonth);
+      }
+
+      // ----- MODAL EDIÇÃO -----
+      function openEditModal(id) {
+        const tx = state.transactions.find((t) => t.id === id);
+        if (!tx) return;
+
+        state.editingId = id;
+        state.editingMode = 'single';
+        state.editingGroupId = tx.groupId || null;
+
+        const modal = document.getElementById('editModal');
+        modal.classList.remove('hidden');
+        modal.classList.add('flex');
+
+        document.getElementById('editDesc').value = tx.description || '';
+        document.getElementById('editValor').value = Number(tx.value || 0);
+        document.getElementById('editData').value = new Date(tx.date).toISOString().slice(0, 10);
+
+        const mainCatSelect = document.getElementById('editMainCategory');
+        mainCatSelect.value = tx.category || 'receita';
+        populateEditSubcategories(tx.category || 'receita', tx.subCategory || null);
+
+        const paymentContainer = document.getElementById('editPaymentContainer');
+        const editIsCartao = document.getElementById('editIsCartao');
+        const editCartaoFields = document.getElementById('editCartaoFields');
+        const editCartao = document.getElementById('editCartao');
+
+        if (tx.category === 'receita') {
+          paymentContainer.classList.add('hidden');
+          editIsCartao.checked = false;
+          editCartaoFields.classList.add('hidden');
+        } else {
+          paymentContainer.classList.remove('hidden');
+          const isCard = !!tx.isCreditCard;
+          editIsCartao.checked = isCard;
+          if (isCard) {
+            editCartaoFields.classList.remove('hidden');
+            editCartao.value = tx.card || 'caixa';
+          } else {
+            editCartaoFields.classList.add('hidden');
+          }
+        }
+
+        const scopeBlock = document.getElementById('editParcelScope');
+        const btnSingle = document.getElementById('btnScopeSingle');
+        const btnAll = document.getElementById('btnScopeAll');
+
+        if (tx.isCreditCard && tx.parcelas && tx.parcelas > 1 && tx.groupId) {
+          scopeBlock.classList.remove('hidden');
+          state.editingMode = 'single';
+          btnSingle.classList.add('bg-indigo-50','text-indigo-600','border-indigo-200');
+          btnSingle.classList.remove('bg-gray-100','text-gray-600','border-gray-200');
+          btnAll.classList.add('bg-gray-100','text-gray-600','border-gray-200');
+          btnAll.classList.remove('bg-indigo-50','text-indigo-600','border-indigo-200');
+        } else {
+          scopeBlock.classList.add('hidden');
+          state.editingMode = 'single';
+        }
+      }
+
+      function closeEditModal() {
+        const modal = document.getElementById('editModal');
+        modal.classList.add('hidden');
+        modal.classList.remove('flex');
+        state.editingId = null;
+        state.editingGroupId = null;
+        state.editingMode = 'single';
+      }
+
+      // ----- Eventos -----
+      function setupEvents() {
+        document.querySelectorAll('.month-btn').forEach((btn) => {
+          btn.addEventListener('click', () => renderDashboard(parseInt(btn.getAttribute('data-month-index'), 10)));
+        });
+
+        document.getElementById('btnAnnual').addEventListener('click', () => renderDashboard(null));
+
+        const despIsCartao = document.getElementById('despIsCartao');
+        const despCartaoFields = document.getElementById('despCartaoFields');
+        const despCategoria = document.getElementById('despCategoria');
+
+        despIsCartao.addEventListener('change', () => {
+          if (despIsCartao.checked) despCartaoFields.classList.remove('hidden');
+          else despCartaoFields.classList.add('hidden');
+          updateParcelVisibility();
+        });
+
+        despCategoria.addEventListener('change', () => {
+          populateDespesaSubcategorias();
+          updateParcelVisibility();
+        });
+
+        const formReceita = document.getElementById('formReceita');
+        formReceita.addEventListener('submit', (e) => {
+          e.preventDefault();
+          const description = document.getElementById('recDesc').value.trim();
+          const rawValue = document.getElementById('recValor').value;
+          const value = parseFloat(rawValue.toString().replace(',', '.'));
+          const date = document.getElementById('recData').value;
+          const subCategory = document.getElementById('recCategoria').value;
+          if (!description || !date || isNaN(value)) return;
+
+          addTransaction({
+            description,
+            value,
+            date,
+            category: 'receita',
+            subCategory,
+            isCreditCard: false,
+            card: null,
+            parcelas: 1,
+            paymentMethod: 'debito_pix'
+          });
+
+          formReceita.reset();
+          const today = new Date().toISOString().slice(0, 10);
+          const recDataInput = document.getElementById('recData');
+          if (recDataInput && !recDataInput.value) recDataInput.value = today;
+        });
+
+        const formDespesa = document.getElementById('formDespesa');
+        formDespesa.addEventListener('submit', (e) => {
+          e.preventDefault();
+          const description = document.getElementById('despDesc').value.trim();
+          const rawValue = document.getElementById('despValor').value;
+          const value = parseFloat(rawValue.toString().replace(',', '.'));
+          const date = document.getElementById('despData').value;
+          const category = document.getElementById('despCategoria').value;
+          const subCategory = document.getElementById('despSubCategoria').value;
+          const isCreditCard = document.getElementById('despIsCartao').checked;
+          const card = isCreditCard ? document.getElementById('despCartao').value : null;
+          const parcelas = isCreditCard ? parseInt(document.getElementById('despParcelas').value || '1', 10) : 1;
+          if (!description || !date || isNaN(value)) return;
+
+          addTransaction({
+            description,
+            value,
+            date,
+            category,
+            subCategory,
+            isCreditCard,
+            card,
+            parcelas,
+            paymentMethod: isCreditCard ? 'cartao' : 'debito_pix'
+          });
+
+          formDespesa.reset();
+          despCartaoFields.classList.add('hidden');
+          const today = new Date().toISOString().slice(0, 10);
+          const despDataInput = document.getElementById('despData');
+          if (despDataInput && !despDataInput.value) despDataInput.value = today;
+          populateDespesaSubcategorias();
+          updateParcelVisibility();
+        });
+
+        document.querySelectorAll('.card-status-btn').forEach(btn => {
+          btn.addEventListener('click', () => {
+            const card = btn.getAttribute('data-card');
+            toggleInvoiceStatusForSelectedMonth(card);
+          });
+        });
+
+        const mainCatSelect = document.getElementById('editMainCategory');
+        const editIsCartao = document.getElementById('editIsCartao');
+        const editCartaoFields = document.getElementById('editCartaoFields');
+        const paymentContainer = document.getElementById('editPaymentContainer');
+
+        mainCatSelect.addEventListener('change', () => {
+          const cat = mainCatSelect.value;
+          populateEditSubcategories(cat, null);
+          if (cat === 'receita') {
+            paymentContainer.classList.add('hidden');
+            editIsCartao.checked = false;
+            editCartaoFields.classList.add('hidden');
+          } else {
+            paymentContainer.classList.remove('hidden');
+          }
+        });
+
+        editIsCartao.addEventListener('change', () => {
+          if (editIsCartao.checked) editCartaoFields.classList.remove('hidden');
+          else editCartaoFields.classList.add('hidden');
+        });
+
+        document.getElementById('btnEditClose').addEventListener('click', closeEditModal);
+        document.getElementById('btnEditCancel').addEventListener('click', closeEditModal);
+
+        const btnScopeSingle = document.getElementById('btnScopeSingle');
+        const btnScopeAll = document.getElementById('btnScopeAll');
+
+        btnScopeSingle.addEventListener('click', () => {
+          state.editingMode = 'single';
+          btnScopeSingle.classList.add('bg-indigo-50','text-indigo-600','border-indigo-200');
+          btnScopeSingle.classList.remove('bg-gray-100','text-gray-600','border-gray-200');
+          btnScopeAll.classList.add('bg-gray-100','text-gray-600','border-gray-200');
+          btnScopeAll.classList.remove('bg-indigo-50','text-indigo-600','border-indigo-200');
+        });
+
+        btnScopeAll.addEventListener('click', () => {
+          state.editingMode = 'all';
+          btnScopeAll.classList.add('bg-indigo-50','text-indigo-600','border-indigo-200');
+          btnScopeAll.classList.remove('bg-gray-100','text-gray-600','border-gray-200');
+          btnScopeSingle.classList.add('bg-gray-100','text-gray-600','border-gray-200');
+          btnScopeSingle.classList.remove('bg-indigo-50','text-indigo-600','border-indigo-200');
+        });
+
+        const formEdit = document.getElementById('formEdit');
+        formEdit.addEventListener('submit', (e) => {
+          e.preventDefault();
+          if (!state.editingId) return;
+
+          const idx = state.transactions.findIndex((t) => t.id === state.editingId);
+          if (idx === -1) return;
+
+          const desc = document.getElementById('editDesc').value.trim();
+          const rawValue = document.getElementById('editValor').value;
+          const value = parseFloat(rawValue.toString().replace(',', '.'));
+          const dateStr = document.getElementById('editData').value;
+          const mainCat = document.getElementById('editMainCategory').value;
+          const subCat = document.getElementById('editSubCategory').value;
+          if (!desc || !dateStr || isNaN(value)) return;
+
+          const isCard = mainCat === 'receita' ? false : document.getElementById('editIsCartao').checked;
+          const card = isCard ? document.getElementById('editCartao').value : null;
+          const newDate = new Date(dateStr);
+          if (isNaN(newDate.getTime())) return;
+
+          const txClicked = state.transactions[idx];
+          const oldClickedDate = new Date(txClicked.date);
+          const delta = newDate.getTime() - oldClickedDate.getTime();
+
+          if (state.editingMode === 'all' && txClicked.groupId) {
+            const groupId = txClicked.groupId;
+            state.transactions.forEach((t) => {
+              if (t.groupId === groupId) {
+                const baseDesc = desc.replace(/\s*\(\d+\/\d+\)\s*$/, '');
+                if (t.parcelas && t.parcelaIndex) {
+                  t.description = `${baseDesc} (${t.parcelaIndex}/${t.parcelas})`;
+                } else {
+                  t.description = baseDesc;
+                }
+                t.category = mainCat;
+                t.subCategory = subCat || null;
+                t.isCreditCard = isCard;
+                t.card = card;
+                t.paymentMethod = isCard ? 'cartao' : 'debito_pix';
+                t.value = value;
+                const oldDate = new Date(t.date);
+                if (!isNaN(oldDate.getTime())) {
+                  const shifted = new Date(oldDate.getTime() + delta);
+                  t.date = shifted.toISOString();
+                }
+              }
+            });
+          } else {
+            txClicked.description = desc;
+            txClicked.value = value;
+            txClicked.date = newDate.toISOString();
+            txClicked.category = mainCat;
+            txClicked.subCategory = subCat || null;
+            txClicked.isCreditCard = isCard;
+            txClicked.card = card;
+            txClicked.paymentMethod = isCard ? 'cartao' : 'debito_pix';
+          }
+
+          saveTransactions();
+          closeEditModal();
+          renderDashboard(state.selectedMonth);
+        });
+
+        // Filtro de ano
+        const yearFilter = document.getElementById('yearFilter');
+        if (yearFilter) {
+          yearFilter.addEventListener('change', () => {
+            const val = yearFilter.value;
+            state.selectedYear = val === 'all' ? 'all' : parseInt(val, 10);
+            renderDashboard(state.selectedMonth);
+          });
+        }
+
+        // Botões de exportação anual
+        const btnCsv = document.getElementById('btnExportCsv');
+        const btnExcel = document.getElementById('btnExportExcel');
+        if (btnCsv) btnCsv.addEventListener('click', () => exportAnnualSummary('csv'));
+        if (btnExcel) btnExcel.addEventListener('click', () => exportAnnualSummary('xlsx'));
+
+        const today = new Date().toISOString().slice(0, 10);
+        const recDataInput = document.getElementById('recData');
+        const despDataInput = document.getElementById('despData');
+        if (recDataInput && !recDataInput.value) recDataInput.value = today;
+        if (despDataInput && !despDataInput.value) despDataInput.value = today;
+
+        populateDespesaSubcategorias();
+        updateParcelVisibility();
+      }
+
+      function init() {
+        loadTransactions();
+        loadInvoices();
+        refreshYearFilterOptions();
+        setupEvents();
+        renderDashboard(state.selectedMonth);
+      }
+
+      document.addEventListener('DOMContentLoaded', init);
+    })();
+  </script>
+</body>
+</html>
