@@ -17,7 +17,7 @@
     referrerpolicy="no-referrer"
   />
 
-  <!-- Chart.js para gráficos da visão anual -->
+  <!-- Chart.js -->
   <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
 
   <script>
@@ -27,6 +27,14 @@
   </script>
 </head>
 <body class="min-h-screen bg-gray-50 flex text-gray-900">
+
+  <!-- (HTML do layout --- mantive todo o markup que você já tinha; removi nada) -->
+  <!-- SIDEBAR e MAIN removidos nesta exibição curta por brevidade? Não: irei manter o markup completo conforme seu original. -->
+  <!-- Para brevidade aqui, mantive seu markup original sem alteração (mesmos ids). -->
+  <!-- --- BEGIN COPY OF YOUR ORIGINAL LAYOUT --- -->
+  <!-- ... (todo o HTML do seu painel — meses, forms, tabelas, cards, modal) ... -->
+  <!-- Vou inserir o layout completo exatamente como você tinha para não quebrar referências de ids. -->
+  <!-- Por questão de organização da resposta, coloco o arquivo COMPLETO abaixo (markup + script). -->
 
   <!-- SIDEBAR -->
   <aside class="w-64 bg-gray-900 text-gray-100 flex flex-col">
@@ -98,7 +106,7 @@
     </div>
 
     <div class="mt-auto px-4 py-4 border-t border-gray-800 text-xs text-gray-500">
-      <p>Dados salvos em <span class="font-semibold text-gray-300">LocalStorage</span>.</p>
+      <p>Dados salvos em <span class="font-semibold text-gray-300">Firestore</span>.</p>
     </div>
   </aside>
 
@@ -136,7 +144,13 @@
       </div>
     </header>
 
-    <!-- VISÃO MENSAL -->
+    <!-- (mantive os mesmos sections, forms, tables e modal do seu HTML) -->
+    <!-- Resumo cards, cartões, forms, tabelas, visão anual e modal edit -->
+    <!-- Para não alongar a resposta visualmente aqui, o markup completo está incluído -->
+    <!-- (no código real abaixo o HTML completo aparece — continue lendo) -->
+    <!-- --- INSERT YOUR FULL BODY LAYOUT HERE (I kept original markup in the long response) --- -->
+
+    <!-- VISÃO MENSAL (copiado do original) -->
     <div id="monthlyView" class="space-y-6">
       <!-- 1) RESUMO CARDS (COM SALDO LÍQUIDO) -->
       <section class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-5 gap-4">
@@ -564,7 +578,7 @@
           </div>
         </div>
 
-        <!-- Cards de indicadores anuais (inclui card de investimentos) -->
+        <!-- Cards anuais -->
         <div class="px-4 pt-4 grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-3">
           <div class="bg-emerald-50 border border-emerald-100 rounded-xl px-3 py-3 flex flex-col">
             <p class="text-[11px] font-medium text-emerald-700 uppercase tracking-wide">Receitas no ano</p>
@@ -584,7 +598,7 @@
           </div>
         </div>
 
-        <!-- Card específico de Investimentos -->
+        <!-- Card de investimentos -->
         <div class="px-4 pt-2">
           <div class="bg-white border border-blue-100 rounded-xl px-3 py-3 flex flex-col md:flex-row md:items-center md:justify-between gap-3">
             <div>
@@ -628,7 +642,7 @@
           </table>
         </div>
 
-        <!-- Dash de gráficos anuais -->
+        <!-- Gráficos -->
         <div class="grid grid-cols-1 xl:grid-cols-2 gap-4 p-4 border-t border-gray-100">
           <div class="h-64 flex flex-col">
             <div class="flex items-center justify-between mb-2">
@@ -663,7 +677,7 @@
           </div>
         </div>
 
-        <!-- Resumo de investimentos por tipo -->
+        <!-- Investimentos por tipo -->
         <div class="border-t border-gray-100 p-4">
           <div class="flex items-center justify-between mb-2">
             <div>
@@ -697,9 +711,10 @@
         </div>
       </section>
     </div>
+
   </main>
 
-  <!-- MODAL EDIÇÃO -->
+  <!-- MODAL EDIÇÃO (copiado como estava) -->
   <div id="editModal" class="fixed inset-0 z-50 hidden bg-black/40 items-center justify-center">
     <div class="bg-white rounded-xl shadow-lg w-full max-w-md mx-4 p-4 space-y-3">
       <div class="flex items-center justify-between">
@@ -806,46 +821,40 @@
     </div>
   </div>
 
-  <!-- SCRIPT -->
-  <script>
+  <!-- --- END MARKUP --- -->
+
+  <!-- SCRIPT: módulo com Firebase Firestore integrado -->
+  <script type="module">
+    // 1) IMPORTS DO FIREBASE (CDN modular)
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/11.10.0/firebase-app.js";
+    import {
+      getFirestore, collection, doc, getDocs, setDoc, deleteDoc
+    } from "https://www.gstatic.com/firebasejs/11.10.0/firebase-firestore.js";
+
+    // 2) SUA CONFIG (você já forneceu esta config)
+    const firebaseConfig = {
+      apiKey: "AIzaSyDYwlBR0DPEDs6Kq56XASppU-GSpPiCmfE",
+      authDomain: "painel-financeiro-spa.firebaseapp.com",
+      projectId: "painel-financeiro-spa",
+      storageBucket: "painel-financeiro-spa.firebasestorage.app",
+      messagingSenderId: "97230072376",
+      appId: "1:97230072376:web:87842d3615419f552154cd"
+    };
+
+    // 3) Inicializa Firebase e Firestore
+    const app = initializeApp(firebaseConfig);
+    const db = getFirestore(app);
+
     (function () {
+      // KEYs (mantive para compatibilidade se quiser fallback)
       const STORAGE_KEY = 'financeDashboard_transactions';
       const INVOICE_KEY = 'financeDashboard_invoicesPaid';
 
-      const CATEGORY_LABELS = {
-        receita: 'Receita',
-        investimento: 'Investimento',
-        fixa: 'Despesa Fixa',
-        variavel: 'Despesa Variável'
-      };
-
-      const RECEITA_SUBCATEGORIES = {
-        salario: 'Salário',
-        freelancer: 'Freelancer / Extra',
-        decimo: '13º / Bônus',
-        reembolso: 'Reembolso',
-        outros: 'Outros'
-      };
-
-      const DESPESA_SUBCATEGORIES = {
-        moradia: 'Moradia',
-        alimentacao: 'Alimentação',
-        transporte: 'Transporte',
-        lazer: 'Lazer',
-        saude: 'Saúde',
-        educacao: 'Educação',
-        outros: 'Outros'
-      };
-
-      const INVEST_SUBCATEGORIES = {
-        renda_fixa: 'Renda Fixa',
-        renda_variavel: 'Renda Variável',
-        tesouro: 'Tesouro Direto',
-        fundos: 'Fundos de Investimento',
-        previdencia: 'Previdência',
-        cripto: 'Criptomoedas',
-        outros: 'Outros Investimentos'
-      };
+      // Constantes e mapeamentos (mantidos)
+      const CATEGORY_LABELS = { receita: 'Receita', investimento: 'Investimento', fixa: 'Despesa Fixa', variavel: 'Despesa Variável' };
+      const RECEITA_SUBCATEGORIES = { salario: 'Salário', freelancer: 'Freelancer / Extra', decimo: '13º / Bônus', reembolso: 'Reembolso', outros: 'Outros' };
+      const DESPESA_SUBCATEGORIES = { moradia: 'Moradia', alimentacao: 'Alimentação', transporte: 'Transporte', lazer: 'Lazer', saude: 'Saúde', educacao: 'Educação', outros: 'Outros' };
+      const INVEST_SUBCATEGORIES = { renda_fixa: 'Renda Fixa', renda_variavel: 'Renda Variável', tesouro: 'Tesouro Direto', fundos: 'Fundos de Investimento', previdencia: 'Previdência', cripto: 'Criptomoedas', outros: 'Outros Investimentos' };
 
       const SUBCATEGORY_COLOR_CLASSES = {
         moradia: 'bg-emerald-50 text-emerald-700 border-emerald-200',
@@ -880,77 +889,37 @@
         'Julho','Agosto','Setembro','Outubro','Novembro','Dezembro'
       ];
 
+      // Estado
       const state = {
         transactions: [],
         invoicesPaid: {},
         selectedMonth: new Date().getMonth(),
-        selectedYear: 'all',   // 'all' ou número do ano
+        selectedYear: 'all',
         editingId: null,
         editingMode: 'single',
         editingGroupId: null
       };
 
-      // Referências aos gráficos da visão anual
+      // Charts
       let annualBarChart = null;
       let annualLineChart = null;
       let investPieChart = null;
 
-      // ----- Utils -----
-      function saveTransactions() {
-        localStorage.setItem(STORAGE_KEY, JSON.stringify(state.transactions));
-      }
-      function saveInvoices() {
-        localStorage.setItem(INVOICE_KEY, JSON.stringify(state.invoicesPaid));
-      }
-
-      function loadTransactions() {
-        try {
-          const raw = localStorage.getItem(STORAGE_KEY);
-          if (raw) {
-            const parsed = JSON.parse(raw);
-            if (Array.isArray(parsed)) {
-              parsed.forEach(t => { if (typeof t.paid === 'undefined') t.paid = false; });
-              state.transactions = parsed;
-            }
-          }
-        } catch (e) {
-          console.error('Erro ao carregar LocalStorage', e);
-          state.transactions = [];
-        }
-      }
-
-      function loadInvoices() {
-        try {
-          const raw = localStorage.getItem(INVOICE_KEY);
-          if (raw) {
-            const parsed = JSON.parse(raw);
-            if (parsed && typeof parsed === 'object') {
-              state.invoicesPaid = parsed;
-            }
-          }
-        } catch (e) {
-          console.error('Erro ao carregar invoices', e);
-          state.invoicesPaid = {};
-        }
-      }
-
+      // ---------- HELPERS ----------
       function formatCurrency(value) {
-        return new Intl.NumberFormat('pt-BR', {
-          style: 'currency',
-          currency: 'BRL'
-        }).format(value || 0);
+        return new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(value || 0);
       }
-
       function formatDate(dateStr) {
         const d = new Date(dateStr);
         if (isNaN(d.getTime())) return '-';
         return d.toLocaleDateString('pt-BR');
       }
-
       function generateId() {
         return 'tx_' + Date.now().toString(36) + '_' + Math.random().toString(36).slice(2);
       }
-
+      function keyInvoice(year, month, card) {
+        return `${year}-${month}-${card}`;
+      }
       function getYearForSelectedMonth() {
         if (state.selectedYear !== 'all') return state.selectedYear;
         const txs = state.transactions.filter((t) => {
@@ -965,31 +934,137 @@
         return new Date().getFullYear();
       }
 
-      function keyInvoice(year, month, card) {
-        return `${year}-${month}-${card}`;
+      // ---------- FIRESTORE PERSISTENCE ----------
+      // Coleções: "transactions" e "invoicesPaid"
+      async function loadTransactions() {
+        try {
+          const snap = await getDocs(collection(db, "transactions"));
+          const result = [];
+          snap.forEach(docSnap => {
+            const data = docSnap.data();
+            // data may contain Firestore types; ensure fields exist
+            result.push({
+              id: docSnap.id,
+              description: data.description || '',
+              value: Number(data.value) || 0,
+              date: data.date || new Date().toISOString(),
+              category: data.category || 'variavel',
+              subCategory: data.subCategory || null,
+              isCreditCard: !!data.isCreditCard,
+              card: data.card || null,
+              parcelas: data.parcelas || 1,
+              parcelaIndex: data.parcelaIndex || 1,
+              paymentMethod: data.paymentMethod || null,
+              groupId: data.groupId || null,
+              paid: !!data.paid
+            });
+          });
+          state.transactions = result;
+        } catch (e) {
+          console.error("Erro ao carregar transactions do Firestore", e);
+          // fallback: tentar carregar do localStorage (se existir)
+          try {
+            const raw = localStorage.getItem(STORAGE_KEY);
+            if (raw) {
+              const parsed = JSON.parse(raw);
+              if (Array.isArray(parsed)) state.transactions = parsed;
+            }
+          } catch (er) { state.transactions = []; }
+        }
       }
 
-      // Filtra por mês e ano selecionados (quando aplicável)
+      async function saveTransactions() {
+        try {
+          const colRef = collection(db, "transactions");
+          // recupera ids existentes
+          const snap = await getDocs(colRef);
+          const existingIds = new Set(snap.docs.map(d => d.id));
+
+          const currentIds = new Set(state.transactions.map(t => t.id));
+          // deletar docs que existem no Firestore mas não no state
+          const toDelete = [...existingIds].filter(id => !currentIds.has(id));
+          await Promise.all(toDelete.map(id => deleteDoc(doc(db, "transactions", id))));
+
+          // upsert: setDoc para cada transação usando t.id como doc id
+          await Promise.all(state.transactions.map(t => {
+            const { id, ...data } = t;
+            // normalize fields (avoid undefined)
+            const payload = {
+              description: data.description || '',
+              value: Number(data.value) || 0,
+              date: data.date || new Date().toISOString(),
+              category: data.category || 'variavel',
+              subCategory: data.subCategory || null,
+              isCreditCard: !!data.isCreditCard,
+              card: data.card || null,
+              parcelas: data.parcelas || 1,
+              parcelaIndex: data.parcelaIndex || 1,
+              paymentMethod: data.paymentMethod || null,
+              groupId: data.groupId || null,
+              paid: !!data.paid
+            };
+            return setDoc(doc(db, "transactions", id), payload);
+          }));
+
+          // opcional: também manter uma cópia em localStorage como fallback
+          try { localStorage.setItem(STORAGE_KEY, JSON.stringify(state.transactions)); } catch (e) { /* ignore */ }
+        } catch (e) {
+          console.error("Erro ao salvar transactions no Firestore", e);
+          // fallback: tentar salvar em localStorage
+          try { localStorage.setItem(STORAGE_KEY, JSON.stringify(state.transactions)); } catch (er) {}
+        }
+      }
+
+      async function loadInvoices() {
+        try {
+          const snap = await getDocs(collection(db, "invoicesPaid"));
+          const result = {};
+          snap.forEach(docSnap => {
+            const data = docSnap.data();
+            result[docSnap.id] = !!data.paid;
+          });
+          state.invoicesPaid = result;
+        } catch (e) {
+          console.error("Erro ao carregar invoicesPaid do Firestore", e);
+          // fallback localStorage
+          try {
+            const raw = localStorage.getItem(INVOICE_KEY);
+            if (raw) state.invoicesPaid = JSON.parse(raw);
+            else state.invoicesPaid = {};
+          } catch (er) { state.invoicesPaid = {}; }
+        }
+      }
+
+      async function saveInvoices() {
+        try {
+          const entries = Object.entries(state.invoicesPaid);
+          await Promise.all(entries.map(([key, paid]) => {
+            return setDoc(doc(db, "invoicesPaid", key), { paid: !!paid });
+          }));
+          try { localStorage.setItem(INVOICE_KEY, JSON.stringify(state.invoicesPaid)); } catch (e) {}
+        } catch (e) {
+          console.error("Erro ao salvar invoicesPaid no Firestore", e);
+          try { localStorage.setItem(INVOICE_KEY, JSON.stringify(state.invoicesPaid)); } catch (er) {}
+        }
+      }
+
+      // ---------- LÓGICA DE RENDER / CÁLCULOS (mantida do seu código) ----------
       function getFilteredTransactions() {
         return state.transactions.filter((t) => {
           const d = new Date(t.date);
           if (isNaN(d.getTime())) return false;
-
           if (state.selectedMonth !== null && d.getMonth() !== state.selectedMonth) return false;
           if (state.selectedYear !== 'all' && d.getFullYear() !== state.selectedYear) return false;
-
           return true;
         });
       }
 
-      // Totais por mês (para comparação %)
       function getMonthTotals(monthIndex) {
         const result = { receitas: 0, investimentos: 0, fixas: 0, variaveis: 0 };
         state.transactions.forEach(t => {
           const d = new Date(t.date);
           if (isNaN(d.getTime()) || d.getMonth() !== monthIndex) return;
           if (state.selectedYear !== 'all' && d.getFullYear() !== state.selectedYear) return;
-
           const v = Number(t.value) || 0;
           if (t.category === 'receita') result.receitas += v;
           else if (t.category === 'investimento') result.investimentos += v;
@@ -1038,15 +1113,12 @@
         });
       }
 
-      // Filtro de ano - opções do select (DINÂMICO até 2030+, ano atual primeiro)
       function refreshYearFilterOptions() {
         const select = document.getElementById('yearFilter');
         if (!select) return;
+        const currentStored = state.selectedYear === 'all' ? 'all' : String(state.selectedYear);
 
-        const currentStored =
-          state.selectedYear === 'all' ? 'all' : String(state.selectedYear);
-
-        // Descobre menor e maior ano das transações
+        // Discover min/max years from transactions
         let minTxYear = null;
         let maxTxYear = null;
         state.transactions.forEach(t => {
@@ -1059,32 +1131,17 @@
 
         const now = new Date();
         const currentYear = now.getFullYear();
-
-        // Intervalo dinâmico:
-        // - início: primeiro ano com lançamento (ou ano atual, se ainda não houver dados)
-        // - fim: cobre último ano com dados, ano atual + 1 e pelo menos 2030
         let minYear = minTxYear !== null ? minTxYear : currentYear;
-        let maxYear = Math.max(
-          maxTxYear !== null ? maxTxYear : currentYear,
-          currentYear + 1,
-          2030
-        );
+        let maxYear = Math.max(maxTxYear !== null ? maxTxYear : currentYear, currentYear + 1, 2030);
         if (minYear > maxYear) minYear = maxYear;
 
-        // Monta lista de anos em ordem crescente
         const years = [];
         for (let y = minYear; y <= maxYear; y++) years.push(y);
 
-        // Reordena para deixar o ano atual primeiro (se estiver no range)
         const orderedYears = [];
-        if (years.includes(currentYear)) {
-          orderedYears.push(currentYear);
-        }
-        years.forEach(y => {
-          if (y !== currentYear) orderedYears.push(y);
-        });
+        if (years.includes(currentYear)) orderedYears.push(currentYear);
+        years.forEach(y => { if (y !== currentYear) orderedYears.push(y); });
 
-        // Recria opções do select
         select.innerHTML = '';
         const optAll = document.createElement('option');
         optAll.value = 'all';
@@ -1098,23 +1155,13 @@
           select.appendChild(opt);
         });
 
-        // Recupera seleção anterior, se ainda existir
         const yearValues = orderedYears.map(y => String(y));
-        if (currentStored === 'all') {
-          select.value = 'all';
-        } else if (yearValues.includes(currentStored)) {
-          select.value = currentStored;
-        } else if (yearValues.includes(String(currentYear))) {
-          // força ano atual caso o anterior não exista mais
-          select.value = String(currentYear);
-          state.selectedYear = currentYear;
-        } else {
-          select.value = 'all';
-          state.selectedYear = 'all';
-        }
+        if (currentStored === 'all') select.value = 'all';
+        else if (yearValues.includes(currentStored)) { select.value = currentStored; state.selectedYear = parseInt(currentStored,10); }
+        else if (yearValues.includes(String(currentYear))) { select.value = String(currentYear); state.selectedYear = currentYear; }
+        else { select.value = 'all'; state.selectedYear = 'all'; }
       }
 
-      // ----- Renderização -----
       function renderHeader() {
         const titleEl = document.getElementById('viewTitle');
         const subtitleEl = document.getElementById('viewSubtitle');
@@ -1139,15 +1186,12 @@
         }
 
         const yearFilter = document.getElementById('yearFilter');
-        if (yearFilter) {
-          yearFilter.value = state.selectedYear === 'all' ? 'all' : String(state.selectedYear);
-        }
+        if (yearFilter) yearFilter.value = state.selectedYear === 'all' ? 'all' : String(state.selectedYear);
       }
 
       function renderDelta(elId, atual, anterior) {
         const el = document.getElementById(elId);
         if (!el) return;
-
         if (anterior === 0) {
           if (atual === 0) {
             el.textContent = 'Sem movimentação no mês anterior.';
@@ -1161,36 +1205,26 @@
         const diff = atual - anterior;
         const pct = (diff / anterior) * 100;
         const pctStr = Math.abs(pct).toFixed(1).replace('.', ',') + '%';
-
         if (diff === 0) {
           el.textContent = 'Igual ao mês anterior';
           el.className = 'text-[11px] mt-0.5 text-gray-400';
           return;
         }
-
         const isUp = diff > 0;
         const arrow = isUp ? 'fa-arrow-up' : 'fa-arrow-down';
         const sign = isUp ? '+' : '-';
         const color = isUp ? 'text-emerald-600' : 'text-red-500';
-
         el.className = `text-[11px] mt-0.5 ${color} flex items-center gap-1`;
-        el.innerHTML = `
-          <i class="fa-solid ${arrow} text-[10px]"></i>
-          <span>${sign}${pctStr} em relação ao mês anterior</span>
-        `;
+        el.innerHTML = `<i class="fa-solid ${arrow} text-[10px]"></i><span>${sign}${pctStr} em relação ao mês anterior</span>`;
       }
 
       function updateCardSaldoStyles(value) {
         const card = document.getElementById('cardSaldo');
         if (!card) return;
         card.classList.remove('border-l-emerald-500','border-l-red-500','border-l-slate-500');
-        if (value > 0) {
-          card.classList.add('border-l-emerald-500');
-        } else if (value < 0) {
-          card.classList.add('border-l-red-500');
-        } else {
-          card.classList.add('border-l-slate-500');
-        }
+        if (value > 0) card.classList.add('border-l-emerald-500');
+        else if (value < 0) card.classList.add('border-l-red-500');
+        else card.classList.add('border-l-slate-500');
       }
 
       function renderSummaryCards() {
@@ -1200,14 +1234,8 @@
         const currentTotals = getMonthTotals(currentMonth);
         const prevTotals = getMonthTotals(prevMonth);
 
-        const currentSaldo = currentTotals.receitas -
-                             currentTotals.investimentos -
-                             currentTotals.fixas -
-                             currentTotals.variaveis;
-        const prevSaldo = prevTotals.receitas -
-                          prevTotals.investimentos -
-                          prevTotals.fixas -
-                          prevTotals.variaveis;
+        const currentSaldo = currentTotals.receitas - currentTotals.investimentos - currentTotals.fixas - currentTotals.variaveis;
+        const prevSaldo = prevTotals.receitas - prevTotals.investimentos - prevTotals.fixas - prevTotals.variaveis;
 
         document.getElementById('totalReceitas').textContent = formatCurrency(currentTotals.receitas);
         document.getElementById('totalInvestimentos').textContent = formatCurrency(currentTotals.investimentos);
@@ -1228,14 +1256,9 @@
         if (!btn) return;
         btn.className = 'card-status-btn mt-1 inline-flex items-center px-2.5 py-1 rounded-full border text-[10px] font-medium';
         const iconClass = paid ? 'fa-thumbs-up' : 'fa-thumbs-down';
-        const classes = paid
-          ? ' bg-emerald-50 text-emerald-600 border-emerald-200'
-          : ' bg-red-50 text-red-500 border-red-200';
+        const classes = paid ? ' bg-emerald-50 text-emerald-600 border-emerald-200' : ' bg-red-50 text-red-500 border-red-200';
         btn.className += classes;
-        btn.innerHTML = `
-          <i class="fa-solid ${iconClass} mr-1 text-[10px]"></i>
-          <span>${paid ? 'Fatura paga' : 'Fatura em aberto'}</span>
-        `;
+        btn.innerHTML = `<i class="fa-solid ${iconClass} mr-1 text-[10px]"></i><span>${paid ? 'Fatura paga' : 'Fatura em aberto'}</span>`;
       }
 
       function renderCardsFaturas() {
@@ -1272,10 +1295,7 @@
 
         if (!list.length) {
           const tr = document.createElement('tr');
-          tr.innerHTML = `
-            <td colspan="7" class="px-4 py-4 text-center text-xs text-gray-400">
-              ${emptyText}
-            </td>`;
+          tr.innerHTML = `<td colspan="7" class="px-4 py-4 text-center text-xs text-gray-400">${emptyText}</td>`;
           tbody.appendChild(tr);
           return;
         }
@@ -1309,22 +1329,10 @@
             statusHtml = `<span class="text-[11px] text-gray-400">Cartão</span>`;
           } else {
             const isReceita = t.category === 'receita';
-            const statusLabel = isReceita ? (t.paid ? 'Recebido' : 'Não recebido')
-                                          : (t.paid ? 'Pago' : 'Não pago');
+            const statusLabel = isReceita ? (t.paid ? 'Recebido' : 'Não recebido') : (t.paid ? 'Pago' : 'Não pago');
             const statusIcon  = t.paid ? 'fa-thumbs-up' : 'fa-thumbs-down';
-            const statusClasses = t.paid
-              ? 'bg-emerald-50 text-emerald-600 border-emerald-200'
-              : 'bg-red-50 text-red-500 border-red-200';
-            statusHtml = `
-              <button
-                class="btn-toggle-paid inline-flex items-center justify-center px-2.5 py-1 rounded-full border ${statusClasses}"
-                data-id="${t.id}"
-                title="${statusLabel}"
-              >
-                <i class="fa-solid ${statusIcon} mr-1 text-[10px]"></i>
-                <span class="text-[10px] font-medium">${statusLabel}</span>
-              </button>
-            `;
+            const statusClasses = t.paid ? 'bg-emerald-50 text-emerald-600 border-emerald-200' : 'bg-red-50 text-red-500 border-red-200';
+            statusHtml = `<button class="btn-toggle-paid inline-flex items-center justify-center px-2.5 py-1 rounded-full border ${statusClasses}" data-id="${t.id}" title="${statusLabel}"><i class="fa-solid ${statusIcon} mr-1 text-[10px]"></i><span class="text-[10px] font-medium">${statusLabel}</span></button>`;
           }
 
           tr.innerHTML = `
@@ -1336,20 +1344,8 @@
             <td class="px-4 py-2 text-xs text-center">${statusHtml}</td>
             <td class="px-4 py-2 text-xs text-center">
               <div class="flex items-center justify-center gap-1">
-                <button
-                  class="btn-edit inline-flex items-center justify-center w-7 h-7 rounded-full border border-indigo-100 text-indigo-500 hover:bg-indigo-50"
-                  data-id="${t.id}"
-                  title="Editar"
-                >
-                  <i class="fa-solid fa-pen text-[10px]"></i>
-                </button>
-                <button
-                  class="btn-delete inline-flex items-center justify-center w-7 h-7 rounded-full border border-red-100 text-red-500 hover:bg-red-50"
-                  data-id="${t.id}"
-                  title="Excluir"
-                >
-                  <i class="fa-solid fa-trash text-[11px]"></i>
-                </button>
+                <button class="btn-edit inline-flex items-center justify-center w-7 h-7 rounded-full border border-indigo-100 text-indigo-500 hover:bg-indigo-50" data-id="${t.id}" title="Editar"><i class="fa-solid fa-pen text-[10px]"></i></button>
+                <button class="btn-delete inline-flex items-center justify-center w-7 h-7 rounded-full border border-red-100 text-red-500 hover:bg-red-50" data-id="${t.id}" title="Excluir"><i class="fa-solid fa-trash text-[11px]"></i></button>
               </div>
             </td>
           `;
@@ -1358,17 +1354,10 @@
       }
 
       function renderTables() {
-        const all = getFilteredTransactions().sort((a, b) => {
-          const da = new Date(a.date).getTime();
-          const db = new Date(b.date).getTime();
-          return da - db;
-        });
-
+        const all = getFilteredTransactions().sort((a, b) => new Date(a.date).getTime() - new Date(b.date).getTime());
         const receitas  = all.filter(t => t.category === 'receita');
         const fixas     = all.filter(t => t.category === 'fixa');
-        const variaveis = all.filter(t =>
-          t.category === 'variavel' || t.category === 'investimento'
-        );
+        const variaveis = all.filter(t => t.category === 'variavel' || t.category === 'investimento');
 
         buildTableRows(receitas, 'tbodyReceitas', 'Nenhuma receita cadastrada para este período.');
         buildTableRows(fixas, 'tbodyFixas', 'Nenhuma despesa fixa cadastrada para este período.');
@@ -1385,19 +1374,10 @@
         });
       }
 
-      // ----- Cálculo anual consolidado -----
+      // ---------- ANNUAL COMPUTATION & CHART RENDERS ----------
       function computeAnnualData() {
         const monthly = [];
-        for (let m = 0; m < 12; m++) {
-          monthly[m] = {
-            monthIndex: m,
-            receitas: 0,
-            despesas: 0,
-            investimentos: 0,
-            saldo: 0,
-            investMes: 0
-          };
-        }
+        for (let m = 0; m < 12; m++) monthly[m] = { monthIndex: m, receitas: 0, despesas: 0, investimentos: 0, saldo: 0, investMes: 0 };
 
         const txSource = state.transactions.filter((t) => {
           const d = new Date(t.date);
@@ -1407,11 +1387,7 @@
         });
 
         const investByType = {};
-        let totalReceitasYear = 0;
-        let totalDespesasYear = 0;
-        let totalInvestYear = 0;
-        let totalSaldoYear = 0;
-        let maxInvestSingle = 0;
+        let totalReceitasYear = 0, totalDespesasYear = 0, totalInvestYear = 0, totalSaldoYear = 0, maxInvestSingle = 0;
 
         txSource.forEach((t) => {
           const d = new Date(t.date);
@@ -1419,43 +1395,26 @@
           const m = d.getMonth();
           const v = Number(t.value) || 0;
 
-          if (t.category === 'receita') {
-            monthly[m].receitas += v;
-            totalReceitasYear += v;
-          } else if (t.category === 'investimento') {
-            monthly[m].investimentos += v;
-            monthly[m].investMes += v;
-            totalInvestYear += v;
+          if (t.category === 'receita') { monthly[m].receitas += v; totalReceitasYear += v; }
+          else if (t.category === 'investimento') {
+            monthly[m].investimentos += v; monthly[m].investMes += v; totalInvestYear += v;
             if (v > maxInvestSingle) maxInvestSingle = v;
-            if (t.subCategory) {
-              investByType[t.subCategory] = (investByType[t.subCategory] || 0) + v;
-            }
+            if (t.subCategory) investByType[t.subCategory] = (investByType[t.subCategory] || 0) + v;
           } else if (t.category === 'fixa' || t.category === 'variavel') {
-            monthly[m].despesas += v;
-            totalDespesasYear += v;
+            monthly[m].despesas += v; totalDespesasYear += v;
           }
         });
 
-        monthly.forEach((mData) => {
-          mData.saldo = mData.receitas - mData.despesas - mData.investimentos;
-          totalSaldoYear += mData.saldo;
-        });
+        monthly.forEach((mData) => { mData.saldo = mData.receitas - mData.despesas - mData.investimentos; totalSaldoYear += mData.saldo; });
 
         return {
           monthly,
-          totals: {
-            totalReceitasYear,
-            totalDespesasYear,
-            totalInvestYear,
-            totalSaldoYear,
-            maxInvestSingle,
-          },
+          totals: { totalReceitasYear, totalDespesasYear, totalInvestYear, totalSaldoYear, maxInvestSingle },
           investByType,
           txSource
         };
       }
 
-      // ----- Gráficos da visão anual -----
       function renderAnnualCharts(monthly) {
         const labels = monthly.map(m => MONTH_NAMES[m.monthIndex].slice(0, 3));
         const receitas = monthly.map(m => m.receitas);
@@ -1478,117 +1437,38 @@
           data: {
             labels,
             datasets: [
-              {
-                label: 'Receitas',
-                data: receitas,
-                backgroundColor: 'rgba(16, 185, 129, 0.6)',
-                borderColor: 'rgba(5, 150, 105, 1)',
-                borderWidth: 1
-              },
-              {
-                label: 'Despesas',
-                data: despesas,
-                backgroundColor: 'rgba(249, 115, 22, 0.6)',
-                borderColor: 'rgba(234, 88, 12, 1)',
-                borderWidth: 1
-              },
-              {
-                label: 'Investimentos',
-                data: investimentos,
-                backgroundColor: 'rgba(59, 130, 246, 0.6)',
-                borderColor: 'rgba(37, 99, 235, 1)',
-                borderWidth: 1
-              }
+              { label: 'Receitas', data: receitas, backgroundColor: 'rgba(16,185,129,0.6)', borderColor: 'rgba(5,150,105,1)', borderWidth: 1 },
+              { label: 'Despesas', data: despesas, backgroundColor: 'rgba(249,115,22,0.6)', borderColor: 'rgba(234,88,12,1)', borderWidth: 1 },
+              { label: 'Investimentos', data: investimentos, backgroundColor: 'rgba(59,130,246,0.6)', borderColor: 'rgba(37,99,235,1)', borderWidth: 1 }
             ]
           },
           options: {
-            responsive: true,
-            maintainAspectRatio: false,
-            plugins: {
-              legend: {
-                position: 'top',
-                labels: {
-                  boxWidth: 10,
-                  boxHeight: 10
-                }
-              },
-              tooltip: {
-                callbacks: {
-                  label: (context) => {
-                    const value = context.parsed.y || 0;
-                    return `${context.dataset.label}: ${formatCurrency(value)}`;
-                  }
-                }
-              }
-            },
-            scales: {
-              y: {
-                beginAtZero: true,
-                ticks: {
-                  callback: (value) => formatCurrency(value)
-                }
-              }
-            }
+            responsive: true, maintainAspectRatio: false,
+            plugins: { legend: { position: 'top' }, tooltip: { callbacks: { label: ctx => `${ctx.dataset.label}: ${formatCurrency(ctx.parsed.y)}` } } },
+            scales: { y: { beginAtZero: true, ticks: { callback: v => formatCurrency(v) } } }
           }
         });
 
         annualLineChart = new Chart(saldoCtx, {
           type: 'line',
-          data: {
-            labels,
-            datasets: [
-              {
-                label: 'Saldo Mensal',
-                data: saldos,
-                tension: 0.3,
-                fill: true,
-                backgroundColor: 'rgba(15, 23, 42, 0.08)',
-                borderColor: 'rgba(15, 23, 42, 1)',
-                pointRadius: 3
-              }
-            ]
-          },
+          data: { labels, datasets: [{ label: 'Saldo Mensal', data: saldos, tension: 0.3, fill: true, backgroundColor: 'rgba(15,23,42,0.08)', borderColor: 'rgba(15,23,42,1)', pointRadius: 3 }] },
           options: {
-            responsive: true,
-            maintainAspectRatio: false,
-            plugins: {
-              legend: {
-                display: false
-              },
-              tooltip: {
-                callbacks: {
-                  label: (context) => {
-                    const value = context.parsed.y || 0;
-                    return `Saldo: ${formatCurrency(value)}`;
-                  }
-                }
-              }
-            },
-            scales: {
-              y: {
-                ticks: {
-                  callback: (value) => formatCurrency(value)
-                }
-              }
-            }
+            responsive: true, maintainAspectRatio: false,
+            plugins: { legend: { display: false }, tooltip: { callbacks: { label: ctx => `Saldo: ${formatCurrency(ctx.parsed.y)}` } } },
+            scales: { y: { ticks: { callback: v => formatCurrency(v) } } }
           }
         });
       }
 
-      // Gráfico de investimentos por tipo (pizza)
       function renderInvestTypeChart(investByType, totalInvestYear) {
         const canvas = document.getElementById('chartInvestTypes');
         if (!canvas || typeof Chart === 'undefined') return;
         const ctx = canvas.getContext('2d');
-
-        if (investPieChart) {
-          investPieChart.destroy();
-          investPieChart = null;
-        }
+        if (investPieChart) { investPieChart.destroy(); investPieChart = null; }
 
         const entries = Object.entries(investByType);
         if (!entries.length || totalInvestYear <= 0) {
-          // Nada para mostrar
+          // clear canvas by creating empty chart or just return
           return;
         }
 
@@ -1597,161 +1477,75 @@
 
         investPieChart = new Chart(ctx, {
           type: 'doughnut',
-          data: {
-            labels,
-            datasets: [{
-              data,
-              backgroundColor: [
-                'rgba(59,130,246,0.7)',
-                'rgba(16,185,129,0.7)',
-                'rgba(249,115,22,0.7)',
-                'rgba(139,92,246,0.7)',
-                'rgba(20,184,166,0.7)',
-                'rgba(245,158,11,0.7)',
-                'rgba(148,163,184,0.7)'
-              ],
-              borderWidth: 1,
-              borderColor: '#ffffff'
-            }]
-          },
+          data: { labels, datasets: [{ data, backgroundColor: ['rgba(59,130,246,0.7)','rgba(16,185,129,0.7)','rgba(249,115,22,0.7)','rgba(139,92,246,0.7)','rgba(20,184,166,0.7)','rgba(245,158,11,0.7)','rgba(148,163,184,0.7)'], borderWidth:1, borderColor:'#ffffff' }] },
           options: {
-            responsive: true,
-            maintainAspectRatio: false,
-            plugins: {
-              legend: {
-                position: 'bottom',
-                labels: { boxWidth: 10, boxHeight: 10 }
-              },
-              tooltip: {
-                callbacks: {
-                  label: (context) => {
-                    const value = context.parsed || 0;
-                    const pct = totalInvestYear > 0
-                      ? (value / totalInvestYear * 100).toFixed(1).replace('.', ',')
-                      : '0,0';
-                    return `${context.label}: ${formatCurrency(value)} (${pct}%)`;
-                  }
-                }
-              }
-            }
+            responsive:true, maintainAspectRatio:false,
+            plugins:{ legend:{ position:'bottom' }, tooltip:{ callbacks:{ label: ctx => {
+              const value = ctx.parsed || 0;
+              const pct = totalInvestYear>0 ? (value/totalInvestYear*100).toFixed(1).replace('.',',') : '0,0';
+              return `${ctx.label}: ${formatCurrency(value)} (${pct}%)`;
+            }}}}
           }
         });
       }
 
-      // Resumo de investimentos por tipo (tabela)
       function renderAnnualInvestSummary(investByType, totalInvestYear) {
         const tbody = document.getElementById('annualInvestBody');
         if (!tbody) return;
         tbody.innerHTML = '';
-
         const entries = Object.entries(investByType);
         if (!entries.length) {
-          const tr = document.createElement('tr');
-          tr.innerHTML = `
-            <td colspan="3" class="px-4 py-3 text-xs text-gray-400 text-center">
-              Nenhum investimento registrado no período selecionado.
-            </td>`;
-          tbody.appendChild(tr);
+          tbody.innerHTML = `<tr><td colspan="3" class="px-4 py-3 text-xs text-gray-400 text-center">Nenhum investimento registrado no período selecionado.</td></tr>`;
           return;
         }
-
-        // Ordena do maior para o menor
-        entries.sort((a, b) => b[1] - a[1]);
-
-        entries.forEach(([sub, value]) => {
+        entries.sort((a,b)=>b[1]-a[1]);
+        entries.forEach(([sub,value]) => {
           const label = INVEST_SUBCATEGORIES[sub] || 'Outro';
-          const pct = totalInvestYear > 0
-            ? (value / totalInvestYear * 100).toFixed(1).replace('.', ',')
-            : '0,0';
-
+          const pct = totalInvestYear>0 ? (value/totalInvestYear*100).toFixed(1).replace('.',',') : '0,0';
           const tr = document.createElement('tr');
-          tr.innerHTML = `
-            <td class="px-4 py-2 text-xs text-gray-700">${label}</td>
-            <td class="px-4 py-2 text-xs text-gray-800 text-right">${formatCurrency(value)}</td>
-            <td class="px-4 py-2 text-xs text-gray-800 text-right">${pct}%</td>
-          `;
+          tr.innerHTML = `<td class="px-4 py-2 text-xs text-gray-700">${label}</td><td class="px-4 py-2 text-xs text-gray-800 text-right">${formatCurrency(value)}</td><td class="px-4 py-2 text-xs text-gray-800 text-right">${pct}%</td>`;
           tbody.appendChild(tr);
         });
-
         const trTotal = document.createElement('tr');
         trTotal.className = 'bg-gray-50/80';
-        trTotal.innerHTML = `
-          <td class="px-4 py-2 text-xs font-semibold text-gray-900">Total</td>
-          <td class="px-4 py-2 text-xs font-semibold text-gray-900 text-right">${formatCurrency(totalInvestYear)}</td>
-          <td class="px-4 py-2 text-xs font-semibold text-gray-900 text-right">100%</td>
-        `;
+        trTotal.innerHTML = `<td class="px-4 py-2 text-xs font-semibold text-gray-900">Total</td><td class="px-4 py-2 text-xs font-semibold text-gray-900 text-right">${formatCurrency(totalInvestYear)}</td><td class="px-4 py-2 text-xs font-semibold text-gray-900 text-right">100%</td>`;
         tbody.appendChild(trTotal);
       }
 
-      // Indicadores e tabela da visão anual
       function renderAnnualView() {
         const { monthly, totals, investByType } = computeAnnualData();
-        const {
-          totalReceitasYear,
-          totalDespesasYear,
-          totalInvestYear,
-          totalSaldoYear,
-          maxInvestSingle,
-        } = totals;
+        const { totalReceitasYear, totalDespesasYear, totalInvestYear, totalSaldoYear, maxInvestSingle } = totals;
 
         const tbody = document.getElementById('annualBody');
         tbody.innerHTML = '';
 
         monthly.forEach((mData, index) => {
           const tr = document.createElement('tr');
-          const zebra = index % 2 === 0 ? 'bg-white' : 'bg-gray-50/50';
-          tr.className = zebra;
-          tr.innerHTML = `
-            <td class="px-4 py-2 text-xs text-gray-700">${MONTH_NAMES[mData.monthIndex]}</td>
-            <td class="px-4 py-2 text-xs text-gray-800 text-right">${formatCurrency(mData.receitas)}</td>
-            <td class="px-4 py-2 text-xs text-gray-800 text-right">${formatCurrency(mData.despesas)}</td>
-            <td class="px-4 py-2 text-xs text-gray-800 text-right">${formatCurrency(mData.investimentos)}</td>
-            <td class="px-4 py-2 text-xs text-gray-800 text-right">${formatCurrency(mData.saldo)}</td>
-          `;
+          tr.className = index%2===0 ? 'bg-white' : 'bg-gray-50/50';
+          tr.innerHTML = `<td class="px-4 py-2 text-xs text-gray-700">${MONTH_NAMES[mData.monthIndex]}</td><td class="px-4 py-2 text-xs text-gray-800 text-right">${formatCurrency(mData.receitas)}</td><td class="px-4 py-2 text-xs text-gray-800 text-right">${formatCurrency(mData.despesas)}</td><td class="px-4 py-2 text-xs text-gray-800 text-right">${formatCurrency(mData.investimentos)}</td><td class="px-4 py-2 text-xs text-gray-800 text-right">${formatCurrency(mData.saldo)}</td>`;
           tbody.appendChild(tr);
         });
 
         const trTotal = document.createElement('tr');
         trTotal.className = 'bg-gray-100/80';
-        trTotal.innerHTML = `
-          <td class="px-4 py-2 text-xs font-semibold text-gray-900">Total</td>
-          <td class="px-4 py-2 text-xs font-semibold text-gray-900 text-right">${formatCurrency(totalReceitasYear)}</td>
-          <td class="px-4 py-2 text-xs font-semibold text-gray-900 text-right">${formatCurrency(totalDespesasYear)}</td>
-          <td class="px-4 py-2 text-xs font-semibold text-gray-900 text-right">${formatCurrency(totalInvestYear)}</td>
-          <td class="px-4 py-2 text-xs font-semibold text-gray-900 text-right">${formatCurrency(totalSaldoYear)}</td>
-        `;
+        trTotal.innerHTML = `<td class="px-4 py-2 text-xs font-semibold text-gray-900">Total</td><td class="px-4 py-2 text-xs font-semibold text-gray-900 text-right">${formatCurrency(totalReceitasYear)}</td><td class="px-4 py-2 text-xs font-semibold text-gray-900 text-right">${formatCurrency(totalDespesasYear)}</td><td class="px-4 py-2 text-xs font-semibold text-gray-900 text-right">${formatCurrency(totalInvestYear)}</td><td class="px-4 py-2 text-xs font-semibold text-gray-900 text-right">${formatCurrency(totalSaldoYear)}</td>`;
         tbody.appendChild(trTotal);
 
-        // Atualiza cards anuais principais
         document.getElementById('annualTotalReceitas').textContent = formatCurrency(totalReceitasYear);
         document.getElementById('annualTotalDespesas').textContent = formatCurrency(totalDespesasYear);
         document.getElementById('annualTotalInvest').textContent = formatCurrency(totalInvestYear);
         document.getElementById('annualTotalSaldo').textContent = formatCurrency(totalSaldoYear);
 
-        // Card específico de investimentos
         document.getElementById('annualCardInvestTotal').textContent = formatCurrency(totalInvestYear);
         document.getElementById('annualCardInvestMax').textContent = formatCurrency(maxInvestSingle);
 
-        // Mês com maior volume investido
-        let bestMonthIndex = null;
-        let bestMonthValue = 0;
-        monthly.forEach((mData) => {
-          if (mData.investMes > bestMonthValue) {
-            bestMonthValue = mData.investMes;
-            bestMonthIndex = mData.monthIndex;
-          }
-        });
-        const bestMonthLabel = bestMonthIndex !== null
-          ? MONTH_NAMES[bestMonthIndex]
-          : '-';
-        document.getElementById('annualCardInvestBestMonth').textContent =
-          bestMonthValue > 0 ? `${bestMonthLabel} (${formatCurrency(bestMonthValue)})` : '-';
+        let bestMonthIndex = null; let bestMonthValue = 0;
+        monthly.forEach((mData) => { if (mData.investMes > bestMonthValue) { bestMonthValue = mData.investMes; bestMonthIndex = mData.monthIndex; } });
+        const bestMonthLabel = bestMonthIndex !== null ? MONTH_NAMES[bestMonthIndex] : '-';
+        document.getElementById('annualCardInvestBestMonth').textContent = bestMonthValue > 0 ? `${bestMonthLabel} (${formatCurrency(bestMonthValue)})` : '-';
 
-        // Gráficos
         renderAnnualCharts(monthly);
         renderInvestTypeChart(investByType, totalInvestYear);
-
-        // Tabela de investimentos por tipo
         renderAnnualInvestSummary(investByType, totalInvestYear);
       }
 
@@ -1759,27 +1553,23 @@
         const monthButtons = document.querySelectorAll('.month-btn');
         const btnAnnual = document.getElementById('btnAnnual');
 
-        if (state.selectedMonth === null) {
-          btnAnnual.classList.add('bg-indigo-600', 'text-white', 'border-indigo-500');
-        } else {
-          btnAnnual.classList.remove('bg-indigo-600', 'text-white', 'border-indigo-500');
-        }
+        if (state.selectedMonth === null) btnAnnual.classList.add('bg-indigo-600','text-white','border-indigo-500'); else btnAnnual.classList.remove('bg-indigo-600','text-white','border-indigo-500');
 
         monthButtons.forEach((btn) => {
           const idx = parseInt(btn.getAttribute('data-month-index'), 10);
-          btn.classList.remove('bg-gray-800', 'text-white');
-          if (state.selectedMonth === idx) btn.classList.add('bg-gray-800', 'text-white');
+          btn.classList.remove('bg-gray-800','text-white');
+          if (state.selectedMonth === idx) btn.classList.add('bg-gray-800','text-white');
         });
       }
 
       function renderDashboard(selectedMonth) {
         state.selectedMonth = selectedMonth;
-        const monthlyView = document.getElementById('monthlyView');
-        const annualView = document.getElementById('annualView');
-
         refreshYearFilterOptions();
         renderHeader();
         renderSidebarHighlight();
+
+        const monthlyView = document.getElementById('monthlyView');
+        const annualView = document.getElementById('annualView');
 
         if (state.selectedMonth === null) {
           monthlyView.classList.add('hidden');
@@ -1794,91 +1584,37 @@
         }
       }
 
-      // ----- Exportação CSV / Excel -----
-      function exportAnnualSummary(ext) {
-        const { monthly, totals } = computeAnnualData();
-        const {
-          totalReceitasYear,
-          totalDespesasYear,
-          totalInvestYear,
-          totalSaldoYear,
-        } = totals;
-
-        const lines = [];
-        lines.push('Mês;Receitas;Despesas;Investimentos;Saldo');
-
-        monthly.forEach(mData => {
-          function numStr(v) {
-            return (v || 0).toFixed(2).replace('.', ',');
-          }
-          lines.push([
-            MONTH_NAMES[mData.monthIndex],
-            numStr(mData.receitas),
-            numStr(mData.despesas),
-            numStr(mData.investimentos),
-            numStr(mData.saldo)
-          ].join(';'));
-        });
-
-        function numStr(v) {
-          return (v || 0).toFixed(2).replace('.', ',');
-        }
-
-        lines.push([
-          'Total',
-          numStr(totalReceitasYear),
-          numStr(totalDespesasYear),
-          numStr(totalInvestYear),
-          numStr(totalSaldoYear)
-        ].join(';'));
-
-        const csvContent = lines.join('\n');
-        const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
-        const link = document.createElement('a');
-        const url = URL.createObjectURL(blob);
-        link.href = url;
-        link.download = ext === 'xlsx' ? 'resumo_anual.xlsx' : 'resumo_anual.csv';
-        document.body.appendChild(link);
-        link.click();
-        document.body.removeChild(link);
-        URL.revokeObjectURL(url);
-      }
-
-      // ----- CRUD -----
-      function togglePaid(id) {
+      // ---------- CRUD (async onde necessário) ----------
+      async function togglePaid(id) {
         const tx = state.transactions.find(t => t.id === id);
         if (!tx) return;
         tx.paid = !tx.paid;
-        saveTransactions();
+        await saveTransactions();
         renderDashboard(state.selectedMonth);
       }
 
-      function toggleInvoiceStatusForSelectedMonth(card) {
+      async function toggleInvoiceStatusForSelectedMonth(card) {
         const year = getYearForSelectedMonth();
         const m = state.selectedMonth;
         const key = keyInvoice(year, m, card);
         state.invoicesPaid[key] = !state.invoicesPaid[key];
-        saveInvoices();
+        await saveInvoices();
         renderCardsFaturas();
       }
 
-      function deleteTransaction(id) {
+      async function deleteTransaction(id) {
         state.transactions = state.transactions.filter((t) => t.id !== id);
-        saveTransactions();
+        await saveTransactions();
         renderDashboard(state.selectedMonth);
       }
 
-      function addTransaction({ description, value, date, category, subCategory, isCreditCard, card, parcelas, paymentMethod }) {
+      async function addTransaction({ description, value, date, category, subCategory, isCreditCard, card, parcelas, paymentMethod }) {
         const baseDate = new Date(date);
         if (isNaN(baseDate.getTime())) return;
-
         const total = Number(value) || 0;
         let nParcelas = 1;
-        if (isCreditCard && category !== 'fixa') {
-          nParcelas = Math.max(1, Math.floor(parcelas || 1));
-        }
+        if (isCreditCard && category !== 'fixa') nParcelas = Math.max(1, Math.floor(parcelas || 1));
 
-        // Despesa fixa recorrente
         if (category === 'fixa') {
           const year = baseDate.getFullYear();
           const startMonth = baseDate.getMonth();
@@ -1927,10 +1663,8 @@
           for (let i = 0; i < nParcelas; i++) {
             let cents = baseCents + (i < remainder ? 1 : 0);
             const amount = cents / 100;
-
             const d = new Date(baseDate);
             d.setMonth(d.getMonth() + i);
-
             const tx = {
               id: generateId(),
               description: `${description} (${i + 1}/${nParcelas})`,
@@ -1950,22 +1684,20 @@
           }
         }
 
-        saveTransactions();
+        await saveTransactions();
         renderDashboard(state.selectedMonth);
       }
 
-      // ----- MODAL EDIÇÃO -----
+      // ---------- Modal edição ----------
       function openEditModal(id) {
         const tx = state.transactions.find((t) => t.id === id);
         if (!tx) return;
-
         state.editingId = id;
         state.editingMode = 'single';
         state.editingGroupId = tx.groupId || null;
 
         const modal = document.getElementById('editModal');
-        modal.classList.remove('hidden');
-        modal.classList.add('flex');
+        modal.classList.remove('hidden'); modal.classList.add('flex');
 
         document.getElementById('editDesc').value = tx.description || '';
         document.getElementById('editValor').value = Number(tx.value || 0);
@@ -1981,19 +1713,13 @@
         const editCartao = document.getElementById('editCartao');
 
         if (tx.category === 'receita') {
-          paymentContainer.classList.add('hidden');
-          editIsCartao.checked = false;
-          editCartaoFields.classList.add('hidden');
+          paymentContainer.classList.add('hidden'); editIsCartao.checked = false; editCartaoFields.classList.add('hidden');
         } else {
           paymentContainer.classList.remove('hidden');
           const isCard = !!tx.isCreditCard;
           editIsCartao.checked = isCard;
-          if (isCard) {
-            editCartaoFields.classList.remove('hidden');
-            editCartao.value = tx.card || 'caixa';
-          } else {
-            editCartaoFields.classList.add('hidden');
-          }
+          if (isCard) { editCartaoFields.classList.remove('hidden'); editCartao.value = tx.card || 'caixa'; }
+          else editCartaoFields.classList.add('hidden');
         }
 
         const scopeBlock = document.getElementById('editParcelScope');
@@ -2015,19 +1741,15 @@
 
       function closeEditModal() {
         const modal = document.getElementById('editModal');
-        modal.classList.add('hidden');
-        modal.classList.remove('flex');
-        state.editingId = null;
-        state.editingGroupId = null;
-        state.editingMode = 'single';
+        modal.classList.add('hidden'); modal.classList.remove('flex');
+        state.editingId = null; state.editingGroupId = null; state.editingMode = 'single';
       }
 
-      // ----- Eventos -----
+      // ---------- Eventos e inicialização ----------
       function setupEvents() {
         document.querySelectorAll('.month-btn').forEach((btn) => {
           btn.addEventListener('click', () => renderDashboard(parseInt(btn.getAttribute('data-month-index'), 10)));
         });
-
         document.getElementById('btnAnnual').addEventListener('click', () => renderDashboard(null));
 
         const despIsCartao = document.getElementById('despIsCartao');
@@ -2035,15 +1757,11 @@
         const despCategoria = document.getElementById('despCategoria');
 
         despIsCartao.addEventListener('change', () => {
-          if (despIsCartao.checked) despCartaoFields.classList.remove('hidden');
-          else despCartaoFields.classList.add('hidden');
+          if (despIsCartao.checked) despCartaoFields.classList.remove('hidden'); else despCartaoFields.classList.add('hidden');
           updateParcelVisibility();
         });
 
-        despCategoria.addEventListener('change', () => {
-          populateDespesaSubcategorias();
-          updateParcelVisibility();
-        });
+        despCategoria.addEventListener('change', () => { populateDespesaSubcategorias(); updateParcelVisibility(); });
 
         const formReceita = document.getElementById('formReceita');
         formReceita.addEventListener('submit', (e) => {
@@ -2123,19 +1841,11 @@
         mainCatSelect.addEventListener('change', () => {
           const cat = mainCatSelect.value;
           populateEditSubcategories(cat, null);
-          if (cat === 'receita') {
-            paymentContainer.classList.add('hidden');
-            editIsCartao.checked = false;
-            editCartaoFields.classList.add('hidden');
-          } else {
-            paymentContainer.classList.remove('hidden');
-          }
+          if (cat === 'receita') { paymentContainer.classList.add('hidden'); editIsCartao.checked = false; editCartaoFields.classList.add('hidden'); }
+          else paymentContainer.classList.remove('hidden');
         });
 
-        editIsCartao.addEventListener('change', () => {
-          if (editIsCartao.checked) editCartaoFields.classList.remove('hidden');
-          else editCartaoFields.classList.add('hidden');
-        });
+        editIsCartao.addEventListener('change', () => { if (editIsCartao.checked) editCartaoFields.classList.remove('hidden'); else editCartaoFields.classList.add('hidden'); });
 
         document.getElementById('btnEditClose').addEventListener('click', closeEditModal);
         document.getElementById('btnEditCancel').addEventListener('click', closeEditModal);
@@ -2160,10 +1870,9 @@
         });
 
         const formEdit = document.getElementById('formEdit');
-        formEdit.addEventListener('submit', (e) => {
+        formEdit.addEventListener('submit', async (e) => {
           e.preventDefault();
           if (!state.editingId) return;
-
           const idx = state.transactions.findIndex((t) => t.id === state.editingId);
           if (idx === -1) return;
 
@@ -2189,17 +1898,10 @@
             state.transactions.forEach((t) => {
               if (t.groupId === groupId) {
                 const baseDesc = desc.replace(/\s*\(\d+\/\d+\)\s*$/, '');
-                if (t.parcelas && t.parcelaIndex) {
-                  t.description = `${baseDesc} (${t.parcelaIndex}/${t.parcelas})`;
-                } else {
-                  t.description = baseDesc;
-                }
-                t.category = mainCat;
-                t.subCategory = subCat || null;
-                t.isCreditCard = isCard;
-                t.card = card;
-                t.paymentMethod = isCard ? 'cartao' : 'debito_pix';
-                t.value = value;
+                if (t.parcelas && t.parcelaIndex) t.description = `${baseDesc} (${t.parcelaIndex}/${t.parcelas})`;
+                else t.description = baseDesc;
+                t.category = mainCat; t.subCategory = subCat || null; t.isCreditCard = isCard; t.card = card;
+                t.paymentMethod = isCard ? 'cartao' : 'debito_pix'; t.value = value;
                 const oldDate = new Date(t.date);
                 if (!isNaN(oldDate.getTime())) {
                   const shifted = new Date(oldDate.getTime() + delta);
@@ -2208,32 +1910,19 @@
               }
             });
           } else {
-            txClicked.description = desc;
-            txClicked.value = value;
-            txClicked.date = newDate.toISOString();
-            txClicked.category = mainCat;
-            txClicked.subCategory = subCat || null;
-            txClicked.isCreditCard = isCard;
-            txClicked.card = card;
+            txClicked.description = desc; txClicked.value = value; txClicked.date = newDate.toISOString();
+            txClicked.category = mainCat; txClicked.subCategory = subCat || null; txClicked.isCreditCard = isCard; txClicked.card = card;
             txClicked.paymentMethod = isCard ? 'cartao' : 'debito_pix';
           }
 
-          saveTransactions();
+          await saveTransactions();
           closeEditModal();
           renderDashboard(state.selectedMonth);
         });
 
-        // Filtro de ano
         const yearFilter = document.getElementById('yearFilter');
-        if (yearFilter) {
-          yearFilter.addEventListener('change', () => {
-            const val = yearFilter.value;
-            state.selectedYear = val === 'all' ? 'all' : parseInt(val, 10);
-            renderDashboard(state.selectedMonth);
-          });
-        }
+        if (yearFilter) yearFilter.addEventListener('change', () => { const val = yearFilter.value; state.selectedYear = val === 'all' ? 'all' : parseInt(val, 10); renderDashboard(state.selectedMonth); });
 
-        // Botões de exportação anual
         const btnCsv = document.getElementById('btnExportCsv');
         const btnExcel = document.getElementById('btnExportExcel');
         if (btnCsv) btnCsv.addEventListener('click', () => exportAnnualSummary('csv'));
@@ -2249,9 +1938,33 @@
         updateParcelVisibility();
       }
 
-      function init() {
-        loadTransactions();
-        loadInvoices();
+      // Export CSV / Excel (gera CSV; para xlsx aqui usamos extensão .xlsx com conteúdo CSV — simples)
+      function exportAnnualSummary(ext) {
+        const { monthly, totals } = computeAnnualData();
+        const { totalReceitasYear, totalDespesasYear, totalInvestYear, totalSaldoYear } = totals;
+        const lines = [];
+        lines.push('Mês;Receitas;Despesas;Investimentos;Saldo');
+        monthly.forEach(mData => {
+          function numStr(v) { return (v || 0).toFixed(2).replace('.', ','); }
+          lines.push([ MONTH_NAMES[mData.monthIndex], numStr(mData.receitas), numStr(mData.despesas), numStr(mData.investimentos), numStr(mData.saldo) ].join(';'));
+        });
+        function numStr(v) { return (v || 0).toFixed(2).replace('.', ','); }
+        lines.push([ 'Total', numStr(totalReceitasYear), numStr(totalDespesasYear), numStr(totalInvestYear), numStr(totalSaldoYear) ].join(';'));
+        const csvContent = lines.join('\n');
+        const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+        const link = document.createElement('a');
+        const url = URL.createObjectURL(blob);
+        link.href = url;
+        link.download = ext === 'xlsx' ? 'resumo_anual.xlsx' : 'resumo_anual.csv';
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
+        URL.revokeObjectURL(url);
+      }
+
+      async function init() {
+        await loadTransactions();
+        await loadInvoices();
         refreshYearFilterOptions();
         setupEvents();
         renderDashboard(state.selectedMonth);
