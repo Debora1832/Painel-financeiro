@@ -149,7 +149,6 @@
       </div>
     </header>
 
-    <!-- (mantive os mesmos sections, forms, tables e modal do seu HTML) -->
     <!-- VISÃO MENSAL -->
     <div id="monthlyView" class="space-y-6">
       <!-- 1) RESUMO CARDS (COM SALDO LÍQUIDO) -->
@@ -431,10 +430,14 @@
               </select>
             </div>
 
-            <div class="flex items-center gap-2 pt-1">
-              <input id="despIsCartao" type="checkbox"
-                class="rounded border-gray-300 text-indigo-600 focus:ring-indigo-500" />
-              <label for="despIsCartao" class="text-xs text-gray-700">Pagamento via Cartão de Crédito?</label>
+            <!-- Nova: Forma de Pagamento -->
+            <div class="space-y-2">
+              <label for="despFormaPagamento" class="font-medium text-gray-700">Forma de Pagamento</label>
+              <select id="despFormaPagamento" class="w-full rounded-lg border border-gray-200 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500">
+                <option value="debito_pix">Débito / PIX</option>
+                <option value="cartao">Cartão de Crédito</option>
+                <option value="boleto">Boleto</option>
+              </select>
             </div>
 
             <div id="despCartaoFields" class="space-y-2 pt-1 hidden">
@@ -449,22 +452,16 @@
                   <option value="c6">C6 Bank</option>
                 </select>
               </div>
-              <div id="despParcelasWrapper" class="space-y-1">
-                <label for="despParcelas" class="font-medium text-gray-700">Número de Parcelas</label>
-                <input id="despParcelas" type="number" min="1" max="48" value="1"
-                  class="w-full rounded-lg border border-gray-200 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500" />
-                <p class="text-[11px] text-gray-400">Compras parceladas serão distribuídas automaticamente pelos meses futuros.</p>
-              </div>
             </div>
 
-            <!-- Nova opção: se for investimento, marcar aportado -->
-            <div id="investAportadoRow" class="pt-1 hidden">
-              <label class="text-xs text-gray-700">Já aportado?</label>
-              <div class="flex items-center gap-2">
-                <input id="despAportado" type="checkbox" class="rounded border-gray-300 text-blue-600 focus:ring-blue-500" />
-                <label for="despAportado" class="text-xs text-gray-600">Marcar como aportado</label>
-              </div>
+            <div id="despParcelasWrapper" class="space-y-1 hidden">
+              <label for="despParcelas" class="font-medium text-gray-700">Número de Parcelas</label>
+              <input id="despParcelas" type="number" min="1" max="48" value="1"
+                class="w-full rounded-lg border border-gray-200 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500" />
+              <p class="text-[11px] text-gray-400">Compras parceladas serão distribuídas automaticamente pelos meses futuros.</p>
             </div>
+
+            <!-- Observação: checkbox 'Já aportado?' removido do formulário conforme solicitado -->
           </div>
 
           <div class="pt-2 flex justify-end">
@@ -477,7 +474,7 @@
         </form>
       </section>
 
-      <!-- 4) TABELAS DE TRANSAÇÕES -->
+      <!-- 4) TABELAS DE TRANSAÇÕES (mantidas) -->
       <section class="space-y-4">
         <div class="bg-white rounded-xl shadow-sm border border-gray-100">
           <div class="px-4 py-3 border-b border-gray-100 flex items-center justify-between">
@@ -1127,17 +1124,40 @@
           opt.textContent = label;
           select.appendChild(opt);
         });
-        // mostrar checkbox aportado somente para investimentos
-        const investRow = document.getElementById('investAportadoRow');
-        if (tipo === 'investimento') investRow.classList.remove('hidden'); else investRow.classList.add('hidden');
+
+        // Se for investimento: esconder campos de cartão e parcelas
+        const formaSelect = document.getElementById('despFormaPagamento');
+        if (!formaSelect) return;
+        if (tipo === 'investimento') {
+          formaSelect.value = 'debito_pix'; // default visual
+          document.getElementById('despCartaoFields').classList.add('hidden');
+          document.getElementById('despParcelasWrapper').classList.add('hidden');
+        }
       }
 
-      function updateParcelVisibility() {
+      function updateParcelVisibilityAndCard() {
         const tipo = document.getElementById('despCategoria').value;
-        const isCartao = document.getElementById('despIsCartao').checked;
-        const wrapper = document.getElementById('despParcelasWrapper');
-        if (isCartao && tipo !== 'fixa') wrapper.classList.remove('hidden');
-        else wrapper.classList.add('hidden');
+        const forma = document.getElementById('despFormaPagamento').value;
+        const cartaoWrapper = document.getElementById('despCartaoFields');
+        const parcelasWrapper = document.getElementById('despParcelasWrapper');
+
+        // Se for investimento -> esconder ambos sempre
+        if (tipo === 'investimento') {
+          cartaoWrapper.classList.add('hidden');
+          parcelasWrapper.classList.add('hidden');
+          return;
+        }
+
+        if (forma === 'cartao') {
+          cartaoWrapper.classList.remove('hidden');
+          parcelasWrapper.classList.remove('hidden');
+        } else if (forma === 'boleto') {
+          cartaoWrapper.classList.add('hidden');
+          parcelasWrapper.classList.remove('hidden');
+        } else { // debito_pix / dinheiro
+          cartaoWrapper.classList.add('hidden');
+          parcelasWrapper.classList.add('hidden');
+        }
       }
 
       function populateEditSubcategories(mainCategory, selectedSub) {
@@ -1367,6 +1387,7 @@
           let pagamentoTexto = '-';
           if (t.isCreditCard && t.card) pagamentoTexto = CARD_LABELS[t.card] || '-';
           else if (t.paymentMethod === 'debito_pix') pagamentoTexto = 'Débito/Pix';
+          else if (t.paymentMethod === 'boleto') pagamentoTexto = 'Boleto';
 
           let statusHtml = '';
           if (t.isCreditCard) {
@@ -1857,16 +1878,19 @@
         });
         document.getElementById('btnAnnual').addEventListener('click', () => renderDashboard(null));
 
-        const despIsCartao = document.getElementById('despIsCartao');
-        const despCartaoFields = document.getElementById('despCartaoFields');
         const despCategoria = document.getElementById('despCategoria');
 
-        despIsCartao.addEventListener('change', () => {
-          if (despIsCartao.checked) despCartaoFields.classList.remove('hidden'); else despCartaoFields.classList.add('hidden');
-          updateParcelVisibility();
-        });
+        const formaPagamentoSelect = document.getElementById('despFormaPagamento');
+        if (formaPagamentoSelect) {
+          formaPagamentoSelect.addEventListener('change', () => updateParcelVisibilityAndCard());
+        }
 
-        despCategoria.addEventListener('change', () => { populateDespesaSubcategorias(); updateParcelVisibility(); });
+        if (despCategoria) {
+          despCategoria.addEventListener('change', () => {
+            populateDespesaSubcategorias();
+            updateParcelVisibilityAndCard();
+          });
+        }
 
         const formReceita = document.getElementById('formReceita');
         formReceita.addEventListener('submit', (e) => {
@@ -1905,10 +1929,13 @@
           const date = document.getElementById('despData').value;
           const category = document.getElementById('despCategoria').value;
           const subCategory = document.getElementById('despSubCategoria').value;
-          const isCreditCard = document.getElementById('despIsCartao').checked;
+          const forma = document.getElementById('despFormaPagamento').value;
+
+          // Decidir se é pagamento via cartão
+          const isCreditCard = forma === 'cartao';
           const card = isCreditCard ? document.getElementById('despCartao').value : null;
           const parcelas = isCreditCard ? parseInt(document.getElementById('despParcelas').value || '1', 10) : 1;
-          const aportado = document.getElementById('despAportado') ? document.getElementById('despAportado').checked : false;
+
           if (!description || !date || isNaN(value)) return;
 
           addTransaction({
@@ -1920,17 +1947,23 @@
             isCreditCard,
             card,
             parcelas,
-            paymentMethod: isCreditCard ? 'cartao' : 'debito_pix',
-            aportado: category === 'investimento' ? aportado : false
+            paymentMethod: isCreditCard ? 'cartao' : forma, // 'boleto' or 'debito_pix'
+            aportado: false // sempre false vindo do formulário; o status pode ser alterado via tabela
           });
 
           formDespesa.reset();
-          despCartaoFields.classList.add('hidden');
+          // esconder subseções pós-reset
+          document.getElementById('despCartaoFields').classList.add('hidden');
+          document.getElementById('despParcelasWrapper').classList.add('hidden');
+
+          // repor datas para hoje caso precise
           const today = new Date().toISOString().slice(0, 10);
           const despDataInput = document.getElementById('despData');
           if (despDataInput && !despDataInput.value) despDataInput.value = today;
+
+          // repopular subcategorias e visibilidade
           populateDespesaSubcategorias();
-          updateParcelVisibility();
+          updateParcelVisibilityAndCard();
         });
 
         document.querySelectorAll('.card-status-btn').forEach(btn => {
@@ -2042,7 +2075,7 @@
         if (despDataInput && !despDataInput.value) despDataInput.value = today;
 
         populateDespesaSubcategorias();
-        updateParcelVisibility();
+        updateParcelVisibilityAndCard();
       }
 
       // Export CSV / Excel (gera CSV; para xlsx aqui usamos extensão .xlsx com conteúdo CSV — simples)
