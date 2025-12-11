@@ -25,16 +25,21 @@
       theme: { extend: {} }
     }
   </script>
+
+  <style>
+    /* Tabelas com layout fixo para evitar deslocamento das colunas */
+    table { table-layout: fixed; width: 100%; }
+    table th, table td { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+    .col-date { width: 12%; min-width: 90px; }
+    .col-desc { width: 36%; min-width: 160px; }
+    .col-cat { width: 20%; min-width: 120px; }
+    .col-payment { width: 12%; min-width: 100px; }
+    .col-value { width: 10%; min-width: 100px; text-align: right; }
+    .col-status { width: 8%; min-width: 80px; text-align: center; }
+    .col-action { width: 8%; min-width: 80px; text-align: center; }
+  </style>
 </head>
 <body class="min-h-screen bg-gray-50 flex text-gray-900">
-
-  <!-- (HTML do layout --- mantive todo o markup que você já tinha; removi nada) -->
-  <!-- SIDEBAR e MAIN removidos nesta exibição curta por brevidade? Não: irei manter o markup completo conforme seu original. -->
-  <!-- Para brevidade aqui, mantive seu markup original sem alteração (mesmos ids). -->
-  <!-- --- BEGIN COPY OF YOUR ORIGINAL LAYOUT --- -->
-  <!-- ... (todo o HTML do seu painel — meses, forms, tabelas, cards, modal) ... -->
-  <!-- Vou inserir o layout completo exatamente como você tinha para não quebrar referências de ids. -->
-  <!-- Por questão de organização da resposta, coloco o arquivo COMPLETO abaixo (markup + script). -->
 
   <!-- SIDEBAR -->
   <aside class="w-64 bg-gray-900 text-gray-100 flex flex-col">
@@ -145,12 +150,7 @@
     </header>
 
     <!-- (mantive os mesmos sections, forms, tables e modal do seu HTML) -->
-    <!-- Resumo cards, cartões, forms, tabelas, visão anual e modal edit -->
-    <!-- Para não alongar a resposta visualmente aqui, o markup completo está incluído -->
-    <!-- (no código real abaixo o HTML completo aparece — continue lendo) -->
-    <!-- --- INSERT YOUR FULL BODY LAYOUT HERE (I kept original markup in the long response) --- -->
-
-    <!-- VISÃO MENSAL (copiado do original) -->
+    <!-- VISÃO MENSAL -->
     <div id="monthlyView" class="space-y-6">
       <!-- 1) RESUMO CARDS (COM SALDO LÍQUIDO) -->
       <section class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-5 gap-4">
@@ -230,7 +230,7 @@
         </div>
       </section>
 
-      <!-- 2) CARTÕES -->
+      <!-- 2) CARTÕES (mantido) -->
       <section class="space-y-3">
         <div class="flex items-center justify-between">
           <h2 class="text-lg font-semibold text-gray-900 flex items-center gap-2">
@@ -240,7 +240,6 @@
         </div>
 
         <div class="grid grid-cols-1 lg:grid-cols-3 gap-4">
-          <!-- Total de Faturas -->
           <div class="lg:col-span-1 bg-white rounded-xl shadow-sm border border-gray-100 p-4 flex flex-col justify-between">
             <div class="flex items-center justify-between mb-2">
               <div>
@@ -256,9 +255,8 @@
             </p>
           </div>
 
-          <!-- Cards individuais -->
           <div class="lg:col-span-2 grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-5 gap-3">
-            <!-- Caixa -->
+            <!-- Cartões mantidos -->
             <div class="bg-white rounded-xl shadow-sm border border-gray-100 p-3 flex flex-col gap-1">
               <div class="flex items-center justify-between">
                 <p class="text-xs text-gray-500">Caixa</p>
@@ -271,7 +269,6 @@
               ></button>
             </div>
 
-            <!-- Inter Débora -->
             <div class="bg-white rounded-xl shadow-sm border border-gray-100 p-3 flex flex-col gap-1">
               <div class="flex items-center justify-between">
                 <p class="text-xs text-gray-500">Inter (Débora)</p>
@@ -284,7 +281,6 @@
               ></button>
             </div>
 
-            <!-- Inter Cristiano -->
             <div class="bg-white rounded-xl shadow-sm border border-gray-100 p-3 flex flex-col gap-1">
               <div class="flex items-center justify-between">
                 <p class="text-xs text-gray-500">Inter (Cristiano)</p>
@@ -297,7 +293,6 @@
               ></button>
             </div>
 
-            <!-- Nubank -->
             <div class="bg-white rounded-xl shadow-sm border border-gray-100 p-3 flex flex-col gap-1">
               <div class="flex items-center justify-between">
                 <p class="text-xs text-gray-500">Nubank</p>
@@ -310,7 +305,6 @@
               ></button>
             </div>
 
-            <!-- C6 -->
             <div class="bg-white rounded-xl shadow-sm border border-gray-100 p-3 flex flex-col gap-1">
               <div class="flex items-center justify-between">
                 <p class="text-xs text-gray-500">C6 Bank</p>
@@ -365,10 +359,13 @@
             <div class="space-y-1">
               <label for="recCategoria" class="font-medium text-gray-700">Categoria da Receita</label>
               <select id="recCategoria" class="w-full rounded-lg border border-gray-200 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500">
+                <!-- Opções expandidas -->
                 <option value="salario">Salário</option>
                 <option value="freelancer">Freelancer / Extra</option>
                 <option value="decimo">13º / Bônus</option>
                 <option value="reembolso">Reembolso</option>
+                <option value="aluguéis">Aluguéis</option>
+                <option value="juros_dividendos">Juros / Dividendos</option>
                 <option value="outros">Outros</option>
               </select>
             </div>
@@ -459,6 +456,15 @@
                 <p class="text-[11px] text-gray-400">Compras parceladas serão distribuídas automaticamente pelos meses futuros.</p>
               </div>
             </div>
+
+            <!-- Nova opção: se for investimento, marcar aportado -->
+            <div id="investAportadoRow" class="pt-1 hidden">
+              <label class="text-xs text-gray-700">Já aportado?</label>
+              <div class="flex items-center gap-2">
+                <input id="despAportado" type="checkbox" class="rounded border-gray-300 text-blue-600 focus:ring-blue-500" />
+                <label for="despAportado" class="text-xs text-gray-600">Marcar como aportado</label>
+              </div>
+            </div>
           </div>
 
           <div class="pt-2 flex justify-end">
@@ -484,13 +490,13 @@
             <table class="min-w-full text-sm">
               <thead class="bg-gray-50 border-b border-gray-100">
                 <tr class="text-xs text-gray-500 uppercase tracking-wide">
-                  <th class="text-left px-4 py-2">Data</th>
-                  <th class="text-left px-4 py-2">Descrição</th>
-                  <th class="text-left px-4 py-2">Categoria</th>
-                  <th class="text-left px-4 py-2">Pagamento</th>
-                  <th class="text-right px-4 py-2">Valor</th>
-                  <th class="text-center px-4 py-2">Status</th>
-                  <th class="text-center px-4 py-2">Ação</th>
+                  <th class="col-date text-left px-4 py-2">Data</th>
+                  <th class="col-desc text-left px-4 py-2">Descrição</th>
+                  <th class="col-cat text-left px-4 py-2">Categoria</th>
+                  <th class="col-payment text-left px-4 py-2">Pagamento</th>
+                  <th class="col-value text-right px-4 py-2">Valor</th>
+                  <th class="col-status text-center px-4 py-2">Status</th>
+                  <th class="col-action text-center px-4 py-2">Ação</th>
                 </tr>
               </thead>
               <tbody id="tbodyReceitas" class="divide-y divide-gray-100"></tbody>
@@ -509,13 +515,13 @@
             <table class="min-w-full text-sm">
               <thead class="bg-gray-50 border-b border-gray-100">
                 <tr class="text-xs text-gray-500 uppercase tracking-wide">
-                  <th class="text-left px-4 py-2">Data</th>
-                  <th class="text-left px-4 py-2">Descrição</th>
-                  <th class="text-left px-4 py-2">Categoria</th>
-                  <th class="text-left px-4 py-2">Pagamento</th>
-                  <th class="text-right px-4 py-2">Valor</th>
-                  <th class="text-center px-4 py-2">Status</th>
-                  <th class="text-center px-4 py-2">Ação</th>
+                  <th class="col-date text-left px-4 py-2">Data</th>
+                  <th class="col-desc text-left px-4 py-2">Descrição</th>
+                  <th class="col-cat text-left px-4 py-2">Categoria</th>
+                  <th class="col-payment text-left px-4 py-2">Pagamento</th>
+                  <th class="col-value text-right px-4 py-2">Valor</th>
+                  <th class="col-status text-center px-4 py-2">Status</th>
+                  <th class="col-action text-center px-4 py-2">Ação</th>
                 </tr>
               </thead>
               <tbody id="tbodyFixas" class="divide-y divide-gray-100"></tbody>
@@ -527,30 +533,55 @@
           <div class="px-4 py-3 border-b border-gray-100 flex items-center justify-between">
             <div>
               <h2 class="text-sm font-semibold text-gray-900">Despesas Variáveis</h2>
-              <p class="text-xs text-gray-500">Compras, gastos eventuais e investimentos.</p>
+              <p class="text-xs text-gray-500">Compras e gastos eventuais.</p>
             </div>
           </div>
           <div class="overflow-x-auto">
             <table class="min-w-full text-sm">
               <thead class="bg-gray-50 border-b border-gray-100">
                 <tr class="text-xs text-gray-500 uppercase tracking-wide">
-                  <th class="text-left px-4 py-2">Data</th>
-                  <th class="text-left px-4 py-2">Descrição</th>
-                  <th class="text-left px-4 py-2">Categoria</th>
-                  <th class="text-left px-4 py-2">Pagamento</th>
-                  <th class="text-right px-4 py-2">Valor</th>
-                  <th class="text-center px-4 py-2">Status</th>
-                  <th class="text-center px-4 py-2">Ação</th>
+                  <th class="col-date text-left px-4 py-2">Data</th>
+                  <th class="col-desc text-left px-4 py-2">Descrição</th>
+                  <th class="col-cat text-left px-4 py-2">Categoria</th>
+                  <th class="col-payment text-left px-4 py-2">Pagamento</th>
+                  <th class="col-value text-right px-4 py-2">Valor</th>
+                  <th class="col-status text-center px-4 py-2">Status</th>
+                  <th class="col-action text-center px-4 py-2">Ação</th>
                 </tr>
               </thead>
               <tbody id="tbodyVariaveis" class="divide-y divide-gray-100"></tbody>
             </table>
           </div>
         </div>
+
+        <!-- NOVA TABELA: INVESTIMENTOS MENSAL -->
+        <div class="bg-white rounded-xl shadow-sm border border-gray-100">
+          <div class="px-4 py-3 border-b border-gray-100 flex items-center justify-between">
+            <div>
+              <h2 class="text-sm font-semibold text-gray-900">Investimentos</h2>
+              <p class="text-xs text-gray-500">Aportes do período. Você pode marcar como aportado.</p>
+            </div>
+          </div>
+          <div class="overflow-x-auto">
+            <table class="min-w-full text-sm">
+              <thead class="bg-gray-50 border-b border-gray-100">
+                <tr class="text-xs text-gray-500 uppercase tracking-wide">
+                  <th class="col-date text-left px-4 py-2">Data</th>
+                  <th class="col-desc text-left px-4 py-2">Descrição</th>
+                  <th class="col-cat text-left px-4 py-2">Tipo</th>
+                  <th class="col-value text-right px-4 py-2">Valor</th>
+                  <th class="col-status text-center px-4 py-2">Aportado</th>
+                  <th class="col-action text-center px-4 py-2">Ação</th>
+                </tr>
+              </thead>
+              <tbody id="tbodyInvestimentos" class="divide-y divide-gray-100"></tbody>
+            </table>
+          </div>
+        </div>
       </section>
     </div>
 
-    <!-- VISÃO ANUAL -->
+    <!-- VISÃO ANUAL (mantida) -->
     <div id="annualView" class="space-y-4 hidden">
       <section class="bg-white rounded-xl shadow-sm border border-gray-100">
         <div class="px-4 py-3 border-b border-gray-100 flex items-center justify-between">
@@ -711,7 +742,6 @@
         </div>
       </section>
     </div>
-
   </main>
 
   <!-- MODAL EDIÇÃO (copiado como estava) -->
@@ -821,8 +851,6 @@
     </div>
   </div>
 
-  <!-- --- END MARKUP --- -->
-
   <!-- SCRIPT: módulo com Firebase Firestore integrado -->
   <script type="module">
     // 1) IMPORTS DO FIREBASE (CDN modular)
@@ -850,11 +878,20 @@
       const STORAGE_KEY = 'financeDashboard_transactions';
       const INVOICE_KEY = 'financeDashboard_invoicesPaid';
 
-      // Constantes e mapeamentos (mantidos)
+      // Constantes e mapeamentos (mantidos e expandidos)
       const CATEGORY_LABELS = { receita: 'Receita', investimento: 'Investimento', fixa: 'Despesa Fixa', variavel: 'Despesa Variável' };
-      const RECEITA_SUBCATEGORIES = { salario: 'Salário', freelancer: 'Freelancer / Extra', decimo: '13º / Bônus', reembolso: 'Reembolso', outros: 'Outros' };
-      const DESPESA_SUBCATEGORIES = { moradia: 'Moradia', alimentacao: 'Alimentação', transporte: 'Transporte', lazer: 'Lazer', saude: 'Saúde', educacao: 'Educação', outros: 'Outros' };
-      const INVEST_SUBCATEGORIES = { renda_fixa: 'Renda Fixa', renda_variavel: 'Renda Variável', tesouro: 'Tesouro Direto', fundos: 'Fundos de Investimento', previdencia: 'Previdência', cripto: 'Criptomoedas', outros: 'Outros Investimentos' };
+      const RECEITA_SUBCATEGORIES = {
+        salario: 'Salário', freelancer: 'Freelancer / Extra', decimo: '13º / Bônus',
+        reembolso: 'Reembolso', alugueis: 'Aluguéis', juros_dividendos: 'Juros / Dividendos', outros: 'Outros'
+      };
+      const DESPESA_SUBCATEGORIES = {
+        moradia: 'Moradia', alimentacao: 'Alimentação', transporte: 'Transporte', lazer: 'Lazer',
+        saude: 'Saúde', educacao: 'Educação', servicos: 'Serviços', manutencao: 'Manutenção', outros: 'Outros'
+      };
+      const INVEST_SUBCATEGORIES = {
+        renda_fixa: 'Renda Fixa', renda_variavel: 'Renda Variável', tesouro: 'Tesouro Direto',
+        fundos: 'Fundos de Investimento', previdencia: 'Previdência', cripto: 'Criptomoedas', imoveis: 'Imóveis', outros: 'Outros Investimentos'
+      };
 
       const SUBCATEGORY_COLOR_CLASSES = {
         moradia: 'bg-emerald-50 text-emerald-700 border-emerald-200',
@@ -873,7 +910,10 @@
         tesouro: 'bg-lime-50 text-lime-700 border-lime-200',
         fundos: 'bg-cyan-50 text-cyan-700 border-cyan-200',
         previdencia: 'bg-emerald-50 text-emerald-700 border-emerald-200',
-        cripto: 'bg-purple-50 text-purple-700 border-purple-200'
+        cripto: 'bg-purple-50 text-purple-700 border-purple-200',
+        imoveis: 'bg-slate-50 text-slate-700 border-slate-200',
+        servicos: 'bg-amber-50 text-amber-700 border-amber-200',
+        manutencao: 'bg-rose-50 text-rose-700 border-rose-200'
       };
 
       const CARD_LABELS = {
@@ -900,7 +940,7 @@
         editingGroupId: null
       };
 
-      // Charts
+      // Charts placeholders
       let annualBarChart = null;
       let annualLineChart = null;
       let investPieChart = null;
@@ -935,14 +975,12 @@
       }
 
       // ---------- FIRESTORE PERSISTENCE ----------
-      // Coleções: "transactions" e "invoicesPaid"
       async function loadTransactions() {
         try {
           const snap = await getDocs(collection(db, "transactions"));
           const result = [];
           snap.forEach(docSnap => {
             const data = docSnap.data();
-            // data may contain Firestore types; ensure fields exist
             result.push({
               id: docSnap.id,
               description: data.description || '',
@@ -956,7 +994,8 @@
               parcelaIndex: data.parcelaIndex || 1,
               paymentMethod: data.paymentMethod || null,
               groupId: data.groupId || null,
-              paid: !!data.paid
+              paid: !!data.paid,
+              aportado: !!data.aportado
             });
           });
           state.transactions = result;
@@ -1001,7 +1040,8 @@
               parcelaIndex: data.parcelaIndex || 1,
               paymentMethod: data.paymentMethod || null,
               groupId: data.groupId || null,
-              paid: !!data.paid
+              paid: !!data.paid,
+              aportado: !!data.aportado
             };
             return setDoc(doc(db, "transactions", id), payload);
           }));
@@ -1048,7 +1088,7 @@
         }
       }
 
-      // ---------- LÓGICA DE RENDER / CÁLCULOS (mantida do seu código) ----------
+      // ---------- LÓGICA DE RENDER / CÁLCULOS ----------
       function getFilteredTransactions() {
         return state.transactions.filter((t) => {
           const d = new Date(t.date);
@@ -1087,6 +1127,9 @@
           opt.textContent = label;
           select.appendChild(opt);
         });
+        // mostrar checkbox aportado somente para investimentos
+        const investRow = document.getElementById('investAportadoRow');
+        if (tipo === 'investimento') investRow.classList.remove('hidden'); else investRow.classList.add('hidden');
       }
 
       function updateParcelVisibility() {
@@ -1289,6 +1332,7 @@
         });
       }
 
+      // Build generic rows (receitas / fixas / variaveis)
       function buildTableRows(list, tbodyId, emptyText) {
         const tbody = document.getElementById(tbodyId);
         tbody.innerHTML = '';
@@ -1353,16 +1397,60 @@
         });
       }
 
+      // Build rows specifically for investimentos (com toggle aportado)
+      function buildInvestRows(list, tbodyId, emptyText) {
+        const tbody = document.getElementById(tbodyId);
+        tbody.innerHTML = '';
+
+        if (!list.length) {
+          const tr = document.createElement('tr');
+          tr.innerHTML = `<td colspan="6" class="px-4 py-4 text-center text-xs text-gray-400">${emptyText}</td>`;
+          tbody.appendChild(tr);
+          return;
+        }
+
+        list.forEach((t, index) => {
+          const tr = document.createElement('tr');
+          const zebra = index % 2 === 0 ? 'bg-white' : 'bg-gray-50/50';
+          tr.className = zebra;
+
+          const subLabel = t.subCategory ? (INVEST_SUBCATEGORIES[t.subCategory] || t.subCategory) : '-';
+
+          const aportado = !!t.aportado;
+          const btnClass = aportado ? 'bg-blue-50 text-blue-700 border-blue-200' : 'bg-gray-50 text-gray-600 border-gray-200';
+          const icon = aportado ? 'fa-check' : 'fa-hourglass-half';
+          const statusHtml = `<button class="btn-toggle-aportado inline-flex items-center justify-center px-2.5 py-1 rounded-full border ${btnClass}" data-id="${t.id}" title="${aportado ? 'Aportado' : 'Não aportado'}"><i class="fa-solid ${icon} mr-1 text-[10px]"></i><span class="text-[10px] font-medium">${aportado ? 'Aportado' : 'Não aportado'}</span></button>`;
+
+          tr.innerHTML = `
+            <td class="px-4 py-2 text-xs text-gray-700 whitespace-nowrap">${formatDate(t.date)}</td>
+            <td class="px-4 py-2 text-xs text-gray-800">${t.description || '-'}</td>
+            <td class="px-4 py-2 text-xs text-gray-700">${subLabel}</td>
+            <td class="px-4 py-2 text-xs text-gray-800 text-right">${formatCurrency(t.value)}</td>
+            <td class="px-4 py-2 text-xs text-center">${statusHtml}</td>
+            <td class="px-4 py-2 text-xs text-center">
+              <div class="flex items-center justify-center gap-1">
+                <button class="btn-edit inline-flex items-center justify-center w-7 h-7 rounded-full border border-indigo-100 text-indigo-500 hover:bg-indigo-50" data-id="${t.id}" title="Editar"><i class="fa-solid fa-pen text-[10px]"></i></button>
+                <button class="btn-delete inline-flex items-center justify-center w-7 h-7 rounded-full border border-red-100 text-red-500 hover:bg-red-50" data-id="${t.id}" title="Excluir"><i class="fa-solid fa-trash text-[11px]"></i></button>
+              </div>
+            </td>
+          `;
+          tbody.appendChild(tr);
+        });
+      }
+
       function renderTables() {
         const all = getFilteredTransactions().sort((a, b) => new Date(a.date).getTime() - new Date(b.date).getTime());
         const receitas  = all.filter(t => t.category === 'receita');
         const fixas     = all.filter(t => t.category === 'fixa');
-        const variaveis = all.filter(t => t.category === 'variavel' || t.category === 'investimento');
+        const variaveis = all.filter(t => t.category === 'variavel');
+        const investimentos = all.filter(t => t.category === 'investimento');
 
         buildTableRows(receitas, 'tbodyReceitas', 'Nenhuma receita cadastrada para este período.');
         buildTableRows(fixas, 'tbodyFixas', 'Nenhuma despesa fixa cadastrada para este período.');
-        buildTableRows(variaveis, 'tbodyVariaveis', 'Nenhuma despesa variável ou investimento neste período.');
+        buildTableRows(variaveis, 'tbodyVariaveis', 'Nenhuma despesa variável neste período.');
+        buildInvestRows(investimentos, 'tbodyInvestimentos', 'Nenhum investimento registrado neste período.');
 
+        // bind buttons
         document.querySelectorAll('.btn-delete').forEach((btn) => {
           btn.addEventListener('click', () => deleteTransaction(btn.getAttribute('data-id')));
         });
@@ -1371,6 +1459,9 @@
         });
         document.querySelectorAll('.btn-toggle-paid').forEach((btn) => {
           btn.addEventListener('click', () => togglePaid(btn.getAttribute('data-id')));
+        });
+        document.querySelectorAll('.btn-toggle-aportado').forEach((btn) => {
+          btn.addEventListener('click', () => toggleAportado(btn.getAttribute('data-id')));
         });
       }
 
@@ -1593,6 +1684,14 @@
         renderDashboard(state.selectedMonth);
       }
 
+      async function toggleAportado(id) {
+        const tx = state.transactions.find(t => t.id === id);
+        if (!tx) return;
+        tx.aportado = !tx.aportado;
+        await saveTransactions();
+        renderDashboard(state.selectedMonth);
+      }
+
       async function toggleInvoiceStatusForSelectedMonth(card) {
         const year = getYearForSelectedMonth();
         const m = state.selectedMonth;
@@ -1608,12 +1707,15 @@
         renderDashboard(state.selectedMonth);
       }
 
-      async function addTransaction({ description, value, date, category, subCategory, isCreditCard, card, parcelas, paymentMethod }) {
+      async function addTransaction({ description, value, date, category, subCategory, isCreditCard, card, parcelas, paymentMethod, aportado }) {
         const baseDate = new Date(date);
         if (isNaN(baseDate.getTime())) return;
         const total = Number(value) || 0;
         let nParcelas = 1;
         if (isCreditCard && category !== 'fixa') nParcelas = Math.max(1, Math.floor(parcelas || 1));
+
+        // default aportado false for non-investments, respect param for investments
+        const aportFlag = !!aportado;
 
         if (category === 'fixa') {
           const year = baseDate.getFullYear();
@@ -1633,7 +1735,8 @@
               parcelaIndex: 1,
               paymentMethod: isCreditCard ? 'cartao' : (paymentMethod || 'debito_pix'),
               groupId: null,
-              paid: false
+              paid: false,
+              aportado: false
             };
             state.transactions.push(tx);
           }
@@ -1651,7 +1754,8 @@
             parcelaIndex: 1,
             paymentMethod: isCreditCard ? 'cartao' : (paymentMethod || 'debito_pix'),
             groupId: null,
-            paid: false
+            paid: false,
+            aportado: category === 'investimento' ? aportFlag : false
           };
           state.transactions.push(tx);
         } else {
@@ -1678,7 +1782,8 @@
               parcelaIndex: i + 1,
               paymentMethod: 'cartao',
               groupId,
-              paid: false
+              paid: false,
+              aportado: category === 'investimento' ? aportFlag : false
             };
             state.transactions.push(tx);
           }
@@ -1803,6 +1908,7 @@
           const isCreditCard = document.getElementById('despIsCartao').checked;
           const card = isCreditCard ? document.getElementById('despCartao').value : null;
           const parcelas = isCreditCard ? parseInt(document.getElementById('despParcelas').value || '1', 10) : 1;
+          const aportado = document.getElementById('despAportado') ? document.getElementById('despAportado').checked : false;
           if (!description || !date || isNaN(value)) return;
 
           addTransaction({
@@ -1814,7 +1920,8 @@
             isCreditCard,
             card,
             parcelas,
-            paymentMethod: isCreditCard ? 'cartao' : 'debito_pix'
+            paymentMethod: isCreditCard ? 'cartao' : 'debito_pix',
+            aportado: category === 'investimento' ? aportado : false
           });
 
           formDespesa.reset();
