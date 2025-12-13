@@ -229,7 +229,7 @@
         </div>
       </section>
 
-      <!-- 2) CARTÕES (mantido) -->
+      <!-- 2) CARTÕES (mantido, com cores laterais) -->
       <section class="space-y-3">
         <div class="flex items-center justify-between">
           <h2 class="text-lg font-semibold text-gray-900 flex items-center gap-2">
@@ -255,8 +255,8 @@
           </div>
 
           <div class="lg:col-span-2 grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-5 gap-3">
-            <!-- Cartões mantidos -->
-            <div class="bg-white rounded-xl shadow-sm border border-gray-100 p-3 flex flex-col gap-1">
+            <!-- Cartões mantidos: adicionei border-left colorido para cada cartão -->
+            <div class="bg-white rounded-xl shadow-sm border border-gray-100 p-3 flex flex-col gap-1 border-l-4 border-l-sky-500">
               <div class="flex items-center justify-between">
                 <p class="text-xs text-gray-500">Caixa</p>
                 <i class="fa-solid fa-credit-card text-sky-600 text-sm"></i>
@@ -268,7 +268,7 @@
               ></button>
             </div>
 
-            <div class="bg-white rounded-xl shadow-sm border border-gray-100 p-3 flex flex-col gap-1">
+            <div class="bg-white rounded-xl shadow-sm border border-gray-100 p-3 flex flex-col gap-1 border-l-4 border-l-orange-500">
               <div class="flex items-center justify-between">
                 <p class="text-xs text-gray-500">Inter (Débora)</p>
                 <i class="fa-solid fa-credit-card text-orange-500 text-sm"></i>
@@ -280,7 +280,7 @@
               ></button>
             </div>
 
-            <div class="bg-white rounded-xl shadow-sm border border-gray-100 p-3 flex flex-col gap-1">
+            <div class="bg-white rounded-xl shadow-sm border border-gray-100 p-3 flex flex-col gap-1 border-l-4 border-l-orange-400">
               <div class="flex items-center justify-between">
                 <p class="text-xs text-gray-500">Inter (Cristiano)</p>
                 <i class="fa-solid fa-credit-card text-orange-500 text-sm"></i>
@@ -292,7 +292,7 @@
               ></button>
             </div>
 
-            <div class="bg-white rounded-xl shadow-sm border border-gray-100 p-3 flex flex-col gap-1">
+            <div class="bg-white rounded-xl shadow-sm border border-gray-100 p-3 flex flex-col gap-1 border-l-4 border-l-violet-600">
               <div class="flex items-center justify-between">
                 <p class="text-xs text-gray-500">Nubank</p>
                 <i class="fa-solid fa-credit-card text-purple-600 text-sm"></i>
@@ -304,7 +304,7 @@
               ></button>
             </div>
 
-            <div class="bg-white rounded-xl shadow-sm border border-gray-100 p-3 flex flex-col gap-1">
+            <div class="bg-white rounded-xl shadow-sm border border-gray-100 p-3 flex flex-col gap-1 border-l-4 border-l-slate-700">
               <div class="flex items-center justify-between">
                 <p class="text-xs text-gray-500">C6 Bank</p>
                 <i class="fa-solid fa-credit-card text-gray-900 text-sm"></i>
@@ -437,6 +437,7 @@
                 <option value="debito_pix">Débito / PIX</option>
                 <option value="cartao">Cartão de Crédito</option>
                 <option value="boleto">Boleto</option>
+                <option value="dinheiro">Dinheiro</option>
               </select>
             </div>
 
@@ -848,6 +849,53 @@
     </div>
   </div>
 
+  <!-- MODAL EXCLUSÃO (novo) -->
+  <div id="deleteModal" class="fixed inset-0 z-50 hidden bg-black/40 items-center justify-center">
+    <div class="bg-white rounded-xl shadow-lg w-full max-w-md mx-4 p-4 space-y-3">
+      <div class="flex items-center justify-between">
+        <div>
+          <h2 class="text-sm font-semibold text-gray-900 flex items-center gap-2">
+            <i class="fa-solid fa-trash text-red-500"></i>
+            Confirmar Exclusão
+          </h2>
+          <p id="deleteModalSubtitle" class="text-xs text-gray-500">Selecione se quer excluir apenas este lançamento ou toda a série.</p>
+        </div>
+        <button id="btnDeleteClose" class="w-7 h-7 rounded-full flex items-center justify-center text-gray-400 hover:bg-gray-100">
+          <i class="fa-solid fa-xmark text-xs"></i>
+        </button>
+      </div>
+
+      <div id="deleteScopeBlock" class="hidden border-t border-gray-100 pt-2 mt-2">
+        <p class="text-[11px] text-gray-500 mb-2">
+          Este lançamento faz parte de uma compra parcelada. O que você deseja excluir?
+        </p>
+        <div class="flex gap-2">
+          <button type="button" id="btnDeleteSingle"
+            class="px-3 py-1 rounded-full text-[11px] font-medium bg-indigo-50 text-indigo-600 border border-indigo-200">
+            Apenas esta parcela
+          </button>
+          <button type="button" id="btnDeleteAll"
+            class="px-3 py-1 rounded-full text-[11px] font-medium bg-gray-100 text-gray-600 border border-gray-200">
+            Todas as parcelas
+          </button>
+        </div>
+      </div>
+
+      <p id="deleteSingleText" class="text-[12px] text-gray-700">Ao confirmar, este lançamento será removido permanentemente.</p>
+
+      <div class="pt-3 flex justify-end gap-2">
+        <button type="button" id="btnDeleteCancel"
+          class="px-4 py-2 text-xs font-semibold rounded-lg border border-gray-200 text-gray-600 hover:bg-gray-50">
+          Cancelar
+        </button>
+        <button type="button" id="btnDeleteConfirm"
+          class="px-4 py-2 text-xs font-semibold rounded-lg bg-red-600 text-white hover:bg-red-700">
+          Confirmar exclusão
+        </button>
+      </div>
+    </div>
+  </div>
+
   <!-- SCRIPT: módulo com Firebase Firestore integrado -->
   <script type="module">
     // 1) IMPORTS DO FIREBASE (CDN modular)
@@ -934,7 +982,11 @@
         selectedYear: 'all',
         editingId: null,
         editingMode: 'single',
-        editingGroupId: null
+        editingGroupId: null,
+        // novos campos para exclusão
+        deletingId: null,
+        deletingGroupId: null,
+        deletingMode: 'single' // 'single' | 'all'
       };
 
       // Charts placeholders
@@ -1473,7 +1525,7 @@
 
         // bind buttons
         document.querySelectorAll('.btn-delete').forEach((btn) => {
-          btn.addEventListener('click', () => deleteTransaction(btn.getAttribute('data-id')));
+          btn.addEventListener('click', () => openDeleteModal(btn.getAttribute('data-id')));
         });
         document.querySelectorAll('.btn-edit').forEach((btn) => {
           btn.addEventListener('click', () => openEditModal(btn.getAttribute('data-id')));
@@ -1722,8 +1774,15 @@
         renderCardsFaturas();
       }
 
-      async function deleteTransaction(id) {
+      // Nota: a antiga função deleteTransaction(id) foi mantida mas a chamada direta foi substituída
+      async function deleteTransactionById(id) {
         state.transactions = state.transactions.filter((t) => t.id !== id);
+        await saveTransactions();
+        renderDashboard(state.selectedMonth);
+      }
+
+      async function deleteTransactionsByGroup(groupId) {
+        state.transactions = state.transactions.filter((t) => t.groupId !== groupId);
         await saveTransactions();
         renderDashboard(state.selectedMonth);
       }
@@ -1871,7 +1930,54 @@
         state.editingId = null; state.editingGroupId = null; state.editingMode = 'single';
       }
 
-      // ---------- Eventos e inicialização ----------
+      // ---------- Modal exclusão ----------
+      function openDeleteModal(id) {
+        const tx = state.transactions.find((t) => t.id === id);
+        if (!tx) return;
+        state.deletingId = id;
+        state.deletingGroupId = tx.groupId || null;
+        state.deletingMode = 'single';
+
+        const modal = document.getElementById('deleteModal');
+        const scopeBlock = document.getElementById('deleteScopeBlock');
+        const deleteSingleText = document.getElementById('deleteSingleText');
+
+        // Exibir bloco de escopo somente se fizer parte de um grupo parcelado
+        if (tx.isCreditCard && tx.parcelas && tx.parcelas > 1 && tx.groupId) {
+          scopeBlock.classList.remove('hidden');
+          deleteSingleText.textContent = 'Você pode excluir apenas esta parcela ou todas as parcelas da compra parcelada.';
+          // destacar botão "Apenas esta parcela" por padrão
+          document.getElementById('btnDeleteSingle').classList.add('bg-indigo-50','text-indigo-600','border-indigo-200');
+          document.getElementById('btnDeleteSingle').classList.remove('bg-gray-100','text-gray-600','border-gray-200');
+          document.getElementById('btnDeleteAll').classList.add('bg-gray-100','text-gray-600','border-gray-200');
+          document.getElementById('btnDeleteAll').classList.remove('bg-indigo-50','text-indigo-600','border-indigo-200');
+        } else {
+          scopeBlock.classList.add('hidden');
+          deleteSingleText.textContent = 'Ao confirmar, este lançamento será removido permanentemente.';
+        }
+
+        modal.classList.remove('hidden'); modal.classList.add('flex');
+      }
+
+      function closeDeleteModal() {
+        const modal = document.getElementById('deleteModal');
+        modal.classList.add('hidden'); modal.classList.remove('flex');
+        state.deletingId = null; state.deletingGroupId = null; state.deletingMode = 'single';
+      }
+
+      async function performDelete() {
+        if (!state.deletingId) { closeDeleteModal(); return; }
+
+        if (state.deletingMode === 'all' && state.deletingGroupId) {
+          await deleteTransactionsByGroup(state.deletingGroupId);
+        } else {
+          // single
+          await deleteTransactionById(state.deletingId);
+        }
+        closeDeleteModal();
+      }
+
+      // ---------- EVENTOS e inicialização ----------
       function setupEvents() {
         document.querySelectorAll('.month-btn').forEach((btn) => {
           btn.addEventListener('click', () => renderDashboard(parseInt(btn.getAttribute('data-month-index'), 10)));
@@ -1947,7 +2053,7 @@
             isCreditCard,
             card,
             parcelas,
-            paymentMethod: isCreditCard ? 'cartao' : forma, // 'boleto' or 'debito_pix'
+            paymentMethod: isCreditCard ? 'cartao' : forma, // 'boleto' or 'debito_pix' or 'dinheiro'
             aportado: false // sempre false vindo do formulário; o status pode ser alterado via tabela
           });
 
@@ -2060,6 +2166,32 @@
           renderDashboard(state.selectedMonth);
         });
 
+        // Eventos do modal de exclusão
+        document.getElementById('btnDeleteClose').addEventListener('click', closeDeleteModal);
+        document.getElementById('btnDeleteCancel').addEventListener('click', closeDeleteModal);
+
+        const btnDeleteSingle = document.getElementById('btnDeleteSingle');
+        const btnDeleteAll = document.getElementById('btnDeleteAll');
+        const btnDeleteConfirm = document.getElementById('btnDeleteConfirm');
+
+        if (btnDeleteSingle) btnDeleteSingle.addEventListener('click', () => {
+          state.deletingMode = 'single';
+          btnDeleteSingle.classList.add('bg-indigo-50','text-indigo-600','border-indigo-200');
+          btnDeleteSingle.classList.remove('bg-gray-100','text-gray-600','border-gray-200');
+          btnDeleteAll.classList.add('bg-gray-100','text-gray-600','border-gray-200');
+          btnDeleteAll.classList.remove('bg-indigo-50','text-indigo-600','border-indigo-200');
+        });
+
+        if (btnDeleteAll) btnDeleteAll.addEventListener('click', () => {
+          state.deletingMode = 'all';
+          btnDeleteAll.classList.add('bg-indigo-50','text-indigo-600','border-indigo-200');
+          btnDeleteAll.classList.remove('bg-gray-100','text-gray-600','border-gray-200');
+          btnDeleteSingle.classList.add('bg-gray-100','text-gray-600','border-gray-200');
+          btnDeleteSingle.classList.remove('bg-indigo-50','text-indigo-600','border-indigo-200');
+        });
+
+        if (btnDeleteConfirm) btnDeleteConfirm.addEventListener('click', performDelete);
+
         const yearFilter = document.getElementById('yearFilter');
         if (yearFilter) yearFilter.addEventListener('change', () => { const val = yearFilter.value; state.selectedYear = val === 'all' ? 'all' : parseInt(val, 10); renderDashboard(state.selectedMonth); });
 
@@ -2115,3 +2247,4 @@
   </script>
 </body>
 </html>
+
