@@ -819,6 +819,10 @@
         </div>
 
         <div id="editParcelScope" class="hidden border-t border-gray-100 pt-2 mt-2">
+        <div id="editParcelPreview" class="hidden mt-2 border rounded-lg bg-gray-50 p-2 text-[11px] text-gray-700">
+  <p class="font-medium mb-1">Parcelas que serão afetadas:</p>
+  <ul id="editParcelPreviewList" class="space-y-0.5"></ul>
+</div>
           <p class="text-[11px] text-gray-500 mb-2">
             Este lançamento faz parte de uma compra parcelada. O que você deseja editar?
           </p>
@@ -866,6 +870,10 @@
       </div>
 
       <div id="deleteScopeBlock" class="hidden border-t border-gray-100 pt-2 mt-2">
+        <div id="deleteParcelPreview" class="hidden mt-2 border rounded-lg bg-red-50 p-2 text-[11px] text-red-700">
+  <p class="font-medium mb-1">Parcelas que serão removidas:</p>
+  <ul id="deleteParcelPreviewList" class="space-y-0.5"></ul>
+</div>
         <p class="text-[11px] text-gray-500 mb-2">
           Este lançamento faz parte de uma compra parcelada. O que você deseja excluir?
         </p>
@@ -995,6 +1003,22 @@
       let investPieChart = null;
 
       // ---------- HELPERS ----------
+      function buildParcelPreview(groupId) {
+  if (!groupId) return [];
+
+  return state.transactions
+    .filter(t => t.groupId === groupId)
+    .sort((a, b) => new Date(a.date) - new Date(b.date))
+    .map(t => {
+      const d = new Date(t.date);
+      const labelDate = `${MONTH_NAMES[d.getMonth()]}/${d.getFullYear()}`;
+      const parcelaTxt = t.parcelas > 1
+        ? `(${t.parcelaIndex}/${t.parcelas})`
+        : '';
+      return `• ${labelDate} — ${formatCurrency(t.value)} ${parcelaTxt}`;
+    });
+}
+
       function formatCurrency(value) {
         return new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(value || 0);
       }
@@ -1787,91 +1811,118 @@
         renderDashboard(state.selectedMonth);
       }
 
-      async function addTransaction({ description, value, date, category, subCategory, isCreditCard, card, parcelas, paymentMethod, aportado }) {
-        const baseDate = new Date(date);
-        if (isNaN(baseDate.getTime())) return;
-        const total = Number(value) || 0;
-        let nParcelas = 1;
-        if (isCreditCard && category !== 'fixa') nParcelas = Math.max(1, Math.floor(parcelas || 1));
+    async function addTransaction({
+  description,
+  value,
+  date,
+  category,
+  subCategory,
+  isCreditCard,
+  card,
+  parcelas,
+  paymentMethod,
+  aportado
+}) {
+  const baseDate = new Date(date);
+  if (isNaN(baseDate.getTime())) return;
 
-        // default aportado false for non-investments, respect param for investments
-        const aportFlag = !!aportado;
+  const total = Number(value) || 0;
 
-        if (category === 'fixa') {
-          const year = baseDate.getFullYear();
-          const startMonth = baseDate.getMonth();
-          for (let m = startMonth; m < 12; m++) {
-            const d = new Date(year, m, baseDate.getDate());
-            const tx = {
-              id: generateId(),
-              description,
-              value: total,
-              date: d.toISOString(),
-              category,
-              subCategory: subCategory || null,
-              isCreditCard,
-              card: isCreditCard ? card : null,
-              parcelas: 1,
-              parcelaIndex: 1,
-              paymentMethod: isCreditCard ? 'cartao' : (paymentMethod || 'debito_pix'),
-              groupId: null,
-              paid: false,
-              aportado: false
-            };
-            state.transactions.push(tx);
-          }
-        } else if (!isCreditCard || nParcelas === 1) {
-          const tx = {
-            id: generateId(),
-            description,
-            value: total,
-            date: baseDate.toISOString(),
-            category,
-            subCategory: subCategory || null,
-            isCreditCard,
-            card: isCreditCard ? card : null,
-            parcelas: nParcelas,
-            parcelaIndex: 1,
-            paymentMethod: isCreditCard ? 'cartao' : (paymentMethod || 'debito_pix'),
-            groupId: null,
-            paid: false,
-            aportado: category === 'investimento' ? aportFlag : false
-          };
-          state.transactions.push(tx);
-        } else {
-          const totalCents = Math.round(total * 100);
-          const baseCents = Math.floor(totalCents / nParcelas);
-          const remainder = totalCents - baseCents * nParcelas;
-          const groupId = generateId();
+  let nParcelas = 1;
 
-          for (let i = 0; i < nParcelas; i++) {
-            let cents = baseCents + (i < remainder ? 1 : 0);
-            const amount = cents / 100;
-            const d = new Date(baseDate);
-            d.setMonth(d.getMonth() + i);
-            const tx = {
-              id: generateId(),
-              description: `${description} (${i + 1}/${nParcelas})`,
-              value: amount,
-              date: d.toISOString(),
-              category,
-              subCategory: subCategory || null,
-              isCreditCard: true,
-              card,
-              parcelas: nParcelas,
-              parcelaIndex: i + 1,
-              paymentMethod: 'cartao',
-              groupId,
-              paid: false,
-              aportado: category === 'investimento' ? aportFlag : false
-            };
-            state.transactions.push(tx);
-          }
-        }
+  // ✅ Parcelamento vale para CARTÃO e BOLETO
+  if ((isCreditCard || paymentMethod === 'boleto') && category !== 'fixa') {
+    nParcelas = Math.max(1, Math.floor(parcelas || 1));
+  }
 
-        await saveTransactions();
-        renderDashboard(state.selectedMonth);
-      }
+  // =========================
+  // DESPESA FIXA (mensal)
+  // =========================
+  if (category === 'fixa') {
+    const year = baseDate.getFullYear();
+    const startMonth = baseDate.getMonth();
+
+    for (let m = startMonth; m < 12; m++) {
+      const d = new Date(year, m, baseDate.getDate());
+
+      state.transactions.push({
+        id: generateId(),
+        description,
+        value: total,
+        date: d.toISOString(),
+        category,
+        subCategory,
+        isCreditCard,
+        card: isCreditCard ? card : null,
+        parcelas: 1,
+        parcelaIndex: 1,
+        paymentMethod,
+        groupId: null,
+        paid: false,
+        aportado: false
+      });
+    }
+  }
+
+  // =========================
+  // LANÇAMENTO ÚNICO
+  // =========================
+  else if (nParcelas === 1) {
+    state.transactions.push({
+      id: generateId(),
+      description,
+      value: total,
+      date: baseDate.toISOString(),
+      category,
+      subCategory,
+      isCreditCard,
+      card: isCreditCard ? card : null,
+      parcelas: 1,
+      parcelaIndex: 1,
+      paymentMethod,
+      groupId: null,
+      paid: false,
+      aportado: category === 'investimento' ? !!aportado : false
+    });
+  }
+
+  // =========================
+  // PARCELADO (CARTÃO OU BOLETO)
+  // =========================
+  else {
+    const totalCents = Math.round(total * 100);
+    const baseCents = Math.floor(totalCents / nParcelas);
+    const remainder = totalCents - baseCents * nParcelas;
+    const groupId = generateId();
+
+    for (let i = 0; i < nParcelas; i++) {
+      const cents = baseCents + (i < remainder ? 1 : 0);
+      const d = new Date(baseDate);
+      d.setMonth(d.getMonth() + i);
+
+      state.transactions.push({
+        id: generateId(),
+        description: `${description} (${i + 1}/${nParcelas})`,
+        value: cents / 100,
+        date: d.toISOString(),
+        category,
+        subCategory,
+        isCreditCard,
+        card: isCreditCard ? card : null,
+        parcelas: nParcelas,
+        parcelaIndex: i + 1,
+        paymentMethod: isCreditCard ? 'cartao' : 'boleto',
+        groupId,
+        paid: false,
+        aportado: category === 'investimento' ? !!aportado : false
+      });
+    }
+  }
+
+  await saveTransactions();
+  renderDashboard(state.selectedMonth);
+}
+
 
       // ---------- Modal edição ----------
       function openEditModal(id) {
@@ -1911,17 +1962,40 @@
         const btnSingle = document.getElementById('btnScopeSingle');
         const btnAll = document.getElementById('btnScopeAll');
 
-        if (tx.isCreditCard && tx.parcelas && tx.parcelas > 1 && tx.groupId) {
-          scopeBlock.classList.remove('hidden');
-          state.editingMode = 'single';
-          btnSingle.classList.add('bg-indigo-50','text-indigo-600','border-indigo-200');
-          btnSingle.classList.remove('bg-gray-100','text-gray-600','border-gray-200');
-          btnAll.classList.add('bg-gray-100','text-gray-600','border-gray-200');
-          btnAll.classList.remove('bg-indigo-50','text-indigo-600','border-indigo-200');
-        } else {
-          scopeBlock.classList.add('hidden');
-          state.editingMode = 'single';
-        }
+        const isParceladoSerie =
+  tx.parcelas && tx.parcelas > 1 &&
+  tx.groupId &&
+  (tx.isCreditCard || tx.paymentMethod === 'boleto');
+
+if (isParceladoSerie) {
+  scopeBlock.classList.remove('hidden');
+  state.editingMode = 'single';
+
+  btnSingle.classList.add('bg-indigo-50','text-indigo-600','border-indigo-200');
+  btnSingle.classList.remove('bg-gray-100','text-gray-600','border-gray-200');
+
+  btnAll.classList.add('bg-gray-100','text-gray-600','border-gray-200');
+  btnAll.classList.remove('bg-indigo-50','text-indigo-600','border-indigo-200');
+  const previewBox = document.getElementById('editParcelPreview');
+const previewList = document.getElementById('editParcelPreviewList');
+
+if (previewBox && previewList) {
+  previewList.innerHTML = '';
+  buildParcelPreview(tx.groupId).forEach(text => {
+    const li = document.createElement('li');
+    li.textContent = text;
+    previewList.appendChild(li);
+  });
+  previewBox.classList.remove('hidden');
+}
+
+} else {
+  scopeBlock.classList.add('hidden');
+  state.editingMode = 'single';
+  const previewBox = document.getElementById('editParcelPreview');
+if (previewBox) previewBox.classList.add('hidden');
+
+}
       }
 
       function closeEditModal() {
@@ -1943,18 +2017,46 @@
         const deleteSingleText = document.getElementById('deleteSingleText');
 
         // Exibir bloco de escopo somente se fizer parte de um grupo parcelado
-        if (tx.isCreditCard && tx.parcelas && tx.parcelas > 1 && tx.groupId) {
-          scopeBlock.classList.remove('hidden');
-          deleteSingleText.textContent = 'Você pode excluir apenas esta parcela ou todas as parcelas da compra parcelada.';
-          // destacar botão "Apenas esta parcela" por padrão
-          document.getElementById('btnDeleteSingle').classList.add('bg-indigo-50','text-indigo-600','border-indigo-200');
-          document.getElementById('btnDeleteSingle').classList.remove('bg-gray-100','text-gray-600','border-gray-200');
-          document.getElementById('btnDeleteAll').classList.add('bg-gray-100','text-gray-600','border-gray-200');
-          document.getElementById('btnDeleteAll').classList.remove('bg-indigo-50','text-indigo-600','border-indigo-200');
-        } else {
-          scopeBlock.classList.add('hidden');
-          deleteSingleText.textContent = 'Ao confirmar, este lançamento será removido permanentemente.';
-        }
+       const isParceladoSerie =
+  tx.parcelas && tx.parcelas > 1 &&
+  tx.groupId &&
+  (tx.isCreditCard || tx.paymentMethod === 'boleto');
+
+if (isParceladoSerie) {
+  const previewBox = document.getElementById('deleteParcelPreview');
+const previewList = document.getElementById('deleteParcelPreviewList');
+
+if (isParceladoSerie && previewBox && previewList) {
+  previewList.innerHTML = '';
+  buildParcelPreview(tx.groupId).forEach(text => {
+    const li = document.createElement('li');
+    li.textContent = text;
+    previewList.appendChild(li);
+  });
+  previewBox.classList.remove('hidden');
+} else if (previewBox) {
+  previewBox.classList.add('hidden');
+}
+
+  scopeBlock.classList.remove('hidden');
+  deleteSingleText.textContent =
+    'Você pode excluir apenas esta parcela ou todas as parcelas da compra parcelada.';
+
+  document.getElementById('btnDeleteSingle')
+    .classList.add('bg-indigo-50','text-indigo-600','border-indigo-200');
+  document.getElementById('btnDeleteSingle')
+    .classList.remove('bg-gray-100','text-gray-600','border-gray-200');
+
+  document.getElementById('btnDeleteAll')
+    .classList.add('bg-gray-100','text-gray-600','border-gray-200');
+  document.getElementById('btnDeleteAll')
+    .classList.remove('bg-indigo-50','text-indigo-600','border-indigo-200');
+} else {
+  scopeBlock.classList.add('hidden');
+  deleteSingleText.textContent =
+    'Ao confirmar, este lançamento será removido permanentemente.';
+}
+
 
         modal.classList.remove('hidden'); modal.classList.add('flex');
       }
@@ -2039,8 +2141,13 @@
 
           // Decidir se é pagamento via cartão
           const isCreditCard = forma === 'cartao';
-          const card = isCreditCard ? document.getElementById('despCartao').value : null;
-          const parcelas = isCreditCard ? parseInt(document.getElementById('despParcelas').value || '1', 10) : 1;
+const card = isCreditCard ? document.getElementById('despCartao').value : null;
+
+// ✅ Parcelas valem para CARTÃO e BOLETO
+let parcelas = 1;
+if (forma === 'cartao' || forma === 'boleto') {
+  parcelas = parseInt(document.getElementById('despParcelas').value || '1', 10);
+}
 
           if (!description || !date || isNaN(value)) return;
 
@@ -2247,4 +2354,5 @@
   </script>
 </body>
 </html>
+
 
