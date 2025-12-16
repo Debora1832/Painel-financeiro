@@ -37,6 +37,13 @@
     .col-value { width: 10%; min-width: 100px; text-align: right; }
     .col-status { width: 8%; min-width: 80px; text-align: center; }
     .col-action { width: 8%; min-width: 80px; text-align: center; }
+    
+    /* Sorting styles */
+    .sortable { cursor: pointer; user-select: none; position: relative; padding-right: 20px !important; }
+    .sortable:hover { background-color: rgba(99, 102, 241, 0.1); }
+    .sortable::after { content: '⇅'; position: absolute; right: 8px; opacity: 0.3; font-size: 10px; }
+    .sortable.asc::after { content: '↑'; opacity: 1; color: rgb(99, 102, 241); }
+    .sortable.desc::after { content: '↓'; opacity: 1; color: rgb(99, 102, 241); }
   </style>
 </head>
 <body class="min-h-screen bg-gray-50 flex text-gray-900">
@@ -485,15 +492,15 @@
             </div>
           </div>
           <div class="overflow-x-auto">
-            <table class="min-w-full text-sm">
+            <table id="tableReceitas" class="min-w-full text-sm">
               <thead class="bg-gray-50 border-b border-gray-100">
                 <tr class="text-xs text-gray-500 uppercase tracking-wide">
-                  <th class="col-date text-left px-4 py-2">Data</th>
-                  <th class="col-desc text-left px-4 py-2">Descrição</th>
-                  <th class="col-cat text-left px-4 py-2">Categoria</th>
-                  <th class="col-payment text-left px-4 py-2">Pagamento</th>
-                  <th class="col-value text-right px-4 py-2">Valor</th>
-                  <th class="col-status text-center px-4 py-2">Status</th>
+                  <th class="col-date text-left px-4 py-2 sortable" data-column="0" data-type="date">Data</th>
+                  <th class="col-desc text-left px-4 py-2 sortable" data-column="1" data-type="text">Descrição</th>
+                  <th class="col-cat text-left px-4 py-2 sortable" data-column="2" data-type="text">Categoria</th>
+                  <th class="col-payment text-left px-4 py-2 sortable" data-column="3" data-type="text">Pagamento</th>
+                  <th class="col-value text-right px-4 py-2 sortable" data-column="4" data-type="number">Valor</th>
+                  <th class="col-status text-center px-4 py-2 sortable" data-column="5" data-type="text">Status</th>
                   <th class="col-action text-center px-4 py-2">Ação</th>
                 </tr>
                 <tr class="bg-white border-b border-gray-100">
@@ -519,15 +526,15 @@
             </div>
           </div>
           <div class="overflow-x-auto">
-            <table class="min-w-full text-sm">
+            <table id="tableFixas" class="min-w-full text-sm">
               <thead class="bg-gray-50 border-b border-gray-100">
                 <tr class="text-xs text-gray-500 uppercase tracking-wide">
-                  <th class="col-date text-left px-4 py-2">Data</th>
-                  <th class="col-desc text-left px-4 py-2">Descrição</th>
-                  <th class="col-cat text-left px-4 py-2">Categoria</th>
-                  <th class="col-payment text-left px-4 py-2">Pagamento</th>
-                  <th class="col-value text-right px-4 py-2">Valor</th>
-                  <th class="col-status text-center px-4 py-2">Status</th>
+                  <th class="col-date text-left px-4 py-2 sortable" data-column="0" data-type="date">Data</th>
+                  <th class="col-desc text-left px-4 py-2 sortable" data-column="1" data-type="text">Descrição</th>
+                  <th class="col-cat text-left px-4 py-2 sortable" data-column="2" data-type="text">Categoria</th>
+                  <th class="col-payment text-left px-4 py-2 sortable" data-column="3" data-type="text">Pagamento</th>
+                  <th class="col-value text-right px-4 py-2 sortable" data-column="4" data-type="number">Valor</th>
+                  <th class="col-status text-center px-4 py-2 sortable" data-column="5" data-type="text">Status</th>
                   <th class="col-action text-center px-4 py-2">Ação</th>
                 </tr>
                 <tr class="bg-white border-b border-gray-100">
@@ -543,25 +550,19 @@
               <tbody id="tbodyFixas" class="divide-y divide-gray-100"></tbody>
             </table>
           </div>
-        </div>
-
-        <div class="bg-white rounded-xl shadow-sm border border-gray-100">
-          <div class="px-4 py-3 border-b border-gray-100 flex items-center justify-between">
-            <div>
-              <h2 class="text-sm font-semibold text-gray-900">Despesas Variáveis</h2>
               <p class="text-xs text-gray-500">Compras e gastos eventuais.</p>
             </div>
           </div>
           <div class="overflow-x-auto">
-            <table class="min-w-full text-sm">
+            <table id="tableVariaveis" class="min-w-full text-sm">
               <thead class="bg-gray-50 border-b border-gray-100">
                 <tr class="text-xs text-gray-500 uppercase tracking-wide">
-                  <th class="col-date text-left px-4 py-2">Data</th>
-                  <th class="col-desc text-left px-4 py-2">Descrição</th>
-                  <th class="col-cat text-left px-4 py-2">Categoria</th>
-                  <th class="col-payment text-left px-4 py-2">Pagamento</th>
-                  <th class="col-value text-right px-4 py-2">Valor</th>
-                  <th class="col-status text-center px-4 py-2">Status</th>
+                  <th class="col-date text-left px-4 py-2 sortable" data-column="0" data-type="date">Data</th>
+                  <th class="col-desc text-left px-4 py-2 sortable" data-column="1" data-type="text">Descrição</th>
+                  <th class="col-cat text-left px-4 py-2 sortable" data-column="2" data-type="text">Categoria</th>
+                  <th class="col-payment text-left px-4 py-2 sortable" data-column="3" data-type="text">Pagamento</th>
+                  <th class="col-value text-right px-4 py-2 sortable" data-column="4" data-type="number">Valor</th>
+                  <th class="col-status text-center px-4 py-2 sortable" data-column="5" data-type="text">Status</th>
                   <th class="col-action text-center px-4 py-2">Ação</th>
                 </tr>
                 <tr class="bg-white border-b border-gray-100">
@@ -588,14 +589,14 @@
             </div>
           </div>
           <div class="overflow-x-auto">
-            <table class="min-w-full text-sm">
+            <table id="tableInvestimentos" class="min-w-full text-sm">
               <thead class="bg-gray-50 border-b border-gray-100">
                 <tr class="text-xs text-gray-500 uppercase tracking-wide">
-                  <th class="col-date text-left px-4 py-2">Data</th>
-                  <th class="col-desc text-left px-4 py-2">Descrição</th>
-                  <th class="col-cat text-left px-4 py-2">Tipo</th>
-                  <th class="col-value text-right px-4 py-2">Valor</th>
-                  <th class="col-status text-center px-4 py-2">Aportado</th>
+                  <th class="col-date text-left px-4 py-2 sortable" data-column="0" data-type="date">Data</th>
+                  <th class="col-desc text-left px-4 py-2 sortable" data-column="1" data-type="text">Descrição</th>
+                  <th class="col-cat text-left px-4 py-2 sortable" data-column="2" data-type="text">Tipo</th>
+                  <th class="col-value text-right px-4 py-2 sortable" data-column="3" data-type="number">Valor</th>
+                  <th class="col-status text-center px-4 py-2 sortable" data-column="4" data-type="text">Aportado</th>
                   <th class="col-action text-center px-4 py-2">Ação</th>
                 </tr>
                 <tr class="bg-white border-b border-gray-100">
@@ -2160,6 +2161,92 @@ if (isParceladoSerie && previewBox && previewList) {
         });
       }
 
+      // Table sorting function
+      function setupTableSorting() {
+        document.querySelectorAll('.sortable').forEach(header => {
+          header.addEventListener('click', function() {
+            const table = this.closest('table');
+            const tbody = table.querySelector('tbody');
+            const columnIndex = parseInt(this.getAttribute('data-column'));
+            const dataType = this.getAttribute('data-type');
+            
+            // Determine sort direction
+            const currentDirection = this.classList.contains('asc') ? 'asc' : 
+                                   this.classList.contains('desc') ? 'desc' : 'none';
+            let newDirection = 'asc';
+            
+            if (currentDirection === 'none') {
+              newDirection = 'asc';
+            } else if (currentDirection === 'asc') {
+              newDirection = 'desc';
+            } else {
+              newDirection = 'asc';
+            }
+            
+            // Remove sorting classes from all headers in this table
+            table.querySelectorAll('.sortable').forEach(h => {
+              h.classList.remove('asc', 'desc');
+            });
+            
+            // Add new sorting class
+            this.classList.add(newDirection);
+            
+            // Get all rows (excluding empty state rows)
+            const rows = Array.from(tbody.querySelectorAll('tr')).filter(row => 
+              !row.querySelector('td[colspan]')
+            );
+            
+            // Sort rows
+            rows.sort((rowA, rowB) => {
+              const cellA = rowA.querySelectorAll('td')[columnIndex];
+              const cellB = rowB.querySelectorAll('td')[columnIndex];
+              
+              if (!cellA || !cellB) return 0;
+              
+              let valA = cellA.textContent.trim();
+              let valB = cellB.textContent.trim();
+              
+              let comparison = 0;
+              
+              if (dataType === 'number') {
+                // Extract numeric value (remove currency symbols, etc.)
+                const numA = parseFloat(valA.replace(/[^\d,.-]/g, '').replace(',', '.')) || 0;
+                const numB = parseFloat(valB.replace(/[^\d,.-]/g, '').replace(',', '.')) || 0;
+                comparison = numA - numB;
+              } else if (dataType === 'date') {
+                // Parse date in DD/MM/YYYY format
+                const parseDate = (dateStr) => {
+                  const parts = dateStr.split('/');
+                  if (parts.length === 3) {
+                    return new Date(parts[2], parts[1] - 1, parts[0]);
+                  }
+                  return new Date(dateStr);
+                };
+                const dateA = parseDate(valA);
+                const dateB = parseDate(valB);
+                comparison = dateA - dateB;
+              } else {
+                // Text comparison
+                comparison = valA.toLowerCase().localeCompare(valB.toLowerCase());
+              }
+              
+              return newDirection === 'asc' ? comparison : -comparison;
+            });
+            
+            // Re-append rows in sorted order
+            rows.forEach(row => tbody.appendChild(row));
+            
+            // Reapply zebra striping
+            tbody.querySelectorAll('tr').forEach((row, index) => {
+              if (!row.querySelector('td[colspan]')) {
+                row.classList.remove('bg-white', 'bg-gray-50/50');
+                row.classList.add(index % 2 === 0 ? 'bg-white' : 'bg-gray-50/50');
+              }
+            });
+          });
+        });
+      }
+
       function setupEvents() {
         document.querySelectorAll('.month-btn').forEach((btn) => {
           btn.addEventListener('click', () => renderDashboard(parseInt(btn.getAttribute('data-month-index'), 10)));
@@ -2396,6 +2483,7 @@ if (forma === 'cartao' || forma === 'boleto') {
         populateDespesaSubcategorias();
         updateParcelVisibilityAndCard();
         setupTableFilters();
+        setupTableSorting();
       }
 
       // Export CSV / Excel (gera CSV; para xlsx aqui usamos extensão .xlsx com conteúdo CSV — simples)
