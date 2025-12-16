@@ -68,6 +68,101 @@
     .clear-filters-btn.visible {
       display: inline-flex;
     }
+    
+    /* Mobile card view styles */
+    @media (max-width: 767px) {
+      /* Hide table view on mobile */
+      .table-container table {
+        display: none;
+      }
+      
+      /* Show card view on mobile */
+      .card-view {
+        display: block !important;
+      }
+      
+      /* Card styles */
+      .transaction-card {
+        background: white;
+        border: 1px solid #e5e7eb;
+        border-radius: 8px;
+        padding: 16px;
+        margin-bottom: 12px;
+        box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.1);
+      }
+      
+      .card-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: start;
+        margin-bottom: 12px;
+        padding-bottom: 12px;
+        border-bottom: 1px solid #f3f4f6;
+      }
+      
+      .card-title {
+        font-weight: 600;
+        font-size: 14px;
+        color: #111827;
+        flex: 1;
+      }
+      
+      .card-value {
+        font-weight: 700;
+        font-size: 16px;
+        color: #111827;
+        white-space: nowrap;
+        margin-left: 12px;
+      }
+      
+      .card-body {
+        display: grid;
+        gap: 8px;
+      }
+      
+      .card-field {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        font-size: 13px;
+      }
+      
+      .card-label {
+        color: #6b7280;
+        font-weight: 500;
+      }
+      
+      .card-value-text {
+        color: #111827;
+        text-align: right;
+      }
+      
+      .card-actions {
+        display: flex;
+        gap: 8px;
+        margin-top: 12px;
+        padding-top: 12px;
+        border-top: 1px solid #f3f4f6;
+      }
+      
+      .card-actions button {
+        flex: 1;
+        font-size: 12px;
+        padding: 6px 12px;
+      }
+      
+      /* Hide clear filters button text on mobile, show only icon */
+      .clear-filters-btn span.btn-text {
+        display: none;
+      }
+    }
+    
+    /* Desktop: hide card view by default */
+    @media (min-width: 768px) {
+      .card-view {
+        display: none !important;
+      }
+    }
   </style>
 </head>
 <body class="min-h-screen bg-gray-50 flex text-gray-900">
@@ -516,10 +611,10 @@
             </div>
             <button class="clear-filters-btn px-3 py-1.5 text-xs font-medium text-indigo-600 bg-indigo-50 border border-indigo-200 rounded-lg hover:bg-indigo-100 transition-colors flex items-center gap-1" data-table="tableReceitas">
               <i class="fa-solid fa-filter-circle-xmark text-xs"></i>
-              Limpar filtros
+              <span class="btn-text">Limpar filtros</span>
             </button>
           </div>
-          <div class="overflow-x-auto">
+          <div class="overflow-x-auto table-container">
             <table id="tableReceitas" class="min-w-full text-sm">
               <thead class="bg-gray-50 border-b border-gray-100">
                 <tr class="text-xs text-gray-500 uppercase tracking-wide">
@@ -562,6 +657,8 @@
               <tbody id="tbodyReceitas" class="divide-y divide-gray-100"></tbody>
             </table>
           </div>
+          <!-- Card view for mobile -->
+          <div id="cardViewReceitas" class="card-view"></div>
         </div>
 
         <div class="bg-white rounded-xl shadow-sm border border-gray-100">
@@ -572,10 +669,10 @@
             </div>
             <button class="clear-filters-btn px-3 py-1.5 text-xs font-medium text-indigo-600 bg-indigo-50 border border-indigo-200 rounded-lg hover:bg-indigo-100 transition-colors flex items-center gap-1" data-table="tableFixas">
               <i class="fa-solid fa-filter-circle-xmark text-xs"></i>
-              Limpar filtros
+              <span class="btn-text">Limpar filtros</span>
             </button>
           </div>
-          <div class="overflow-x-auto">
+          <div class="overflow-x-auto table-container">
             <table id="tableFixas" class="min-w-full text-sm">
               <thead class="bg-gray-50 border-b border-gray-100">
                 <tr class="text-xs text-gray-500 uppercase tracking-wide">
@@ -618,6 +715,8 @@
               <tbody id="tbodyFixas" class="divide-y divide-gray-100"></tbody>
             </table>
           </div>
+          <!-- Card view for mobile -->
+          <div id="cardViewFixas" class="card-view"></div>
         </div>
 
         <div class="bg-white rounded-xl shadow-sm border border-gray-100">
@@ -628,10 +727,10 @@
             </div>
             <button class="clear-filters-btn px-3 py-1.5 text-xs font-medium text-indigo-600 bg-indigo-50 border border-indigo-200 rounded-lg hover:bg-indigo-100 transition-colors flex items-center gap-1" data-table="tableVariaveis">
               <i class="fa-solid fa-filter-circle-xmark text-xs"></i>
-              Limpar filtros
+              <span class="btn-text">Limpar filtros</span>
             </button>
           </div>
-          <div class="overflow-x-auto">
+          <div class="overflow-x-auto table-container">
             <table id="tableVariaveis" class="min-w-full text-sm">
               <thead class="bg-gray-50 border-b border-gray-100">
                 <tr class="text-xs text-gray-500 uppercase tracking-wide">
@@ -674,6 +773,8 @@
               <tbody id="tbodyVariaveis" class="divide-y divide-gray-100"></tbody>
             </table>
           </div>
+          <!-- Card view for mobile -->
+          <div id="cardViewVariaveis" class="card-view"></div>
         </div>
 
         <!-- NOVA TABELA: INVESTIMENTOS MENSAL -->
@@ -685,10 +786,10 @@
             </div>
             <button class="clear-filters-btn px-3 py-1.5 text-xs font-medium text-indigo-600 bg-indigo-50 border border-indigo-200 rounded-lg hover:bg-indigo-100 transition-colors flex items-center gap-1" data-table="tableInvestimentos">
               <i class="fa-solid fa-filter-circle-xmark text-xs"></i>
-              Limpar filtros
+              <span class="btn-text">Limpar filtros</span>
             </button>
           </div>
-          <div class="overflow-x-auto">
+          <div class="overflow-x-auto table-container">
             <table id="tableInvestimentos" class="min-w-full text-sm">
               <thead class="bg-gray-50 border-b border-gray-100">
                 <tr class="text-xs text-gray-500 uppercase tracking-wide">
@@ -726,6 +827,8 @@
               <tbody id="tbodyInvestimentos" class="divide-y divide-gray-100"></tbody>
             </table>
           </div>
+          <!-- Card view for mobile -->
+          <div id="cardViewInvestimentos" class="card-view"></div>
         </div>
       </section>
     </div>
@@ -1686,6 +1789,152 @@
         });
       }
 
+      // Build card view for mobile
+      function buildCardView(list, cardViewId, emptyText) {
+        const cardView = document.getElementById(cardViewId);
+        cardView.innerHTML = '';
+
+        if (!list.length) {
+          cardView.innerHTML = `<div class="px-4 py-8 text-center text-sm text-gray-400">${emptyText}</div>`;
+          return;
+        }
+
+        list.forEach((t) => {
+          const card = document.createElement('div');
+          card.className = 'transaction-card';
+
+          const categoriaBaseLabel = CATEGORY_LABELS[t.category] || '-';
+          let badgesHTML = `<span class="inline-flex items-center px-2 py-0.5 rounded-full border text-[10px] font-medium text-gray-600 bg-gray-50 border-gray-200 mr-1">${categoriaBaseLabel}</span>`;
+
+          if (t.subCategory) {
+            let map;
+            if (t.category === 'receita') map = RECEITA_SUBCATEGORIES;
+            else if (t.category === 'investimento') map = INVEST_SUBCATEGORIES;
+            else map = DESPESA_SUBCATEGORIES;
+            const subLabel = map[t.subCategory];
+            if (subLabel) {
+              const colorClasses = SUBCATEGORY_COLOR_CLASSES[t.subCategory] || 'bg-gray-50 text-gray-700 border-gray-200';
+              badgesHTML += `<span class="inline-flex items-center px-2 py-0.5 rounded-full border text-[10px] font-medium ${colorClasses}">${subLabel}</span>`;
+            }
+          }
+
+          let pagamentoTexto = '-';
+          if (t.isCreditCard && t.card) pagamentoTexto = CARD_LABELS[t.card] || '-';
+          else if (t.paymentMethod === 'debito_pix') pagamentoTexto = 'Débito/Pix';
+          else if (t.paymentMethod === 'boleto') pagamentoTexto = 'Boleto';
+
+          let statusHtml = '';
+          if (t.isCreditCard) {
+            statusHtml = `<span class="text-xs text-gray-400">Cartão</span>`;
+          } else {
+            const isReceita = t.category === 'receita';
+            const statusLabel = isReceita ? (t.paid ? 'Recebido' : 'Não recebido') : (t.paid ? 'Pago' : 'Não pago');
+            const statusIcon  = t.paid ? 'fa-thumbs-up' : 'fa-thumbs-down';
+            const statusClasses = t.paid ? 'bg-emerald-50 text-emerald-600 border-emerald-200' : 'bg-red-50 text-red-500 border-red-200';
+            statusHtml = `<button class="btn-toggle-paid inline-flex items-center justify-center px-3 py-1.5 rounded-full border ${statusClasses}" data-id="${t.id}" title="${statusLabel}"><i class="fa-solid ${statusIcon} mr-1 text-xs"></i><span class="text-xs font-medium">${statusLabel}</span></button>`;
+          }
+
+          card.innerHTML = `
+            <div class="card-header">
+              <div class="card-title">${t.description || '-'}</div>
+              <div class="card-value">${formatCurrency(t.value)}</div>
+            </div>
+            <div class="card-body">
+              <div class="card-field">
+                <span class="card-label">Data:</span>
+                <span class="card-value-text">${formatDate(t.date)}</span>
+              </div>
+              <div class="card-field">
+                <span class="card-label">Categoria:</span>
+                <span class="card-value-text"><div class="flex flex-wrap gap-1 justify-end">${badgesHTML}</div></span>
+              </div>
+              <div class="card-field">
+                <span class="card-label">Pagamento:</span>
+                <span class="card-value-text">${pagamentoTexto}</span>
+              </div>
+              <div class="card-field">
+                <span class="card-label">Status:</span>
+                <span class="card-value-text">${statusHtml}</span>
+              </div>
+            </div>
+            <div class="card-actions">
+              <button class="btn-edit px-4 py-2 text-xs font-medium text-indigo-600 bg-indigo-50 border border-indigo-200 rounded-lg hover:bg-indigo-100 transition-colors flex items-center justify-center gap-1" data-id="${t.id}">
+                <i class="fa-solid fa-pen text-[10px]"></i> Editar
+              </button>
+              <button class="btn-delete px-4 py-2 text-xs font-medium text-red-600 bg-red-50 border border-red-200 rounded-lg hover:bg-red-100 transition-colors flex items-center justify-center gap-1" data-id="${t.id}">
+                <i class="fa-solid fa-trash text-[10px]"></i> Excluir
+              </button>
+            </div>
+          `;
+          cardView.appendChild(card);
+        });
+      }
+
+      // Build card view for investimentos
+      function buildInvestCardView(list, cardViewId, emptyText) {
+        const cardView = document.getElementById(cardViewId);
+        cardView.innerHTML = '';
+
+        if (!list.length) {
+          cardView.innerHTML = `<div class="px-4 py-8 text-center text-sm text-gray-400">${emptyText}</div>`;
+          return;
+        }
+
+        list.forEach((t) => {
+          const card = document.createElement('div');
+          card.className = 'transaction-card';
+
+          const categoriaBaseLabel = CATEGORY_LABELS[t.category] || '-';
+          let badgesHTML = `<span class="inline-flex items-center px-2 py-0.5 rounded-full border text-[10px] font-medium text-gray-600 bg-gray-50 border-gray-200 mr-1">${categoriaBaseLabel}</span>`;
+
+          if (t.subCategory) {
+            const subLabel = INVEST_SUBCATEGORIES[t.subCategory];
+            if (subLabel) {
+              const colorClasses = SUBCATEGORY_COLOR_CLASSES[t.subCategory] || 'bg-gray-50 text-gray-700 border-gray-200';
+              badgesHTML += `<span class="inline-flex items-center px-2 py-0.5 rounded-full border text-[10px] font-medium ${colorClasses}">${subLabel}</span>`;
+            }
+          }
+
+          const aportLabel = t.aportado ? 'Aportado' : 'Não aportado';
+          const aportIcon  = t.aportado ? 'fa-thumbs-up' : 'fa-thumbs-down';
+          const aportClasses = t.aportado ? 'bg-blue-50 text-blue-600 border-blue-200' : 'bg-gray-50 text-gray-500 border-gray-200';
+
+          card.innerHTML = `
+            <div class="card-header">
+              <div class="card-title">${t.description || '-'}</div>
+              <div class="card-value">${formatCurrency(t.value)}</div>
+            </div>
+            <div class="card-body">
+              <div class="card-field">
+                <span class="card-label">Data:</span>
+                <span class="card-value-text">${formatDate(t.date)}</span>
+              </div>
+              <div class="card-field">
+                <span class="card-label">Tipo:</span>
+                <span class="card-value-text"><div class="flex flex-wrap gap-1 justify-end">${badgesHTML}</div></span>
+              </div>
+              <div class="card-field">
+                <span class="card-label">Aportado:</span>
+                <span class="card-value-text">
+                  <button class="btn-toggle-aportado inline-flex items-center justify-center px-3 py-1.5 rounded-full border ${aportClasses}" data-id="${t.id}">
+                    <i class="fa-solid ${aportIcon} mr-1 text-xs"></i><span class="text-xs font-medium">${aportLabel}</span>
+                  </button>
+                </span>
+              </div>
+            </div>
+            <div class="card-actions">
+              <button class="btn-edit px-4 py-2 text-xs font-medium text-indigo-600 bg-indigo-50 border border-indigo-200 rounded-lg hover:bg-indigo-100 transition-colors flex items-center justify-center gap-1" data-id="${t.id}">
+                <i class="fa-solid fa-pen text-[10px]"></i> Editar
+              </button>
+              <button class="btn-delete px-4 py-2 text-xs font-medium text-red-600 bg-red-50 border border-red-200 rounded-lg hover:bg-red-100 transition-colors flex items-center justify-center gap-1" data-id="${t.id}">
+                <i class="fa-solid fa-trash text-[10px]"></i> Excluir
+              </button>
+            </div>
+          `;
+          cardView.appendChild(card);
+        });
+      }
+
       function renderTables() {
         const all = getFilteredTransactions().sort((a, b) => new Date(a.date).getTime() - new Date(b.date).getTime());
         const receitas  = all.filter(t => t.category === 'receita');
@@ -1693,10 +1942,17 @@
         const variaveis = all.filter(t => t.category === 'variavel');
         const investimentos = all.filter(t => t.category === 'investimento');
 
+        // Build table views
         buildTableRows(receitas, 'tbodyReceitas', 'Nenhuma receita cadastrada para este período.');
         buildTableRows(fixas, 'tbodyFixas', 'Nenhuma despesa fixa cadastrada para este período.');
         buildTableRows(variaveis, 'tbodyVariaveis', 'Nenhuma despesa variável neste período.');
         buildInvestRows(investimentos, 'tbodyInvestimentos', 'Nenhum investimento registrado neste período.');
+
+        // Build card views for mobile
+        buildCardView(receitas, 'cardViewReceitas', 'Nenhuma receita cadastrada para este período.');
+        buildCardView(fixas, 'cardViewFixas', 'Nenhuma despesa fixa cadastrada para este período.');
+        buildCardView(variaveis, 'cardViewVariaveis', 'Nenhuma despesa variável neste período.');
+        buildInvestCardView(investimentos, 'cardViewInvestimentos', 'Nenhum investimento registrado neste período.');
 
         // bind buttons
         document.querySelectorAll('.btn-delete').forEach((btn) => {
