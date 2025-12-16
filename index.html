@@ -69,6 +69,27 @@
       display: inline-flex;
     }
     
+    /* Sidebar collapse styles */
+    aside {
+      transition: width 0.3s ease, transform 0.3s ease;
+    }
+    aside.collapsed {
+      width: 64px;
+    }
+    aside.collapsed .sidebar-text {
+      display: none;
+    }
+    aside.collapsed .sidebar-icon {
+      margin: 0 auto;
+    }
+    .sidebar-toggle {
+      cursor: pointer;
+      transition: transform 0.3s ease;
+    }
+    .sidebar-toggle.collapsed {
+      transform: rotate(180deg);
+    }
+    
     /* Mobile card view styles */
     @media (max-width: 767px) {
       /* Hide table view on mobile */
@@ -168,17 +189,20 @@
 <body class="min-h-screen bg-gray-50 flex text-gray-900">
 
   <!-- SIDEBAR -->
-  <aside class="w-64 bg-gray-900 text-gray-100 flex flex-col">
+  <aside id="sidebar" class="w-64 bg-gray-900 text-gray-100 flex flex-col">
     <div class="px-6 py-4 border-b border-gray-800 flex items-center justify-between">
       <div class="flex items-center gap-2">
-        <div class="w-8 h-8 rounded-xl bg-indigo-500 flex items-center justify-center">
+        <div class="w-8 h-8 rounded-xl bg-indigo-500 flex items-center justify-center sidebar-icon">
           <i class="fa-solid fa-wallet text-white text-sm"></i>
         </div>
-        <div>
+        <div class="sidebar-text">
           <p class="font-semibold text-sm">Painel Financeiro</p>
           <p class="text-xs text-gray-400">Controle mensal</p>
         </div>
       </div>
+      <button id="sidebarToggle" class="sidebar-toggle w-6 h-6 rounded flex items-center justify-center hover:bg-gray-800 transition">
+        <i class="fa-solid fa-chevron-left text-xs text-gray-400"></i>
+      </button>
     </div>
 
     <div class="px-4 pt-4 pb-2">
@@ -187,57 +211,57 @@
         class="w-full flex items-center justify-between text-sm px-3 py-2 rounded-lg border border-gray-700 bg-gray-800 hover:bg-gray-700 transition"
       >
         <span class="flex items-center gap-2">
-          <i class="fa-solid fa-chart-pie text-indigo-400"></i>
-          <span>Visão Anual</span>
+          <i class="fa-solid fa-chart-pie text-indigo-400 sidebar-icon"></i>
+          <span class="sidebar-text">Visão Anual</span>
         </span>
-        <i class="fa-solid fa-chevron-right text-xs text-gray-400"></i>
+        <i class="fa-solid fa-chevron-right text-xs text-gray-400 sidebar-text"></i>
       </button>
     </div>
 
     <div class="px-4 py-3">
-      <p class="text-xs uppercase tracking-wide text-gray-500 mb-2">Meses do ano</p>
+      <p class="text-xs uppercase tracking-wide text-gray-500 mb-2 sidebar-text">Meses do ano</p>
       <div class="space-y-1 text-sm">
         <button data-month-index="0" class="month-btn w-full flex justify-between items-center px-3 py-2 rounded-lg hover:bg-gray-800 transition">
-          <span>Janeiro</span><span class="text-[10px] text-gray-500">01</span>
+          <span class="sidebar-text">Janeiro</span><span class="text-[10px] text-gray-500 sidebar-text">01</span>
         </button>
         <button data-month-index="1" class="month-btn w-full flex justify-between items-center px-3 py-2 rounded-lg hover:bg-gray-800 transition">
-          <span>Fevereiro</span><span class="text-[10px] text-gray-500">02</span>
+          <span class="sidebar-text">Fevereiro</span><span class="text-[10px] text-gray-500 sidebar-text">02</span>
         </button>
         <button data-month-index="2" class="month-btn w-full flex justify-between items-center px-3 py-2 rounded-lg hover:bg-gray-800 transition">
-          <span>Março</span><span class="text-[10px] text-gray-500">03</span>
+          <span class="sidebar-text">Março</span><span class="text-[10px] text-gray-500 sidebar-text">03</span>
         </button>
         <button data-month-index="3" class="month-btn w-full flex justify-between items-center px-3 py-2 rounded-lg hover:bg-gray-800 transition">
-          <span>Abril</span><span class="text-[10px] text-gray-500">04</span>
+          <span class="sidebar-text">Abril</span><span class="text-[10px] text-gray-500 sidebar-text">04</span>
         </button>
         <button data-month-index="4" class="month-btn w-full flex justify-between items-center px-3 py-2 rounded-lg hover:bg-gray-800 transition">
-          <span>Maio</span><span class="text-[10px] text-gray-500">05</span>
+          <span class="sidebar-text">Maio</span><span class="text-[10px] text-gray-500 sidebar-text">05</span>
         </button>
         <button data-month-index="5" class="month-btn w-full flex justify-between items-center px-3 py-2 rounded-lg hover:bg-gray-800 transition">
-          <span>Junho</span><span class="text-[10px] text-gray-500">06</span>
+          <span class="sidebar-text">Junho</span><span class="text-[10px] text-gray-500 sidebar-text">06</span>
         </button>
         <button data-month-index="6" class="month-btn w-full flex justify-between items-center px-3 py-2 rounded-lg hover:bg-gray-800 transition">
-          <span>Julho</span><span class="text-[10px] text-gray-500">07</span>
+          <span class="sidebar-text">Julho</span><span class="text-[10px] text-gray-500 sidebar-text">07</span>
         </button>
         <button data-month-index="7" class="month-btn w-full flex justify-between items-center px-3 py-2 rounded-lg hover:bg-gray-800 transition">
-          <span>Agosto</span><span class="text-[10px] text-gray-500">08</span>
+          <span class="sidebar-text">Agosto</span><span class="text-[10px] text-gray-500 sidebar-text">08</span>
         </button>
         <button data-month-index="8" class="month-btn w-full flex justify-between items-center px-3 py-2 rounded-lg hover:bg-gray-800 transition">
-          <span>Setembro</span><span class="text-[10px] text-gray-500">09</span>
+          <span class="sidebar-text">Setembro</span><span class="text-[10px] text-gray-500 sidebar-text">09</span>
         </button>
         <button data-month-index="9" class="month-btn w-full flex justify-between items-center px-3 py-2 rounded-lg hover:bg-gray-800 transition">
-          <span>Outubro</span><span class="text-[10px] text-gray-500">10</span>
+          <span class="sidebar-text">Outubro</span><span class="text-[10px] text-gray-500 sidebar-text">10</span>
         </button>
         <button data-month-index="10" class="month-btn w-full flex justify-between items-center px-3 py-2 rounded-lg hover:bg-gray-800 transition">
-          <span>Novembro</span><span class="text-[10px] text-gray-500">11</span>
+          <span class="sidebar-text">Novembro</span><span class="text-[10px] text-gray-500 sidebar-text">11</span>
         </button>
         <button data-month-index="11" class="month-btn w-full flex justify-between items-center px-3 py-2 rounded-lg hover:bg-gray-800 transition">
-          <span>Dezembro</span><span class="text-[10px] text-gray-500">12</span>
+          <span class="sidebar-text">Dezembro</span><span class="text-[10px] text-gray-500 sidebar-text">12</span>
         </button>
       </div>
     </div>
 
     <div class="mt-auto px-4 py-4 border-t border-gray-800 text-xs text-gray-500">
-      <p>Dados salvos em <span class="font-semibold text-gray-300">Firestore</span>.</p>
+      <p class="sidebar-text">Dados salvos em <span class="font-semibold text-gray-300">Firestore</span>.</p>
     </div>
   </aside>
 
@@ -2674,6 +2698,16 @@ if (isParceladoSerie && previewBox && previewList) {
       }
 
       function setupEvents() {
+        // Sidebar toggle
+        const sidebarToggle = document.getElementById('sidebarToggle');
+        const sidebar = document.getElementById('sidebar');
+        if (sidebarToggle && sidebar) {
+          sidebarToggle.addEventListener('click', () => {
+            sidebar.classList.toggle('collapsed');
+            sidebarToggle.classList.toggle('collapsed');
+          });
+        }
+        
         document.querySelectorAll('.month-btn').forEach((btn) => {
           btn.addEventListener('click', () => renderDashboard(parseInt(btn.getAttribute('data-month-index'), 10)));
         });
