@@ -44,6 +44,30 @@
     .sortable::after { content: '⇅'; position: absolute; right: 8px; opacity: 0.3; font-size: 10px; }
     .sortable.asc::after { content: '↑'; opacity: 1; color: rgb(99, 102, 241); }
     .sortable.desc::after { content: '↓'; opacity: 1; color: rgb(99, 102, 241); }
+    
+    /* Filter styles */
+    .table-filter.active { 
+      border: 2px solid rgb(99, 102, 241) !important; 
+      background-color: rgb(238, 242, 255);
+      padding-left: 24px !important;
+    }
+    .filter-indicator {
+      position: absolute;
+      left: 6px;
+      top: 50%;
+      transform: translateY(-50%);
+      color: rgb(99, 102, 241);
+      font-size: 10px;
+      pointer-events: none;
+    }
+    .filter-cell { position: relative; }
+    .clear-filters-btn {
+      display: none;
+      margin-left: auto;
+    }
+    .clear-filters-btn.visible {
+      display: inline-flex;
+    }
   </style>
 </head>
 <body class="min-h-screen bg-gray-50 flex text-gray-900">
@@ -490,6 +514,10 @@
               <h2 class="text-sm font-semibold text-gray-900">Receitas</h2>
               <p class="text-xs text-gray-500">Entradas detalhadas no período.</p>
             </div>
+            <button class="clear-filters-btn px-3 py-1.5 text-xs font-medium text-indigo-600 bg-indigo-50 border border-indigo-200 rounded-lg hover:bg-indigo-100 transition-colors flex items-center gap-1" data-table="tableReceitas">
+              <i class="fa-solid fa-filter-circle-xmark text-xs"></i>
+              Limpar filtros
+            </button>
           </div>
           <div class="overflow-x-auto">
             <table id="tableReceitas" class="min-w-full text-sm">
@@ -504,12 +532,30 @@
                   <th class="col-action text-center px-4 py-2">Ação</th>
                 </tr>
                 <tr class="bg-white border-b border-gray-100">
-                  <th class="px-2 py-2"><input type="text" placeholder="Filtrar" class="table-filter w-full text-xs px-2 py-1 border border-gray-200 rounded focus:outline-none focus:ring-1 focus:ring-emerald-500" data-column="0"></th>
-                  <th class="px-2 py-2"><input type="text" placeholder="Filtrar" class="table-filter w-full text-xs px-2 py-1 border border-gray-200 rounded focus:outline-none focus:ring-1 focus:ring-emerald-500" data-column="1"></th>
-                  <th class="px-2 py-2"><input type="text" placeholder="Filtrar" class="table-filter w-full text-xs px-2 py-1 border border-gray-200 rounded focus:outline-none focus:ring-1 focus:ring-emerald-500" data-column="2"></th>
-                  <th class="px-2 py-2"><input type="text" placeholder="Filtrar" class="table-filter w-full text-xs px-2 py-1 border border-gray-200 rounded focus:outline-none focus:ring-1 focus:ring-emerald-500" data-column="3"></th>
-                  <th class="px-2 py-2"><input type="text" placeholder="Filtrar" class="table-filter w-full text-xs px-2 py-1 border border-gray-200 rounded focus:outline-none focus:ring-1 focus:ring-emerald-500" data-column="4"></th>
-                  <th class="px-2 py-2"><input type="text" placeholder="Filtrar" class="table-filter w-full text-xs px-2 py-1 border border-gray-200 rounded focus:outline-none focus:ring-1 focus:ring-emerald-500" data-column="5"></th>
+                  <th class="px-2 py-2 filter-cell">
+                    <i class="fa-solid fa-filter filter-indicator" style="display: none;"></i>
+                    <input type="text" placeholder="Filtrar" class="table-filter w-full text-xs px-2 py-1 border border-gray-200 rounded focus:outline-none focus:ring-1 focus:ring-emerald-500" data-column="0">
+                  </th>
+                  <th class="px-2 py-2 filter-cell">
+                    <i class="fa-solid fa-filter filter-indicator" style="display: none;"></i>
+                    <input type="text" placeholder="Filtrar" class="table-filter w-full text-xs px-2 py-1 border border-gray-200 rounded focus:outline-none focus:ring-1 focus:ring-emerald-500" data-column="1">
+                  </th>
+                  <th class="px-2 py-2 filter-cell">
+                    <i class="fa-solid fa-filter filter-indicator" style="display: none;"></i>
+                    <input type="text" placeholder="Filtrar" class="table-filter w-full text-xs px-2 py-1 border border-gray-200 rounded focus:outline-none focus:ring-1 focus:ring-emerald-500" data-column="2">
+                  </th>
+                  <th class="px-2 py-2 filter-cell">
+                    <i class="fa-solid fa-filter filter-indicator" style="display: none;"></i>
+                    <input type="text" placeholder="Filtrar" class="table-filter w-full text-xs px-2 py-1 border border-gray-200 rounded focus:outline-none focus:ring-1 focus:ring-emerald-500" data-column="3">
+                  </th>
+                  <th class="px-2 py-2 filter-cell">
+                    <i class="fa-solid fa-filter filter-indicator" style="display: none;"></i>
+                    <input type="text" placeholder="Filtrar" class="table-filter w-full text-xs px-2 py-1 border border-gray-200 rounded focus:outline-none focus:ring-1 focus:ring-emerald-500" data-column="4">
+                  </th>
+                  <th class="px-2 py-2 filter-cell">
+                    <i class="fa-solid fa-filter filter-indicator" style="display: none;"></i>
+                    <input type="text" placeholder="Filtrar" class="table-filter w-full text-xs px-2 py-1 border border-gray-200 rounded focus:outline-none focus:ring-1 focus:ring-emerald-500" data-column="5">
+                  </th>
                   <th class="px-2 py-2"></th>
                 </tr>
               </thead>
@@ -524,6 +570,10 @@
               <h2 class="text-sm font-semibold text-gray-900">Despesas Fixas</h2>
               <p class="text-xs text-gray-500">Contas recorrentes registradas para todos os meses.</p>
             </div>
+            <button class="clear-filters-btn px-3 py-1.5 text-xs font-medium text-indigo-600 bg-indigo-50 border border-indigo-200 rounded-lg hover:bg-indigo-100 transition-colors flex items-center gap-1" data-table="tableFixas">
+              <i class="fa-solid fa-filter-circle-xmark text-xs"></i>
+              Limpar filtros
+            </button>
           </div>
           <div class="overflow-x-auto">
             <table id="tableFixas" class="min-w-full text-sm">
@@ -538,20 +588,48 @@
                   <th class="col-action text-center px-4 py-2">Ação</th>
                 </tr>
                 <tr class="bg-white border-b border-gray-100">
-                  <th class="px-2 py-2"><input type="text" placeholder="Filtrar" class="table-filter w-full text-xs px-2 py-1 border border-gray-200 rounded focus:outline-none focus:ring-1 focus:ring-amber-500" data-column="0"></th>
-                  <th class="px-2 py-2"><input type="text" placeholder="Filtrar" class="table-filter w-full text-xs px-2 py-1 border border-gray-200 rounded focus:outline-none focus:ring-1 focus:ring-amber-500" data-column="1"></th>
-                  <th class="px-2 py-2"><input type="text" placeholder="Filtrar" class="table-filter w-full text-xs px-2 py-1 border border-gray-200 rounded focus:outline-none focus:ring-1 focus:ring-amber-500" data-column="2"></th>
-                  <th class="px-2 py-2"><input type="text" placeholder="Filtrar" class="table-filter w-full text-xs px-2 py-1 border border-gray-200 rounded focus:outline-none focus:ring-1 focus:ring-amber-500" data-column="3"></th>
-                  <th class="px-2 py-2"><input type="text" placeholder="Filtrar" class="table-filter w-full text-xs px-2 py-1 border border-gray-200 rounded focus:outline-none focus:ring-1 focus:ring-amber-500" data-column="4"></th>
-                  <th class="px-2 py-2"><input type="text" placeholder="Filtrar" class="table-filter w-full text-xs px-2 py-1 border border-gray-200 rounded focus:outline-none focus:ring-1 focus:ring-amber-500" data-column="5"></th>
+                  <th class="px-2 py-2 filter-cell">
+                    <i class="fa-solid fa-filter filter-indicator" style="display: none;"></i>
+                    <input type="text" placeholder="Filtrar" class="table-filter w-full text-xs px-2 py-1 border border-gray-200 rounded focus:outline-none focus:ring-1 focus:ring-amber-500" data-column="0">
+                  </th>
+                  <th class="px-2 py-2 filter-cell">
+                    <i class="fa-solid fa-filter filter-indicator" style="display: none;"></i>
+                    <input type="text" placeholder="Filtrar" class="table-filter w-full text-xs px-2 py-1 border border-gray-200 rounded focus:outline-none focus:ring-1 focus:ring-amber-500" data-column="1">
+                  </th>
+                  <th class="px-2 py-2 filter-cell">
+                    <i class="fa-solid fa-filter filter-indicator" style="display: none;"></i>
+                    <input type="text" placeholder="Filtrar" class="table-filter w-full text-xs px-2 py-1 border border-gray-200 rounded focus:outline-none focus:ring-1 focus:ring-amber-500" data-column="2">
+                  </th>
+                  <th class="px-2 py-2 filter-cell">
+                    <i class="fa-solid fa-filter filter-indicator" style="display: none;"></i>
+                    <input type="text" placeholder="Filtrar" class="table-filter w-full text-xs px-2 py-1 border border-gray-200 rounded focus:outline-none focus:ring-1 focus:ring-amber-500" data-column="3">
+                  </th>
+                  <th class="px-2 py-2 filter-cell">
+                    <i class="fa-solid fa-filter filter-indicator" style="display: none;"></i>
+                    <input type="text" placeholder="Filtrar" class="table-filter w-full text-xs px-2 py-1 border border-gray-200 rounded focus:outline-none focus:ring-1 focus:ring-amber-500" data-column="4">
+                  </th>
+                  <th class="px-2 py-2 filter-cell">
+                    <i class="fa-solid fa-filter filter-indicator" style="display: none;"></i>
+                    <input type="text" placeholder="Filtrar" class="table-filter w-full text-xs px-2 py-1 border border-gray-200 rounded focus:outline-none focus:ring-1 focus:ring-amber-500" data-column="5">
+                  </th>
                   <th class="px-2 py-2"></th>
                 </tr>
               </thead>
               <tbody id="tbodyFixas" class="divide-y divide-gray-100"></tbody>
             </table>
           </div>
+        </div>
+
+        <div class="bg-white rounded-xl shadow-sm border border-gray-100">
+          <div class="px-4 py-3 border-b border-gray-100 flex items-center justify-between">
+            <div>
+              <h2 class="text-sm font-semibold text-gray-900">Despesas Variáveis</h2>
               <p class="text-xs text-gray-500">Compras e gastos eventuais.</p>
             </div>
+            <button class="clear-filters-btn px-3 py-1.5 text-xs font-medium text-indigo-600 bg-indigo-50 border border-indigo-200 rounded-lg hover:bg-indigo-100 transition-colors flex items-center gap-1" data-table="tableVariaveis">
+              <i class="fa-solid fa-filter-circle-xmark text-xs"></i>
+              Limpar filtros
+            </button>
           </div>
           <div class="overflow-x-auto">
             <table id="tableVariaveis" class="min-w-full text-sm">
@@ -566,12 +644,30 @@
                   <th class="col-action text-center px-4 py-2">Ação</th>
                 </tr>
                 <tr class="bg-white border-b border-gray-100">
-                  <th class="px-2 py-2"><input type="text" placeholder="Filtrar" class="table-filter w-full text-xs px-2 py-1 border border-gray-200 rounded focus:outline-none focus:ring-1 focus:ring-orange-500" data-column="0"></th>
-                  <th class="px-2 py-2"><input type="text" placeholder="Filtrar" class="table-filter w-full text-xs px-2 py-1 border border-gray-200 rounded focus:outline-none focus:ring-1 focus:ring-orange-500" data-column="1"></th>
-                  <th class="px-2 py-2"><input type="text" placeholder="Filtrar" class="table-filter w-full text-xs px-2 py-1 border border-gray-200 rounded focus:outline-none focus:ring-1 focus:ring-orange-500" data-column="2"></th>
-                  <th class="px-2 py-2"><input type="text" placeholder="Filtrar" class="table-filter w-full text-xs px-2 py-1 border border-gray-200 rounded focus:outline-none focus:ring-1 focus:ring-orange-500" data-column="3"></th>
-                  <th class="px-2 py-2"><input type="text" placeholder="Filtrar" class="table-filter w-full text-xs px-2 py-1 border border-gray-200 rounded focus:outline-none focus:ring-1 focus:ring-orange-500" data-column="4"></th>
-                  <th class="px-2 py-2"><input type="text" placeholder="Filtrar" class="table-filter w-full text-xs px-2 py-1 border border-gray-200 rounded focus:outline-none focus:ring-1 focus:ring-orange-500" data-column="5"></th>
+                  <th class="px-2 py-2 filter-cell">
+                    <i class="fa-solid fa-filter filter-indicator" style="display: none;"></i>
+                    <input type="text" placeholder="Filtrar" class="table-filter w-full text-xs px-2 py-1 border border-gray-200 rounded focus:outline-none focus:ring-1 focus:ring-orange-500" data-column="0">
+                  </th>
+                  <th class="px-2 py-2 filter-cell">
+                    <i class="fa-solid fa-filter filter-indicator" style="display: none;"></i>
+                    <input type="text" placeholder="Filtrar" class="table-filter w-full text-xs px-2 py-1 border border-gray-200 rounded focus:outline-none focus:ring-1 focus:ring-orange-500" data-column="1">
+                  </th>
+                  <th class="px-2 py-2 filter-cell">
+                    <i class="fa-solid fa-filter filter-indicator" style="display: none;"></i>
+                    <input type="text" placeholder="Filtrar" class="table-filter w-full text-xs px-2 py-1 border border-gray-200 rounded focus:outline-none focus:ring-1 focus:ring-orange-500" data-column="2">
+                  </th>
+                  <th class="px-2 py-2 filter-cell">
+                    <i class="fa-solid fa-filter filter-indicator" style="display: none;"></i>
+                    <input type="text" placeholder="Filtrar" class="table-filter w-full text-xs px-2 py-1 border border-gray-200 rounded focus:outline-none focus:ring-1 focus:ring-orange-500" data-column="3">
+                  </th>
+                  <th class="px-2 py-2 filter-cell">
+                    <i class="fa-solid fa-filter filter-indicator" style="display: none;"></i>
+                    <input type="text" placeholder="Filtrar" class="table-filter w-full text-xs px-2 py-1 border border-gray-200 rounded focus:outline-none focus:ring-1 focus:ring-orange-500" data-column="4">
+                  </th>
+                  <th class="px-2 py-2 filter-cell">
+                    <i class="fa-solid fa-filter filter-indicator" style="display: none;"></i>
+                    <input type="text" placeholder="Filtrar" class="table-filter w-full text-xs px-2 py-1 border border-gray-200 rounded focus:outline-none focus:ring-1 focus:ring-orange-500" data-column="5">
+                  </th>
                   <th class="px-2 py-2"></th>
                 </tr>
               </thead>
@@ -587,6 +683,10 @@
               <h2 class="text-sm font-semibold text-gray-900">Investimentos</h2>
               <p class="text-xs text-gray-500">Aportes do período. Você pode marcar como aportado.</p>
             </div>
+            <button class="clear-filters-btn px-3 py-1.5 text-xs font-medium text-indigo-600 bg-indigo-50 border border-indigo-200 rounded-lg hover:bg-indigo-100 transition-colors flex items-center gap-1" data-table="tableInvestimentos">
+              <i class="fa-solid fa-filter-circle-xmark text-xs"></i>
+              Limpar filtros
+            </button>
           </div>
           <div class="overflow-x-auto">
             <table id="tableInvestimentos" class="min-w-full text-sm">
@@ -600,11 +700,26 @@
                   <th class="col-action text-center px-4 py-2">Ação</th>
                 </tr>
                 <tr class="bg-white border-b border-gray-100">
-                  <th class="px-2 py-2"><input type="text" placeholder="Filtrar" class="table-filter w-full text-xs px-2 py-1 border border-gray-200 rounded focus:outline-none focus:ring-1 focus:ring-blue-500" data-column="0"></th>
-                  <th class="px-2 py-2"><input type="text" placeholder="Filtrar" class="table-filter w-full text-xs px-2 py-1 border border-gray-200 rounded focus:outline-none focus:ring-1 focus:ring-blue-500" data-column="1"></th>
-                  <th class="px-2 py-2"><input type="text" placeholder="Filtrar" class="table-filter w-full text-xs px-2 py-1 border border-gray-200 rounded focus:outline-none focus:ring-1 focus:ring-blue-500" data-column="2"></th>
-                  <th class="px-2 py-2"><input type="text" placeholder="Filtrar" class="table-filter w-full text-xs px-2 py-1 border border-gray-200 rounded focus:outline-none focus:ring-1 focus:ring-blue-500" data-column="3"></th>
-                  <th class="px-2 py-2"><input type="text" placeholder="Filtrar" class="table-filter w-full text-xs px-2 py-1 border border-gray-200 rounded focus:outline-none focus:ring-1 focus:ring-blue-500" data-column="4"></th>
+                  <th class="px-2 py-2 filter-cell">
+                    <i class="fa-solid fa-filter filter-indicator" style="display: none;"></i>
+                    <input type="text" placeholder="Filtrar" class="table-filter w-full text-xs px-2 py-1 border border-gray-200 rounded focus:outline-none focus:ring-1 focus:ring-blue-500" data-column="0">
+                  </th>
+                  <th class="px-2 py-2 filter-cell">
+                    <i class="fa-solid fa-filter filter-indicator" style="display: none;"></i>
+                    <input type="text" placeholder="Filtrar" class="table-filter w-full text-xs px-2 py-1 border border-gray-200 rounded focus:outline-none focus:ring-1 focus:ring-blue-500" data-column="1">
+                  </th>
+                  <th class="px-2 py-2 filter-cell">
+                    <i class="fa-solid fa-filter filter-indicator" style="display: none;"></i>
+                    <input type="text" placeholder="Filtrar" class="table-filter w-full text-xs px-2 py-1 border border-gray-200 rounded focus:outline-none focus:ring-1 focus:ring-blue-500" data-column="2">
+                  </th>
+                  <th class="px-2 py-2 filter-cell">
+                    <i class="fa-solid fa-filter filter-indicator" style="display: none;"></i>
+                    <input type="text" placeholder="Filtrar" class="table-filter w-full text-xs px-2 py-1 border border-gray-200 rounded focus:outline-none focus:ring-1 focus:ring-blue-500" data-column="3">
+                  </th>
+                  <th class="px-2 py-2 filter-cell">
+                    <i class="fa-solid fa-filter filter-indicator" style="display: none;"></i>
+                    <input type="text" placeholder="Filtrar" class="table-filter w-full text-xs px-2 py-1 border border-gray-200 rounded focus:outline-none focus:ring-1 focus:ring-blue-500" data-column="4">
+                  </th>
                   <th class="px-2 py-2"></th>
                 </tr>
               </thead>
@@ -2129,12 +2244,37 @@ if (isParceladoSerie && previewBox && previewList) {
             const columnIndex = parseInt(this.getAttribute('data-column'));
             const filterValue = this.value.toLowerCase().trim();
             
+            // Update visual indicators for this input
+            const filterCell = this.closest('.filter-cell');
+            const filterIcon = filterCell ? filterCell.querySelector('.filter-indicator') : null;
+            
+            if (filterValue) {
+              this.classList.add('active');
+              if (filterIcon) filterIcon.style.display = 'block';
+            } else {
+              this.classList.remove('active');
+              if (filterIcon) filterIcon.style.display = 'none';
+            }
+            
             // Get all filter inputs for this table
             const filterInputs = table.querySelectorAll('.table-filter');
             const filters = Array.from(filterInputs).map(input => ({
               column: parseInt(input.getAttribute('data-column')),
               value: input.value.toLowerCase().trim()
             }));
+            
+            // Check if any filter is active
+            const hasActiveFilters = filters.some(f => f.value);
+            
+            // Update clear filters button visibility
+            const clearBtn = document.querySelector(`[data-table="${table.id}"]`);
+            if (clearBtn) {
+              if (hasActiveFilters) {
+                clearBtn.classList.add('visible');
+              } else {
+                clearBtn.classList.remove('visible');
+              }
+            }
             
             rows.forEach(row => {
               // Skip "no data" rows
@@ -2157,6 +2297,36 @@ if (isParceladoSerie && previewBox && previewList) {
               
               row.style.display = showRow ? '' : 'none';
             });
+          });
+        });
+        
+        // Setup clear filters buttons
+        document.querySelectorAll('.clear-filters-btn').forEach(btn => {
+          btn.addEventListener('click', function() {
+            const tableId = this.getAttribute('data-table');
+            const table = document.getElementById(tableId);
+            if (!table) return;
+            
+            // Clear all filter inputs in this table
+            const filterInputs = table.querySelectorAll('.table-filter');
+            filterInputs.forEach(input => {
+              input.value = '';
+              input.classList.remove('active');
+              
+              const filterCell = input.closest('.filter-cell');
+              const filterIcon = filterCell ? filterCell.querySelector('.filter-indicator') : null;
+              if (filterIcon) filterIcon.style.display = 'none';
+            });
+            
+            // Show all rows
+            const tbody = table.querySelector('tbody');
+            const rows = tbody.querySelectorAll('tr');
+            rows.forEach(row => {
+              row.style.display = '';
+            });
+            
+            // Hide the clear button
+            this.classList.remove('visible');
           });
         });
       }
