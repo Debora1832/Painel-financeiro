@@ -2814,10 +2814,11 @@
         const btnSingle = document.getElementById('btnScopeSingle');
         const btnAll = document.getElementById('btnScopeAll');
 
+        // Check if this is an installment transaction (credit card or boleto)
         const isParceladoSerie =
   tx.parcelas && tx.parcelas > 1 &&
   tx.groupId &&
-  (tx.isCreditCard || tx.paymentMethod === 'boleto');
+  (tx.isCreditCard || tx.paymentMethod === 'boleto' || tx.paymentMethod === 'Boleto');
 
 if (isParceladoSerie) {
   scopeBlock.classList.remove('hidden');
@@ -2927,7 +2928,7 @@ if (previewBox) previewBox.classList.add('hidden');
        const isParceladoSerie =
   tx.parcelas && tx.parcelas > 1 &&
   tx.groupId &&
-  (tx.isCreditCard || tx.paymentMethod === 'boleto');
+  (tx.isCreditCard || tx.paymentMethod === 'boleto' || tx.paymentMethod === 'Boleto');
 
 if (isParceladoSerie) {
   const previewBox = document.getElementById('deleteParcelPreview');
@@ -3465,8 +3466,15 @@ if (forma === 'cartao' || forma === 'boleto') {
                   const baseDesc = desc.replace(/\s*\(\d+\/\d+\)\s*$/, '');
                   if (t.parcelas && t.parcelaIndex) t.description = `${baseDesc} (${t.parcelaIndex}/${t.parcelas})`;
                   else t.description = baseDesc;
-                  t.category = mainCat; t.subCategory = subCat || null; t.isCreditCard = isCard; t.card = card;
-                  t.paymentMethod = isCard ? 'cartao' : 'debito_pix'; t.value = value;
+                   t.category = mainCat; t.subCategory = subCat || null; t.isCreditCard = isCard; t.card = card;
+                  // Preserve paymentMethod if not changing to/from credit card
+                  if (isCard) {
+                    t.paymentMethod = 'cartao';
+                  } else if (!txClicked.paymentMethod || txClicked.paymentMethod === 'cartao') {
+                    t.paymentMethod = 'debito_pix';
+                  }
+                  // Otherwise keep existing paymentMethod (like 'boleto')
+                  t.value = value;
                   const oldDate = new Date(t.date);
                   if (!isNaN(oldDate.getTime())) {
                     const shifted = new Date(oldDate.getTime() + delta);
@@ -3480,7 +3488,13 @@ if (forma === 'cartao' || forma === 'boleto') {
           } else {
             txClicked.description = desc; txClicked.value = value; txClicked.date = newDate.toISOString();
             txClicked.category = mainCat; txClicked.subCategory = subCat || null; txClicked.isCreditCard = isCard; txClicked.card = card;
-            txClicked.paymentMethod = isCard ? 'cartao' : 'debito_pix';
+            // Preserve paymentMethod if not changing to/from credit card
+            if (isCard) {
+              txClicked.paymentMethod = 'cartao';
+            } else if (!txClicked.paymentMethod || txClicked.paymentMethod === 'cartao') {
+              txClicked.paymentMethod = 'debito_pix';
+            }
+            // Otherwise keep existing paymentMethod (like 'boleto')
             
             showToast('Lançamento atualizado com sucesso', 'success');
           }
