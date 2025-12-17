@@ -1159,20 +1159,35 @@
         </div>
 
         <div id="editParcelScope" class="hidden border-t border-gray-100 pt-2 mt-2">
-        <div id="editParcelPreview" class="hidden mt-2 border rounded-lg bg-gray-50 p-2 text-[11px] text-gray-700">
-  <p class="font-medium mb-1">Parcelas que serão afetadas:</p>
-  <ul id="editParcelPreviewList" class="space-y-0.5"></ul>
-</div>
-          <p class="text-[11px] text-gray-500 mb-2">
+          <div id="editParcelNumField" class="space-y-1 mb-3">
+            <label for="editParcelas" class="font-medium text-gray-700 flex items-center gap-2">
+              <i class="fa-solid fa-calculator text-indigo-600"></i>
+              Número de Parcelas
+            </label>
+            <input id="editParcelas" type="number" min="1" max="60" step="1" value="1"
+              class="w-full rounded-lg border border-gray-200 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500" />
+            <p class="text-xs text-gray-500 mt-1">
+              <i class="fa-solid fa-info-circle"></i>
+              Altere o número de parcelas para redistribuir o valor automaticamente
+            </p>
+          </div>
+          <div id="editParcelPreview" class="hidden mt-2 border-2 border-indigo-200 rounded-lg bg-indigo-50 p-3 text-xs">
+            <p class="font-semibold text-indigo-800 mb-2 flex items-center gap-2">
+              <i class="fa-solid fa-receipt text-indigo-600"></i>
+              Nova distribuição de parcelas:
+            </p>
+            <ul id="editParcelPreviewList" class="space-y-1.5 ml-1"></ul>
+          </div>
+          <p class="text-xs text-gray-600 mb-3 mt-3">
             Este lançamento faz parte de uma compra parcelada. O que você deseja editar?
           </p>
           <div class="flex gap-2">
             <button type="button" id="btnScopeSingle"
-              class="px-3 py-1 rounded-full text-[11px] font-medium bg-indigo-50 text-indigo-600 border border-indigo-200">
+              class="px-4 py-2 rounded-lg text-xs font-medium bg-indigo-50 text-indigo-700 border border-indigo-200 hover:bg-indigo-100 transition">
               Apenas esta parcela
             </button>
             <button type="button" id="btnScopeAll"
-              class="px-3 py-1 rounded-full text-[11px] font-medium bg-gray-100 text-gray-600 border border-gray-200">
+              class="px-4 py-2 rounded-lg text-xs font-medium bg-gray-100 text-gray-600 border border-gray-200 hover:bg-gray-200 transition">
               Todas as parcelas
             </button>
           </div>
@@ -2498,23 +2513,31 @@ if (isParceladoSerie) {
   scopeBlock.classList.remove('hidden');
   state.editingMode = 'single';
 
-  btnSingle.classList.add('bg-indigo-50','text-indigo-600','border-indigo-200');
+  btnSingle.classList.add('bg-indigo-50','text-indigo-700','border-indigo-200');
   btnSingle.classList.remove('bg-gray-100','text-gray-600','border-gray-200');
 
   btnAll.classList.add('bg-gray-100','text-gray-600','border-gray-200');
-  btnAll.classList.remove('bg-indigo-50','text-indigo-600','border-indigo-200');
+  btnAll.classList.remove('bg-indigo-50','text-indigo-700','border-indigo-200');
+  
+  // Set current parcelas number
+  const editParcelasInput = document.getElementById('editParcelas');
+  if (editParcelasInput) {
+    editParcelasInput.value = tx.parcelas || 1;
+  }
+  
   const previewBox = document.getElementById('editParcelPreview');
-const previewList = document.getElementById('editParcelPreviewList');
+  const previewList = document.getElementById('editParcelPreviewList');
 
-if (previewBox && previewList) {
-  previewList.innerHTML = '';
-  buildParcelPreview(tx.groupId).forEach(text => {
-    const li = document.createElement('li');
-    li.textContent = text;
-    previewList.appendChild(li);
-  });
-  previewBox.classList.remove('hidden');
-}
+  if (previewBox && previewList) {
+    previewList.innerHTML = '';
+    buildParcelPreview(tx.groupId).forEach(html => {
+      const li = document.createElement('li');
+      li.innerHTML = html;
+      li.className = 'text-indigo-800';
+      previewList.appendChild(li);
+    });
+    previewBox.classList.add('hidden'); // Hidden by default, shows when parcelas changes
+  }
 
 } else {
   scopeBlock.classList.add('hidden');
@@ -2523,6 +2546,53 @@ if (previewBox && previewList) {
 if (previewBox) previewBox.classList.add('hidden');
 
 }
+      }
+
+      // Function to preview new installment distribution
+      function previewNewInstallments() {
+        const tx = state.transactions.find((t) => t.id === state.editingId);
+        if (!tx || !tx.groupId) return;
+        
+        const newParcelas = parseInt(document.getElementById('editParcelas').value) || 1;
+        const currentParcelas = tx.parcelas || 1;
+        
+        // Only show preview if number changed
+        if (newParcelas === currentParcelas) {
+          document.getElementById('editParcelPreview').classList.add('hidden');
+          return;
+        }
+        
+        const totalValue = document.getElementById('editValor').value || 0;
+        const baseDate = new Date(document.getElementById('editData').value);
+        if (isNaN(baseDate.getTime())) return;
+        
+        const previewBox = document.getElementById('editParcelPreview');
+        const previewList = document.getElementById('editParcelPreviewList');
+        
+        if (!previewBox || !previewList) return;
+        
+        // Calculate new distribution
+        const totalCents = Math.round(totalValue * 100);
+        const baseCents = Math.floor(totalCents / newParcelas);
+        const remainder = totalCents - baseCents * newParcelas;
+        
+        previewList.innerHTML = '';
+        
+        for (let i = 0; i < newParcelas; i++) {
+          const cents = baseCents + (i < remainder ? 1 : 0);
+          const d = new Date(baseDate);
+          d.setMonth(d.getMonth() + i);
+          
+          const monthLabel = `${MONTH_NAMES[d.getMonth()]}/${d.getFullYear()}`;
+          const valueLabel = formatCurrency(cents / 100);
+          
+          const li = document.createElement('li');
+          li.innerHTML = `<span class="flex items-center gap-2"><i class="fa-regular fa-calendar text-indigo-600"></i> ${monthLabel} — ${valueLabel} <span class="font-semibold">(${i + 1}/${newParcelas})</span></span>`;
+          li.className = 'text-indigo-800';
+          previewList.appendChild(li);
+        }
+        
+        previewBox.classList.remove('hidden');
       }
 
       function closeEditModal() {
@@ -2998,11 +3068,17 @@ if (forma === 'cartao' || forma === 'boleto') {
 
         btnScopeAll.addEventListener('click', () => {
           state.editingMode = 'all';
-          btnScopeAll.classList.add('bg-indigo-50','text-indigo-600','border-indigo-200');
+          btnScopeAll.classList.add('bg-indigo-50','text-indigo-700','border-indigo-200');
           btnScopeAll.classList.remove('bg-gray-100','text-gray-600','border-gray-200');
           btnScopeSingle.classList.add('bg-gray-100','text-gray-600','border-gray-200');
-          btnScopeSingle.classList.remove('bg-indigo-50','text-indigo-600','border-indigo-200');
+          btnScopeSingle.classList.remove('bg-indigo-50','text-indigo-700','border-indigo-200');
         });
+
+        // Event listener for parcelas input change
+        const editParcelasInput = document.getElementById('editParcelas');
+        if (editParcelasInput) {
+          editParcelasInput.addEventListener('input', previewNewInstallments);
+        }
 
         const formEdit = document.getElementById('formEdit');
         formEdit.addEventListener('submit', async (e) => {
@@ -3027,31 +3103,79 @@ if (forma === 'cartao' || forma === 'boleto') {
           const txClicked = state.transactions[idx];
           const oldClickedDate = new Date(txClicked.date);
           const delta = newDate.getTime() - oldClickedDate.getTime();
+          
+          // Check if parcelas number changed for installment transactions
+          const newParcelas = parseInt(document.getElementById('editParcelas').value) || 1;
+          const isParceladoSerie = txClicked.groupId && txClicked.parcelas > 1;
+          const parcelasChanged = isParceladoSerie && newParcelas !== txClicked.parcelas;
 
           if (state.editingMode === 'all' && txClicked.groupId) {
             const groupId = txClicked.groupId;
-            state.transactions.forEach((t) => {
-              if (t.groupId === groupId) {
-                const baseDesc = desc.replace(/\s*\(\d+\/\d+\)\s*$/, '');
-                if (t.parcelas && t.parcelaIndex) t.description = `${baseDesc} (${t.parcelaIndex}/${t.parcelas})`;
-                else t.description = baseDesc;
-                t.category = mainCat; t.subCategory = subCat || null; t.isCreditCard = isCard; t.card = card;
-                t.paymentMethod = isCard ? 'cartao' : 'debito_pix'; t.value = value;
-                const oldDate = new Date(t.date);
-                if (!isNaN(oldDate.getTime())) {
-                  const shifted = new Date(oldDate.getTime() + delta);
-                  t.date = shifted.toISOString();
-                }
+            
+            // If parcelas changed, delete old installments and create new ones
+            if (parcelasChanged) {
+              // Delete all installments in the group
+              state.transactions = state.transactions.filter((t) => t.groupId !== groupId);
+              
+              // Create new installments with new distribution
+              const totalCents = Math.round(value * 100);
+              const baseCents = Math.floor(totalCents / newParcelas);
+              const remainder = totalCents - baseCents * newParcelas;
+              const newGroupId = generateId();
+              const baseDesc = desc.replace(/\s*\(\d+\/\d+\)\s*$/, '');
+              
+              for (let i = 0; i < newParcelas; i++) {
+                const cents = baseCents + (i < remainder ? 1 : 0);
+                const d = new Date(newDate);
+                d.setMonth(d.getMonth() + i);
+                
+                state.transactions.push({
+                  id: generateId(),
+                  description: `${baseDesc} (${i + 1}/${newParcelas})`,
+                  value: cents / 100,
+                  date: d.toISOString(),
+                  category: mainCat,
+                  subCategory: subCat || null,
+                  isCreditCard: isCard,
+                  card: card,
+                  parcelas: newParcelas,
+                  parcelaIndex: i + 1,
+                  paymentMethod: isCard ? 'cartao' : 'boleto',
+                  groupId: newGroupId,
+                  paid: false,
+                  aportado: mainCat === 'investimento' ? false : false
+                });
               }
-            });
+              
+              showToast(`Parcelas atualizadas: ${txClicked.parcelas} → ${newParcelas}`, 'success');
+            } else {
+              // Normal update for all installments
+              state.transactions.forEach((t) => {
+                if (t.groupId === groupId) {
+                  const baseDesc = desc.replace(/\s*\(\d+\/\d+\)\s*$/, '');
+                  if (t.parcelas && t.parcelaIndex) t.description = `${baseDesc} (${t.parcelaIndex}/${t.parcelas})`;
+                  else t.description = baseDesc;
+                  t.category = mainCat; t.subCategory = subCat || null; t.isCreditCard = isCard; t.card = card;
+                  t.paymentMethod = isCard ? 'cartao' : 'debito_pix'; t.value = value;
+                  const oldDate = new Date(t.date);
+                  if (!isNaN(oldDate.getTime())) {
+                    const shifted = new Date(oldDate.getTime() + delta);
+                    t.date = shifted.toISOString();
+                  }
+                }
+              });
+              
+              showToast('Todas as parcelas atualizadas com sucesso', 'success');
+            }
           } else {
             txClicked.description = desc; txClicked.value = value; txClicked.date = newDate.toISOString();
             txClicked.category = mainCat; txClicked.subCategory = subCat || null; txClicked.isCreditCard = isCard; txClicked.card = card;
             txClicked.paymentMethod = isCard ? 'cartao' : 'debito_pix';
+            
+            showToast('Lançamento atualizado com sucesso', 'success');
           }
 
           await saveTransactions();
-          showToast('Lançamento atualizado com sucesso', 'success');
           closeEditModal();
           renderDashboard(state.selectedMonth);
         });
