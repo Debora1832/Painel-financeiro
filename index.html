@@ -2763,7 +2763,7 @@
         card: isCreditCard ? card : null,
         parcelas: nParcelas,
         parcelaIndex: i + 1,
-        paymentMethod: isCreditCard ? 'cartao' : 'boleto',
+        paymentMethod: paymentMethod, // Preserve the actual payment method
         groupId,
         paid: false,
         aportado: category === 'investimento' ? !!aportado : false
@@ -3450,7 +3450,7 @@ if (forma === 'cartao' || forma === 'boleto') {
                   card: card,
                   parcelas: newParcelas,
                   parcelaIndex: i + 1,
-                  paymentMethod: isCard ? 'cartao' : 'boleto',
+                  paymentMethod: txClicked.paymentMethod, // Preserve original payment method
                   groupId: newGroupId,
                   paid: false,
                   aportado: mainCat === 'investimento' ? false : false
