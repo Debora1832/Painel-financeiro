@@ -90,6 +90,68 @@
       transform: rotate(180deg);
     }
     
+    /* Toast notification styles */
+    .toast {
+      position: fixed;
+      bottom: 24px;
+      right: 24px;
+      background: white;
+      border-radius: 12px;
+      box-shadow: 0 10px 40px rgba(0, 0, 0, 0.2);
+      padding: 16px 20px;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      z-index: 9999;
+      min-width: 320px;
+      transform: translateX(400px);
+      opacity: 0;
+      transition: all 0.3s ease;
+    }
+    .toast.show {
+      transform: translateX(0);
+      opacity: 1;
+    }
+    .toast.success {
+      border-left: 4px solid #10b981;
+    }
+    .toast.error {
+      border-left: 4px solid #ef4444;
+    }
+    .toast.warning {
+      border-left: 4px solid #f59e0b;
+    }
+    .toast-icon {
+      font-size: 20px;
+      flex-shrink: 0;
+    }
+    .toast-icon.success { color: #10b981; }
+    .toast-icon.error { color: #ef4444; }
+    .toast-icon.warning { color: #f59e0b; }
+    .toast-content {
+      flex: 1;
+    }
+    .toast-title {
+      font-weight: 600;
+      font-size: 14px;
+      color: #111827;
+      margin-bottom: 2px;
+    }
+    .toast-message {
+      font-size: 12px;
+      color: #6b7280;
+    }
+    .toast-close {
+      cursor: pointer;
+      color: #9ca3af;
+      font-size: 16px;
+      padding: 4px;
+      transition: color 0.2s;
+    }
+    .toast-close:hover {
+      color: #4b5563;
+    }
+    
     /* Mobile card view styles */
     @media (max-width: 767px) {
       /* Hide table view on mobile */
@@ -1135,52 +1197,65 @@
   <div id="deleteModal" class="fixed inset-0 z-50 hidden bg-black/40 items-center justify-center">
     <div class="bg-white rounded-xl shadow-lg w-full max-w-md mx-4 p-4 space-y-3">
       <div class="flex items-center justify-between">
-        <div>
-          <h2 class="text-sm font-semibold text-gray-900 flex items-center gap-2">
-            <i class="fa-solid fa-trash text-red-500"></i>
+        <div class="flex-1">
+          <h2 class="text-sm font-semibold text-red-700 flex items-center gap-2">
+            <i class="fa-solid fa-triangle-exclamation text-red-600 text-lg"></i>
             Confirmar Exclusão
           </h2>
-          <p id="deleteModalSubtitle" class="text-xs text-gray-500">Selecione se quer excluir apenas este lançamento ou toda a série.</p>
+          <p id="deleteModalSubtitle" class="text-xs text-gray-600 mt-1">Selecione se quer excluir apenas este lançamento ou toda a série.</p>
         </div>
         <button id="btnDeleteClose" class="w-7 h-7 rounded-full flex items-center justify-center text-gray-400 hover:bg-gray-100">
           <i class="fa-solid fa-xmark text-xs"></i>
         </button>
       </div>
 
-      <div id="deleteScopeBlock" class="hidden border-t border-gray-100 pt-2 mt-2">
-        <div id="deleteParcelPreview" class="hidden mt-2 border rounded-lg bg-red-50 p-2 text-[11px] text-red-700">
-  <p class="font-medium mb-1">Parcelas que serão removidas:</p>
-  <ul id="deleteParcelPreviewList" class="space-y-0.5"></ul>
-</div>
-        <p class="text-[11px] text-gray-500 mb-2">
+      <div id="deleteScopeBlock" class="hidden border-t border-gray-100 pt-3 mt-3">
+        <div id="deleteParcelPreview" class="hidden mt-2 border-2 border-red-200 rounded-lg bg-red-50 p-3 text-xs">
+          <p class="font-semibold text-red-800 mb-2 flex items-center gap-2">
+            <i class="fa-solid fa-receipt text-red-600"></i>
+            Parcelas que serão removidas:
+          </p>
+          <ul id="deleteParcelPreviewList" class="space-y-1.5 ml-1"></ul>
+        </div>
+        <p class="text-xs text-gray-600 mb-3 mt-3">
           Este lançamento faz parte de uma compra parcelada. O que você deseja excluir?
         </p>
         <div class="flex gap-2">
           <button type="button" id="btnDeleteSingle"
-            class="px-3 py-1 rounded-full text-[11px] font-medium bg-indigo-50 text-indigo-600 border border-indigo-200">
+            class="px-4 py-2 rounded-lg text-xs font-medium bg-indigo-50 text-indigo-700 border border-indigo-200 hover:bg-indigo-100 transition">
             Apenas esta parcela
           </button>
           <button type="button" id="btnDeleteAll"
-            class="px-3 py-1 rounded-full text-[11px] font-medium bg-gray-100 text-gray-600 border border-gray-200">
+            class="px-4 py-2 rounded-lg text-xs font-medium bg-red-50 text-red-700 border border-red-200 hover:bg-red-100 transition">
             Todas as parcelas
           </button>
         </div>
       </div>
 
-      <p id="deleteSingleText" class="text-[12px] text-gray-700">Ao confirmar, este lançamento será removido permanentemente.</p>
+      <div id="deleteSingleWarning" class="bg-red-50 border-2 border-red-200 rounded-lg p-3">
+        <p class="text-sm text-red-800 font-semibold flex items-center gap-2">
+          <i class="fa-solid fa-exclamation-circle text-red-600"></i>
+          Você está prestes a excluir este lançamento.
+        </p>
+        <p id="deleteSingleText" class="text-xs text-red-700 mt-1 ml-6">Esta ação não pode ser desfeita.</p>
+      </div>
 
       <div class="pt-3 flex justify-end gap-2">
         <button type="button" id="btnDeleteCancel"
-          class="px-4 py-2 text-xs font-semibold rounded-lg border border-gray-200 text-gray-600 hover:bg-gray-50">
+          class="px-4 py-2 text-xs font-semibold rounded-lg border border-gray-300 text-gray-700 hover:bg-gray-50 transition">
           Cancelar
         </button>
         <button type="button" id="btnDeleteConfirm"
-          class="px-4 py-2 text-xs font-semibold rounded-lg bg-red-600 text-white hover:bg-red-700">
+          class="px-4 py-2 text-xs font-semibold rounded-lg bg-red-600 text-white hover:bg-red-700 transition flex items-center gap-2">
+          <i class="fa-solid fa-trash"></i>
           Confirmar exclusão
         </button>
       </div>
     </div>
   </div>
+
+  <!-- Toast notification container -->
+  <div id="toastContainer"></div>
 
   <!-- SCRIPT: módulo com Firebase Firestore integrado -->
   <script type="module">
@@ -1282,20 +1357,20 @@
 
       // ---------- HELPERS ----------
       function buildParcelPreview(groupId) {
-  if (!groupId) return [];
+        if (!groupId) return [];
 
-  return state.transactions
-    .filter(t => t.groupId === groupId)
-    .sort((a, b) => new Date(a.date) - new Date(b.date))
-    .map(t => {
-      const d = new Date(t.date);
-      const labelDate = `${MONTH_NAMES[d.getMonth()]}/${d.getFullYear()}`;
-      const parcelaTxt = t.parcelas > 1
-        ? `(${t.parcelaIndex}/${t.parcelas})`
-        : '';
-      return `• ${labelDate} — ${formatCurrency(t.value)} ${parcelaTxt}`;
-    });
-}
+        return state.transactions
+          .filter(t => t.groupId === groupId)
+          .sort((a, b) => new Date(a.date) - new Date(b.date))
+          .map(t => {
+            const d = new Date(t.date);
+            const labelDate = `${MONTH_NAMES[d.getMonth()]}/${d.getFullYear()}`;
+            const parcelaTxt = t.parcelas > 1
+              ? `(${t.parcelaIndex}/${t.parcelas})`
+              : '';
+            return `<span class="flex items-center gap-2"><i class="fa-regular fa-calendar text-red-600"></i> ${labelDate} — ${formatCurrency(t.value)} <span class="font-semibold">${parcelaTxt}</span></span>`;
+          });
+      }
 
       function formatCurrency(value) {
         return new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(value || 0);
@@ -2210,26 +2285,44 @@
       async function togglePaid(id) {
         const tx = state.transactions.find(t => t.id === id);
         if (!tx) return;
+        const wasPaid = tx.paid;
         tx.paid = !tx.paid;
         await saveTransactions();
         renderDashboard(state.selectedMonth);
+        const isReceita = tx.category === 'receita';
+        showToast(
+          wasPaid 
+            ? (isReceita ? 'Marcado como não recebido' : 'Marcado como não pago')
+            : (isReceita ? 'Marcado como recebido' : 'Marcado como pago'),
+          'success'
+        );
       }
 
       async function toggleAportado(id) {
         const tx = state.transactions.find(t => t.id === id);
         if (!tx) return;
+        const wasAportado = tx.aportado;
         tx.aportado = !tx.aportado;
         await saveTransactions();
         renderDashboard(state.selectedMonth);
+        showToast(
+          wasAportado ? 'Marcado como não aportado' : 'Marcado como aportado',
+          'success'
+        );
       }
 
       async function toggleInvoiceStatusForSelectedMonth(card) {
         const year = getYearForSelectedMonth();
         const m = state.selectedMonth;
         const key = keyInvoice(year, m, card);
+        const wasPaid = state.invoicesPaid[key];
         state.invoicesPaid[key] = !state.invoicesPaid[key];
         await saveInvoices();
         renderCardsFaturas();
+        showToast(
+          wasPaid ? 'Fatura marcada como não paga' : 'Fatura marcada como paga',
+          'success'
+        );
       }
 
       // Nota: a antiga função deleteTransaction(id) foi mantida mas a chamada direta foi substituída
@@ -2462,9 +2555,10 @@ const previewList = document.getElementById('deleteParcelPreviewList');
 
 if (isParceladoSerie && previewBox && previewList) {
   previewList.innerHTML = '';
-  buildParcelPreview(tx.groupId).forEach(text => {
+  buildParcelPreview(tx.groupId).forEach(html => {
     const li = document.createElement('li');
-    li.textContent = text;
+    li.innerHTML = html;
+    li.className = 'text-red-800';
     previewList.appendChild(li);
   });
   previewBox.classList.remove('hidden');
@@ -2504,11 +2598,18 @@ if (isParceladoSerie && previewBox && previewList) {
       async function performDelete() {
         if (!state.deletingId) { closeDeleteModal(); return; }
 
-        if (state.deletingMode === 'all' && state.deletingGroupId) {
-          await deleteTransactionsByGroup(state.deletingGroupId);
-        } else {
-          // single
-          await deleteTransactionById(state.deletingId);
+        try {
+          if (state.deletingMode === 'all' && state.deletingGroupId) {
+            await deleteTransactionsByGroup(state.deletingGroupId);
+            showToast('Todas as parcelas foram excluídas com sucesso', 'success');
+          } else {
+            // single
+            await deleteTransactionById(state.deletingId);
+            showToast('Lançamento excluído com sucesso', 'success');
+          }
+        } catch (error) {
+          showToast('Erro ao excluir lançamento', 'error');
+          console.error('Error deleting transaction:', error);
         }
         closeDeleteModal();
       }
@@ -2697,6 +2798,52 @@ if (isParceladoSerie && previewBox && previewList) {
         });
       }
 
+      // Toast notification function
+      function showToast(message, type = 'success', title = '') {
+        const container = document.getElementById('toastContainer');
+        const toast = document.createElement('div');
+        toast.className = `toast ${type}`;
+        
+        const icons = {
+          success: 'fa-circle-check',
+          error: 'fa-circle-xmark',
+          warning: 'fa-triangle-exclamation'
+        };
+        
+        const titles = {
+          success: title || 'Sucesso',
+          error: title || 'Erro',
+          warning: title || 'Atenção'
+        };
+        
+        toast.innerHTML = `
+          <i class="fa-solid ${icons[type]} toast-icon ${type}"></i>
+          <div class="toast-content">
+            <div class="toast-title">${titles[type]}</div>
+            <div class="toast-message">${message}</div>
+          </div>
+          <i class="fa-solid fa-xmark toast-close"></i>
+        `;
+        
+        container.appendChild(toast);
+        
+        // Close button
+        const closeBtn = toast.querySelector('.toast-close');
+        closeBtn.addEventListener('click', () => {
+          toast.classList.remove('show');
+          setTimeout(() => toast.remove(), 300);
+        });
+        
+        // Show animation
+        setTimeout(() => toast.classList.add('show'), 10);
+        
+        // Auto-hide after 4 seconds
+        setTimeout(() => {
+          toast.classList.remove('show');
+          setTimeout(() => toast.remove(), 300);
+        }, 4000);
+      }
+
       function setupEvents() {
         // Sidebar toggle
         const sidebarToggle = document.getElementById('sidebarToggle');
@@ -2749,6 +2896,7 @@ if (isParceladoSerie && previewBox && previewList) {
             paymentMethod: 'debito_pix'
           });
 
+          showToast('Receita lançada com sucesso', 'success');
           formReceita.reset();
           const today = new Date().toISOString().slice(0, 10);
           const recDataInput = document.getElementById('recData');
@@ -2791,6 +2939,13 @@ if (forma === 'cartao' || forma === 'boleto') {
             aportado: false // sempre false vindo do formulário; o status pode ser alterado via tabela
           });
 
+          const categoryLabels = {
+            'fixa': 'Despesa fixa',
+            'variavel': 'Despesa variável',
+            'investimento': 'Investimento'
+          };
+          showToast(`${categoryLabels[category] || 'Lançamento'} adicionado com sucesso`, 'success');
+          
           formDespesa.reset();
           // esconder subseções pós-reset
           document.getElementById('despCartaoFields').classList.add('hidden');
@@ -2896,6 +3051,7 @@ if (forma === 'cartao' || forma === 'boleto') {
           }
 
           await saveTransactions();
+          showToast('Lançamento atualizado com sucesso', 'success');
           closeEditModal();
           renderDashboard(state.selectedMonth);
         });
