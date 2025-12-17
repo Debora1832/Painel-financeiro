@@ -69,6 +69,89 @@
       display: inline-flex;
     }
     
+    /* Sidebar collapse styles */
+    aside {
+      transition: width 0.3s ease, transform 0.3s ease;
+    }
+    aside.collapsed {
+      width: 64px;
+    }
+    aside.collapsed .sidebar-text {
+      display: none;
+    }
+    aside.collapsed .sidebar-icon {
+      margin: 0 auto;
+    }
+    .sidebar-toggle {
+      cursor: pointer;
+      transition: transform 0.3s ease;
+    }
+    .sidebar-toggle.collapsed {
+      transform: rotate(180deg);
+    }
+    
+    /* Toast notification styles */
+    .toast {
+      position: fixed;
+      bottom: 24px;
+      right: 24px;
+      background: white;
+      border-radius: 12px;
+      box-shadow: 0 10px 40px rgba(0, 0, 0, 0.2);
+      padding: 16px 20px;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      z-index: 9999;
+      min-width: 320px;
+      transform: translateX(400px);
+      opacity: 0;
+      transition: all 0.3s ease;
+    }
+    .toast.show {
+      transform: translateX(0);
+      opacity: 1;
+    }
+    .toast.success {
+      border-left: 4px solid #10b981;
+    }
+    .toast.error {
+      border-left: 4px solid #ef4444;
+    }
+    .toast.warning {
+      border-left: 4px solid #f59e0b;
+    }
+    .toast-icon {
+      font-size: 20px;
+      flex-shrink: 0;
+    }
+    .toast-icon.success { color: #10b981; }
+    .toast-icon.error { color: #ef4444; }
+    .toast-icon.warning { color: #f59e0b; }
+    .toast-content {
+      flex: 1;
+    }
+    .toast-title {
+      font-weight: 600;
+      font-size: 14px;
+      color: #111827;
+      margin-bottom: 2px;
+    }
+    .toast-message {
+      font-size: 12px;
+      color: #6b7280;
+    }
+    .toast-close {
+      cursor: pointer;
+      color: #9ca3af;
+      font-size: 16px;
+      padding: 4px;
+      transition: color 0.2s;
+    }
+    .toast-close:hover {
+      color: #4b5563;
+    }
+    
     /* Mobile card view styles */
     @media (max-width: 767px) {
       /* Hide table view on mobile */
@@ -168,17 +251,20 @@
 <body class="min-h-screen bg-gray-50 flex text-gray-900">
 
   <!-- SIDEBAR -->
-  <aside class="w-64 bg-gray-900 text-gray-100 flex flex-col">
+  <aside id="sidebar" class="w-64 bg-gray-900 text-gray-100 flex flex-col">
     <div class="px-6 py-4 border-b border-gray-800 flex items-center justify-between">
       <div class="flex items-center gap-2">
-        <div class="w-8 h-8 rounded-xl bg-indigo-500 flex items-center justify-center">
+        <div class="w-8 h-8 rounded-xl bg-indigo-500 flex items-center justify-center sidebar-icon">
           <i class="fa-solid fa-wallet text-white text-sm"></i>
         </div>
-        <div>
+        <div class="sidebar-text">
           <p class="font-semibold text-sm">Painel Financeiro</p>
           <p class="text-xs text-gray-400">Controle mensal</p>
         </div>
       </div>
+      <button id="sidebarToggle" class="sidebar-toggle w-6 h-6 rounded flex items-center justify-center hover:bg-gray-800 transition">
+        <i class="fa-solid fa-chevron-left text-xs text-gray-400"></i>
+      </button>
     </div>
 
     <div class="px-4 pt-4 pb-2">
@@ -187,57 +273,57 @@
         class="w-full flex items-center justify-between text-sm px-3 py-2 rounded-lg border border-gray-700 bg-gray-800 hover:bg-gray-700 transition"
       >
         <span class="flex items-center gap-2">
-          <i class="fa-solid fa-chart-pie text-indigo-400"></i>
-          <span>Visão Anual</span>
+          <i class="fa-solid fa-chart-pie text-indigo-400 sidebar-icon"></i>
+          <span class="sidebar-text">Visão Anual</span>
         </span>
-        <i class="fa-solid fa-chevron-right text-xs text-gray-400"></i>
+        <i class="fa-solid fa-chevron-right text-xs text-gray-400 sidebar-text"></i>
       </button>
     </div>
 
     <div class="px-4 py-3">
-      <p class="text-xs uppercase tracking-wide text-gray-500 mb-2">Meses do ano</p>
+      <p class="text-xs uppercase tracking-wide text-gray-500 mb-2 sidebar-text">Meses do ano</p>
       <div class="space-y-1 text-sm">
         <button data-month-index="0" class="month-btn w-full flex justify-between items-center px-3 py-2 rounded-lg hover:bg-gray-800 transition">
-          <span>Janeiro</span><span class="text-[10px] text-gray-500">01</span>
+          <span class="sidebar-text">Janeiro</span><span class="text-[10px] text-gray-500 sidebar-text">01</span>
         </button>
         <button data-month-index="1" class="month-btn w-full flex justify-between items-center px-3 py-2 rounded-lg hover:bg-gray-800 transition">
-          <span>Fevereiro</span><span class="text-[10px] text-gray-500">02</span>
+          <span class="sidebar-text">Fevereiro</span><span class="text-[10px] text-gray-500 sidebar-text">02</span>
         </button>
         <button data-month-index="2" class="month-btn w-full flex justify-between items-center px-3 py-2 rounded-lg hover:bg-gray-800 transition">
-          <span>Março</span><span class="text-[10px] text-gray-500">03</span>
+          <span class="sidebar-text">Março</span><span class="text-[10px] text-gray-500 sidebar-text">03</span>
         </button>
         <button data-month-index="3" class="month-btn w-full flex justify-between items-center px-3 py-2 rounded-lg hover:bg-gray-800 transition">
-          <span>Abril</span><span class="text-[10px] text-gray-500">04</span>
+          <span class="sidebar-text">Abril</span><span class="text-[10px] text-gray-500 sidebar-text">04</span>
         </button>
         <button data-month-index="4" class="month-btn w-full flex justify-between items-center px-3 py-2 rounded-lg hover:bg-gray-800 transition">
-          <span>Maio</span><span class="text-[10px] text-gray-500">05</span>
+          <span class="sidebar-text">Maio</span><span class="text-[10px] text-gray-500 sidebar-text">05</span>
         </button>
         <button data-month-index="5" class="month-btn w-full flex justify-between items-center px-3 py-2 rounded-lg hover:bg-gray-800 transition">
-          <span>Junho</span><span class="text-[10px] text-gray-500">06</span>
+          <span class="sidebar-text">Junho</span><span class="text-[10px] text-gray-500 sidebar-text">06</span>
         </button>
         <button data-month-index="6" class="month-btn w-full flex justify-between items-center px-3 py-2 rounded-lg hover:bg-gray-800 transition">
-          <span>Julho</span><span class="text-[10px] text-gray-500">07</span>
+          <span class="sidebar-text">Julho</span><span class="text-[10px] text-gray-500 sidebar-text">07</span>
         </button>
         <button data-month-index="7" class="month-btn w-full flex justify-between items-center px-3 py-2 rounded-lg hover:bg-gray-800 transition">
-          <span>Agosto</span><span class="text-[10px] text-gray-500">08</span>
+          <span class="sidebar-text">Agosto</span><span class="text-[10px] text-gray-500 sidebar-text">08</span>
         </button>
         <button data-month-index="8" class="month-btn w-full flex justify-between items-center px-3 py-2 rounded-lg hover:bg-gray-800 transition">
-          <span>Setembro</span><span class="text-[10px] text-gray-500">09</span>
+          <span class="sidebar-text">Setembro</span><span class="text-[10px] text-gray-500 sidebar-text">09</span>
         </button>
         <button data-month-index="9" class="month-btn w-full flex justify-between items-center px-3 py-2 rounded-lg hover:bg-gray-800 transition">
-          <span>Outubro</span><span class="text-[10px] text-gray-500">10</span>
+          <span class="sidebar-text">Outubro</span><span class="text-[10px] text-gray-500 sidebar-text">10</span>
         </button>
         <button data-month-index="10" class="month-btn w-full flex justify-between items-center px-3 py-2 rounded-lg hover:bg-gray-800 transition">
-          <span>Novembro</span><span class="text-[10px] text-gray-500">11</span>
+          <span class="sidebar-text">Novembro</span><span class="text-[10px] text-gray-500 sidebar-text">11</span>
         </button>
         <button data-month-index="11" class="month-btn w-full flex justify-between items-center px-3 py-2 rounded-lg hover:bg-gray-800 transition">
-          <span>Dezembro</span><span class="text-[10px] text-gray-500">12</span>
+          <span class="sidebar-text">Dezembro</span><span class="text-[10px] text-gray-500 sidebar-text">12</span>
         </button>
       </div>
     </div>
 
     <div class="mt-auto px-4 py-4 border-t border-gray-800 text-xs text-gray-500">
-      <p>Dados salvos em <span class="font-semibold text-gray-300">Firestore</span>.</p>
+      <p class="sidebar-text">Dados salvos em <span class="font-semibold text-gray-300">Firestore</span>.</p>
     </div>
   </aside>
 
@@ -1073,20 +1159,35 @@
         </div>
 
         <div id="editParcelScope" class="hidden border-t border-gray-100 pt-2 mt-2">
-        <div id="editParcelPreview" class="hidden mt-2 border rounded-lg bg-gray-50 p-2 text-[11px] text-gray-700">
-  <p class="font-medium mb-1">Parcelas que serão afetadas:</p>
-  <ul id="editParcelPreviewList" class="space-y-0.5"></ul>
-</div>
-          <p class="text-[11px] text-gray-500 mb-2">
+          <div id="editParcelNumField" class="space-y-1 mb-3">
+            <label for="editParcelas" class="font-medium text-gray-700 flex items-center gap-2">
+              <i class="fa-solid fa-calculator text-indigo-600"></i>
+              Número de Parcelas
+            </label>
+            <input id="editParcelas" type="number" min="1" max="60" step="1" value="1"
+              class="w-full rounded-lg border border-gray-200 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500" />
+            <p class="text-xs text-gray-500 mt-1">
+              <i class="fa-solid fa-info-circle"></i>
+              Altere o número de parcelas para redistribuir o valor automaticamente
+            </p>
+          </div>
+          <div id="editParcelPreview" class="hidden mt-2 border-2 border-indigo-200 rounded-lg bg-indigo-50 p-3 text-xs">
+            <p class="font-semibold text-indigo-800 mb-2 flex items-center gap-2">
+              <i class="fa-solid fa-receipt text-indigo-600"></i>
+              Nova distribuição de parcelas:
+            </p>
+            <ul id="editParcelPreviewList" class="space-y-1.5 ml-1"></ul>
+          </div>
+          <p class="text-xs text-gray-600 mb-3 mt-3">
             Este lançamento faz parte de uma compra parcelada. O que você deseja editar?
           </p>
           <div class="flex gap-2">
             <button type="button" id="btnScopeSingle"
-              class="px-3 py-1 rounded-full text-[11px] font-medium bg-indigo-50 text-indigo-600 border border-indigo-200">
+              class="px-4 py-2 rounded-lg text-xs font-medium bg-indigo-50 text-indigo-700 border border-indigo-200 hover:bg-indigo-100 transition">
               Apenas esta parcela
             </button>
             <button type="button" id="btnScopeAll"
-              class="px-3 py-1 rounded-full text-[11px] font-medium bg-gray-100 text-gray-600 border border-gray-200">
+              class="px-4 py-2 rounded-lg text-xs font-medium bg-gray-100 text-gray-600 border border-gray-200 hover:bg-gray-200 transition">
               Todas as parcelas
             </button>
           </div>
@@ -1111,52 +1212,65 @@
   <div id="deleteModal" class="fixed inset-0 z-50 hidden bg-black/40 items-center justify-center">
     <div class="bg-white rounded-xl shadow-lg w-full max-w-md mx-4 p-4 space-y-3">
       <div class="flex items-center justify-between">
-        <div>
-          <h2 class="text-sm font-semibold text-gray-900 flex items-center gap-2">
-            <i class="fa-solid fa-trash text-red-500"></i>
+        <div class="flex-1">
+          <h2 class="text-sm font-semibold text-red-700 flex items-center gap-2">
+            <i class="fa-solid fa-triangle-exclamation text-red-600 text-lg"></i>
             Confirmar Exclusão
           </h2>
-          <p id="deleteModalSubtitle" class="text-xs text-gray-500">Selecione se quer excluir apenas este lançamento ou toda a série.</p>
+          <p id="deleteModalSubtitle" class="text-xs text-gray-600 mt-1">Selecione se quer excluir apenas este lançamento ou toda a série.</p>
         </div>
         <button id="btnDeleteClose" class="w-7 h-7 rounded-full flex items-center justify-center text-gray-400 hover:bg-gray-100">
           <i class="fa-solid fa-xmark text-xs"></i>
         </button>
       </div>
 
-      <div id="deleteScopeBlock" class="hidden border-t border-gray-100 pt-2 mt-2">
-        <div id="deleteParcelPreview" class="hidden mt-2 border rounded-lg bg-red-50 p-2 text-[11px] text-red-700">
-  <p class="font-medium mb-1">Parcelas que serão removidas:</p>
-  <ul id="deleteParcelPreviewList" class="space-y-0.5"></ul>
-</div>
-        <p class="text-[11px] text-gray-500 mb-2">
+      <div id="deleteScopeBlock" class="hidden border-t border-gray-100 pt-3 mt-3">
+        <div id="deleteParcelPreview" class="hidden mt-2 border-2 border-red-200 rounded-lg bg-red-50 p-3 text-xs">
+          <p class="font-semibold text-red-800 mb-2 flex items-center gap-2">
+            <i class="fa-solid fa-receipt text-red-600"></i>
+            Parcelas que serão removidas:
+          </p>
+          <ul id="deleteParcelPreviewList" class="space-y-1.5 ml-1"></ul>
+        </div>
+        <p class="text-xs text-gray-600 mb-3 mt-3">
           Este lançamento faz parte de uma compra parcelada. O que você deseja excluir?
         </p>
         <div class="flex gap-2">
           <button type="button" id="btnDeleteSingle"
-            class="px-3 py-1 rounded-full text-[11px] font-medium bg-indigo-50 text-indigo-600 border border-indigo-200">
+            class="px-4 py-2 rounded-lg text-xs font-medium bg-indigo-50 text-indigo-700 border border-indigo-200 hover:bg-indigo-100 transition">
             Apenas esta parcela
           </button>
           <button type="button" id="btnDeleteAll"
-            class="px-3 py-1 rounded-full text-[11px] font-medium bg-gray-100 text-gray-600 border border-gray-200">
+            class="px-4 py-2 rounded-lg text-xs font-medium bg-red-50 text-red-700 border border-red-200 hover:bg-red-100 transition">
             Todas as parcelas
           </button>
         </div>
       </div>
 
-      <p id="deleteSingleText" class="text-[12px] text-gray-700">Ao confirmar, este lançamento será removido permanentemente.</p>
+      <div id="deleteSingleWarning" class="bg-red-50 border-2 border-red-200 rounded-lg p-3">
+        <p class="text-sm text-red-800 font-semibold flex items-center gap-2">
+          <i class="fa-solid fa-exclamation-circle text-red-600"></i>
+          Você está prestes a excluir este lançamento.
+        </p>
+        <p id="deleteSingleText" class="text-xs text-red-700 mt-1 ml-6">Esta ação não pode ser desfeita.</p>
+      </div>
 
       <div class="pt-3 flex justify-end gap-2">
         <button type="button" id="btnDeleteCancel"
-          class="px-4 py-2 text-xs font-semibold rounded-lg border border-gray-200 text-gray-600 hover:bg-gray-50">
+          class="px-4 py-2 text-xs font-semibold rounded-lg border border-gray-300 text-gray-700 hover:bg-gray-50 transition">
           Cancelar
         </button>
         <button type="button" id="btnDeleteConfirm"
-          class="px-4 py-2 text-xs font-semibold rounded-lg bg-red-600 text-white hover:bg-red-700">
+          class="px-4 py-2 text-xs font-semibold rounded-lg bg-red-600 text-white hover:bg-red-700 transition flex items-center gap-2">
+          <i class="fa-solid fa-trash"></i>
           Confirmar exclusão
         </button>
       </div>
     </div>
   </div>
+
+  <!-- Toast notification container -->
+  <div id="toastContainer"></div>
 
   <!-- SCRIPT: módulo com Firebase Firestore integrado -->
   <script type="module">
@@ -1258,20 +1372,20 @@
 
       // ---------- HELPERS ----------
       function buildParcelPreview(groupId) {
-  if (!groupId) return [];
+        if (!groupId) return [];
 
-  return state.transactions
-    .filter(t => t.groupId === groupId)
-    .sort((a, b) => new Date(a.date) - new Date(b.date))
-    .map(t => {
-      const d = new Date(t.date);
-      const labelDate = `${MONTH_NAMES[d.getMonth()]}/${d.getFullYear()}`;
-      const parcelaTxt = t.parcelas > 1
-        ? `(${t.parcelaIndex}/${t.parcelas})`
-        : '';
-      return `• ${labelDate} — ${formatCurrency(t.value)} ${parcelaTxt}`;
-    });
-}
+        return state.transactions
+          .filter(t => t.groupId === groupId)
+          .sort((a, b) => new Date(a.date) - new Date(b.date))
+          .map(t => {
+            const d = new Date(t.date);
+            const labelDate = `${MONTH_NAMES[d.getMonth()]}/${d.getFullYear()}`;
+            const parcelaTxt = t.parcelas > 1
+              ? `(${t.parcelaIndex}/${t.parcelas})`
+              : '';
+            return `<span class="flex items-center gap-2"><i class="fa-regular fa-calendar text-red-600"></i> ${labelDate} — ${formatCurrency(t.value)} <span class="font-semibold">${parcelaTxt}</span></span>`;
+          });
+      }
 
       function formatCurrency(value) {
         return new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(value || 0);
@@ -2186,26 +2300,44 @@
       async function togglePaid(id) {
         const tx = state.transactions.find(t => t.id === id);
         if (!tx) return;
+        const wasPaid = tx.paid;
         tx.paid = !tx.paid;
         await saveTransactions();
         renderDashboard(state.selectedMonth);
+        const isReceita = tx.category === 'receita';
+        showToast(
+          wasPaid 
+            ? (isReceita ? 'Marcado como não recebido' : 'Marcado como não pago')
+            : (isReceita ? 'Marcado como recebido' : 'Marcado como pago'),
+          'success'
+        );
       }
 
       async function toggleAportado(id) {
         const tx = state.transactions.find(t => t.id === id);
         if (!tx) return;
+        const wasAportado = tx.aportado;
         tx.aportado = !tx.aportado;
         await saveTransactions();
         renderDashboard(state.selectedMonth);
+        showToast(
+          wasAportado ? 'Marcado como não aportado' : 'Marcado como aportado',
+          'success'
+        );
       }
 
       async function toggleInvoiceStatusForSelectedMonth(card) {
         const year = getYearForSelectedMonth();
         const m = state.selectedMonth;
         const key = keyInvoice(year, m, card);
+        const wasPaid = state.invoicesPaid[key];
         state.invoicesPaid[key] = !state.invoicesPaid[key];
         await saveInvoices();
         renderCardsFaturas();
+        showToast(
+          wasPaid ? 'Fatura marcada como não paga' : 'Fatura marcada como paga',
+          'success'
+        );
       }
 
       // Nota: a antiga função deleteTransaction(id) foi mantida mas a chamada direta foi substituída
@@ -2381,23 +2513,31 @@ if (isParceladoSerie) {
   scopeBlock.classList.remove('hidden');
   state.editingMode = 'single';
 
-  btnSingle.classList.add('bg-indigo-50','text-indigo-600','border-indigo-200');
+  btnSingle.classList.add('bg-indigo-50','text-indigo-700','border-indigo-200');
   btnSingle.classList.remove('bg-gray-100','text-gray-600','border-gray-200');
 
   btnAll.classList.add('bg-gray-100','text-gray-600','border-gray-200');
-  btnAll.classList.remove('bg-indigo-50','text-indigo-600','border-indigo-200');
+  btnAll.classList.remove('bg-indigo-50','text-indigo-700','border-indigo-200');
+  
+  // Set current parcelas number
+  const editParcelasInput = document.getElementById('editParcelas');
+  if (editParcelasInput) {
+    editParcelasInput.value = tx.parcelas || 1;
+  }
+  
   const previewBox = document.getElementById('editParcelPreview');
-const previewList = document.getElementById('editParcelPreviewList');
+  const previewList = document.getElementById('editParcelPreviewList');
 
-if (previewBox && previewList) {
-  previewList.innerHTML = '';
-  buildParcelPreview(tx.groupId).forEach(text => {
-    const li = document.createElement('li');
-    li.textContent = text;
-    previewList.appendChild(li);
-  });
-  previewBox.classList.remove('hidden');
-}
+  if (previewBox && previewList) {
+    previewList.innerHTML = '';
+    buildParcelPreview(tx.groupId).forEach(html => {
+      const li = document.createElement('li');
+      li.innerHTML = html;
+      li.className = 'text-indigo-800';
+      previewList.appendChild(li);
+    });
+    previewBox.classList.add('hidden'); // Hidden by default, shows when parcelas changes
+  }
 
 } else {
   scopeBlock.classList.add('hidden');
@@ -2406,6 +2546,53 @@ if (previewBox && previewList) {
 if (previewBox) previewBox.classList.add('hidden');
 
 }
+      }
+
+      // Function to preview new installment distribution
+      function previewNewInstallments() {
+        const tx = state.transactions.find((t) => t.id === state.editingId);
+        if (!tx || !tx.groupId) return;
+        
+        const newParcelas = parseInt(document.getElementById('editParcelas').value) || 1;
+        const currentParcelas = tx.parcelas || 1;
+        
+        // Only show preview if number changed
+        if (newParcelas === currentParcelas) {
+          document.getElementById('editParcelPreview').classList.add('hidden');
+          return;
+        }
+        
+        const totalValue = document.getElementById('editValor').value || 0;
+        const baseDate = new Date(document.getElementById('editData').value);
+        if (isNaN(baseDate.getTime())) return;
+        
+        const previewBox = document.getElementById('editParcelPreview');
+        const previewList = document.getElementById('editParcelPreviewList');
+        
+        if (!previewBox || !previewList) return;
+        
+        // Calculate new distribution
+        const totalCents = Math.round(totalValue * 100);
+        const baseCents = Math.floor(totalCents / newParcelas);
+        const remainder = totalCents - baseCents * newParcelas;
+        
+        previewList.innerHTML = '';
+        
+        for (let i = 0; i < newParcelas; i++) {
+          const cents = baseCents + (i < remainder ? 1 : 0);
+          const d = new Date(baseDate);
+          d.setMonth(d.getMonth() + i);
+          
+          const monthLabel = `${MONTH_NAMES[d.getMonth()]}/${d.getFullYear()}`;
+          const valueLabel = formatCurrency(cents / 100);
+          
+          const li = document.createElement('li');
+          li.innerHTML = `<span class="flex items-center gap-2"><i class="fa-regular fa-calendar text-indigo-600"></i> ${monthLabel} — ${valueLabel} <span class="font-semibold">(${i + 1}/${newParcelas})</span></span>`;
+          li.className = 'text-indigo-800';
+          previewList.appendChild(li);
+        }
+        
+        previewBox.classList.remove('hidden');
       }
 
       function closeEditModal() {
@@ -2438,9 +2625,10 @@ const previewList = document.getElementById('deleteParcelPreviewList');
 
 if (isParceladoSerie && previewBox && previewList) {
   previewList.innerHTML = '';
-  buildParcelPreview(tx.groupId).forEach(text => {
+  buildParcelPreview(tx.groupId).forEach(html => {
     const li = document.createElement('li');
-    li.textContent = text;
+    li.innerHTML = html;
+    li.className = 'text-red-800';
     previewList.appendChild(li);
   });
   previewBox.classList.remove('hidden');
@@ -2480,11 +2668,18 @@ if (isParceladoSerie && previewBox && previewList) {
       async function performDelete() {
         if (!state.deletingId) { closeDeleteModal(); return; }
 
-        if (state.deletingMode === 'all' && state.deletingGroupId) {
-          await deleteTransactionsByGroup(state.deletingGroupId);
-        } else {
-          // single
-          await deleteTransactionById(state.deletingId);
+        try {
+          if (state.deletingMode === 'all' && state.deletingGroupId) {
+            await deleteTransactionsByGroup(state.deletingGroupId);
+            showToast('Todas as parcelas foram excluídas com sucesso', 'success');
+          } else {
+            // single
+            await deleteTransactionById(state.deletingId);
+            showToast('Lançamento excluído com sucesso', 'success');
+          }
+        } catch (error) {
+          showToast('Erro ao excluir lançamento', 'error');
+          console.error('Error deleting transaction:', error);
         }
         closeDeleteModal();
       }
@@ -2673,7 +2868,63 @@ if (isParceladoSerie && previewBox && previewList) {
         });
       }
 
+      // Toast notification function
+      function showToast(message, type = 'success', title = '') {
+        const container = document.getElementById('toastContainer');
+        const toast = document.createElement('div');
+        toast.className = `toast ${type}`;
+        
+        const icons = {
+          success: 'fa-circle-check',
+          error: 'fa-circle-xmark',
+          warning: 'fa-triangle-exclamation'
+        };
+        
+        const titles = {
+          success: title || 'Sucesso',
+          error: title || 'Erro',
+          warning: title || 'Atenção'
+        };
+        
+        toast.innerHTML = `
+          <i class="fa-solid ${icons[type]} toast-icon ${type}"></i>
+          <div class="toast-content">
+            <div class="toast-title">${titles[type]}</div>
+            <div class="toast-message">${message}</div>
+          </div>
+          <i class="fa-solid fa-xmark toast-close"></i>
+        `;
+        
+        container.appendChild(toast);
+        
+        // Close button
+        const closeBtn = toast.querySelector('.toast-close');
+        closeBtn.addEventListener('click', () => {
+          toast.classList.remove('show');
+          setTimeout(() => toast.remove(), 300);
+        });
+        
+        // Show animation
+        setTimeout(() => toast.classList.add('show'), 10);
+        
+        // Auto-hide after 4 seconds
+        setTimeout(() => {
+          toast.classList.remove('show');
+          setTimeout(() => toast.remove(), 300);
+        }, 4000);
+      }
+
       function setupEvents() {
+        // Sidebar toggle
+        const sidebarToggle = document.getElementById('sidebarToggle');
+        const sidebar = document.getElementById('sidebar');
+        if (sidebarToggle && sidebar) {
+          sidebarToggle.addEventListener('click', () => {
+            sidebar.classList.toggle('collapsed');
+            sidebarToggle.classList.toggle('collapsed');
+          });
+        }
+        
         document.querySelectorAll('.month-btn').forEach((btn) => {
           btn.addEventListener('click', () => renderDashboard(parseInt(btn.getAttribute('data-month-index'), 10)));
         });
@@ -2715,6 +2966,7 @@ if (isParceladoSerie && previewBox && previewList) {
             paymentMethod: 'debito_pix'
           });
 
+          showToast('Receita lançada com sucesso', 'success');
           formReceita.reset();
           const today = new Date().toISOString().slice(0, 10);
           const recDataInput = document.getElementById('recData');
@@ -2757,6 +3009,13 @@ if (forma === 'cartao' || forma === 'boleto') {
             aportado: false // sempre false vindo do formulário; o status pode ser alterado via tabela
           });
 
+          const categoryLabels = {
+            'fixa': 'Despesa fixa',
+            'variavel': 'Despesa variável',
+            'investimento': 'Investimento'
+          };
+          showToast(`${categoryLabels[category] || 'Lançamento'} adicionado com sucesso`, 'success');
+          
           formDespesa.reset();
           // esconder subseções pós-reset
           document.getElementById('despCartaoFields').classList.add('hidden');
@@ -2809,11 +3068,17 @@ if (forma === 'cartao' || forma === 'boleto') {
 
         btnScopeAll.addEventListener('click', () => {
           state.editingMode = 'all';
-          btnScopeAll.classList.add('bg-indigo-50','text-indigo-600','border-indigo-200');
+          btnScopeAll.classList.add('bg-indigo-50','text-indigo-700','border-indigo-200');
           btnScopeAll.classList.remove('bg-gray-100','text-gray-600','border-gray-200');
           btnScopeSingle.classList.add('bg-gray-100','text-gray-600','border-gray-200');
-          btnScopeSingle.classList.remove('bg-indigo-50','text-indigo-600','border-indigo-200');
+          btnScopeSingle.classList.remove('bg-indigo-50','text-indigo-700','border-indigo-200');
         });
+
+        // Event listener for parcelas input change
+        const editParcelasInput = document.getElementById('editParcelas');
+        if (editParcelasInput) {
+          editParcelasInput.addEventListener('input', previewNewInstallments);
+        }
 
         const formEdit = document.getElementById('formEdit');
         formEdit.addEventListener('submit', async (e) => {
@@ -2838,27 +3103,76 @@ if (forma === 'cartao' || forma === 'boleto') {
           const txClicked = state.transactions[idx];
           const oldClickedDate = new Date(txClicked.date);
           const delta = newDate.getTime() - oldClickedDate.getTime();
+          
+          // Check if parcelas number changed for installment transactions
+          const newParcelas = parseInt(document.getElementById('editParcelas').value) || 1;
+          const isParceladoSerie = txClicked.groupId && txClicked.parcelas > 1;
+          const parcelasChanged = isParceladoSerie && newParcelas !== txClicked.parcelas;
 
           if (state.editingMode === 'all' && txClicked.groupId) {
             const groupId = txClicked.groupId;
-            state.transactions.forEach((t) => {
-              if (t.groupId === groupId) {
-                const baseDesc = desc.replace(/\s*\(\d+\/\d+\)\s*$/, '');
-                if (t.parcelas && t.parcelaIndex) t.description = `${baseDesc} (${t.parcelaIndex}/${t.parcelas})`;
-                else t.description = baseDesc;
-                t.category = mainCat; t.subCategory = subCat || null; t.isCreditCard = isCard; t.card = card;
-                t.paymentMethod = isCard ? 'cartao' : 'debito_pix'; t.value = value;
-                const oldDate = new Date(t.date);
-                if (!isNaN(oldDate.getTime())) {
-                  const shifted = new Date(oldDate.getTime() + delta);
-                  t.date = shifted.toISOString();
-                }
+            
+            // If parcelas changed, delete old installments and create new ones
+            if (parcelasChanged) {
+              // Delete all installments in the group
+              state.transactions = state.transactions.filter((t) => t.groupId !== groupId);
+              
+              // Create new installments with new distribution
+              const totalCents = Math.round(value * 100);
+              const baseCents = Math.floor(totalCents / newParcelas);
+              const remainder = totalCents - baseCents * newParcelas;
+              const newGroupId = generateId();
+              const baseDesc = desc.replace(/\s*\(\d+\/\d+\)\s*$/, '');
+              
+              for (let i = 0; i < newParcelas; i++) {
+                const cents = baseCents + (i < remainder ? 1 : 0);
+                const d = new Date(newDate);
+                d.setMonth(d.getMonth() + i);
+                
+                state.transactions.push({
+                  id: generateId(),
+                  description: `${baseDesc} (${i + 1}/${newParcelas})`,
+                  value: cents / 100,
+                  date: d.toISOString(),
+                  category: mainCat,
+                  subCategory: subCat || null,
+                  isCreditCard: isCard,
+                  card: card,
+                  parcelas: newParcelas,
+                  parcelaIndex: i + 1,
+                  paymentMethod: isCard ? 'cartao' : 'boleto',
+                  groupId: newGroupId,
+                  paid: false,
+                  aportado: mainCat === 'investimento' ? false : false
+                });
               }
-            });
+              
+              showToast(`Parcelas atualizadas: ${txClicked.parcelas} → ${newParcelas}`, 'success');
+            } else {
+              // Normal update for all installments
+              state.transactions.forEach((t) => {
+                if (t.groupId === groupId) {
+                  const baseDesc = desc.replace(/\s*\(\d+\/\d+\)\s*$/, '');
+                  if (t.parcelas && t.parcelaIndex) t.description = `${baseDesc} (${t.parcelaIndex}/${t.parcelas})`;
+                  else t.description = baseDesc;
+                  t.category = mainCat; t.subCategory = subCat || null; t.isCreditCard = isCard; t.card = card;
+                  t.paymentMethod = isCard ? 'cartao' : 'debito_pix'; t.value = value;
+                  const oldDate = new Date(t.date);
+                  if (!isNaN(oldDate.getTime())) {
+                    const shifted = new Date(oldDate.getTime() + delta);
+                    t.date = shifted.toISOString();
+                  }
+                }
+              });
+              
+              showToast('Todas as parcelas atualizadas com sucesso', 'success');
+            }
           } else {
             txClicked.description = desc; txClicked.value = value; txClicked.date = newDate.toISOString();
             txClicked.category = mainCat; txClicked.subCategory = subCat || null; txClicked.isCreditCard = isCard; txClicked.card = card;
             txClicked.paymentMethod = isCard ? 'cartao' : 'debito_pix';
+            
+            showToast('Lançamento atualizado com sucesso', 'success');
           }
 
           await saveTransactions();
