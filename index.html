@@ -2804,7 +2804,8 @@
           paymentContainer.classList.add('hidden'); editIsCartao.checked = false; editCartaoFields.classList.add('hidden');
         } else {
           paymentContainer.classList.remove('hidden');
-          const isCard = !!tx.isCreditCard;
+          // Check if it's a credit card transaction (both isCreditCard flag and paymentMethod)
+          const isCard = (tx.isCreditCard || tx.paymentMethod === 'cartao');
           editIsCartao.checked = isCard;
           if (isCard) { editCartaoFields.classList.remove('hidden'); editCartao.value = tx.card || 'caixa'; }
           else editCartaoFields.classList.add('hidden');
@@ -2821,7 +2822,8 @@
   tx.groupId &&
   (tx.isCreditCard || 
    tx.paymentMethod === 'boleto' || 
-   tx.paymentMethod === 'Boleto');
+   tx.paymentMethod === 'Boleto' ||
+   tx.paymentMethod === 'cartao');
 
 if (isParceladoSerie) {
   scopeBlock.classList.remove('hidden');
@@ -2931,7 +2933,7 @@ if (previewBox) previewBox.classList.add('hidden');
        const isParceladoSerie =
   tx.parcelas && tx.parcelas > 1 &&
   tx.groupId &&
-  (tx.isCreditCard || tx.paymentMethod === 'boleto' || tx.paymentMethod === 'Boleto');
+  (tx.isCreditCard || tx.paymentMethod === 'boleto' || tx.paymentMethod === 'Boleto' || tx.paymentMethod === 'cartao');
 
 if (isParceladoSerie) {
   const previewBox = document.getElementById('deleteParcelPreview');
