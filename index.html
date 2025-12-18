@@ -2817,6 +2817,14 @@
 
         // Check if this is an installment transaction (credit card or boleto)
         // Check for parcelas > 1 AND groupId AND (credit card OR boleto payment)
+        console.log('Edit Modal - Transaction data:', {
+          id: tx.id,
+          parcelas: tx.parcelas,
+          groupId: tx.groupId,
+          isCreditCard: tx.isCreditCard,
+          paymentMethod: tx.paymentMethod
+        });
+        
         const isParceladoSerie =
   tx.parcelas && tx.parcelas > 1 &&
   tx.groupId &&
@@ -2824,6 +2832,8 @@
    tx.paymentMethod === 'boleto' || 
    tx.paymentMethod === 'Boleto' ||
    tx.paymentMethod === 'cartao');
+   
+        console.log('Edit Modal - isParceladoSerie:', isParceladoSerie);
 
 if (isParceladoSerie) {
   scopeBlock.classList.remove('hidden');
@@ -2930,10 +2940,20 @@ if (previewBox) previewBox.classList.add('hidden');
         const deleteSingleText = document.getElementById('deleteSingleText');
 
         // Exibir bloco de escopo somente se fizer parte de um grupo parcelado
+        console.log('Delete Modal - Transaction data:', {
+          id: tx.id,
+          parcelas: tx.parcelas,
+          groupId: tx.groupId,
+          isCreditCard: tx.isCreditCard,
+          paymentMethod: tx.paymentMethod
+        });
+        
        const isParceladoSerie =
   tx.parcelas && tx.parcelas > 1 &&
   tx.groupId &&
   (tx.isCreditCard || tx.paymentMethod === 'boleto' || tx.paymentMethod === 'Boleto' || tx.paymentMethod === 'cartao');
+  
+        console.log('Delete Modal - isParceladoSerie:', isParceladoSerie);
 
 if (isParceladoSerie) {
   const previewBox = document.getElementById('deleteParcelPreview');
