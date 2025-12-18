@@ -2815,10 +2815,13 @@
         const btnAll = document.getElementById('btnScopeAll');
 
         // Check if this is an installment transaction (credit card or boleto)
+        // Check for parcelas > 1 AND groupId AND (credit card OR boleto payment)
         const isParceladoSerie =
   tx.parcelas && tx.parcelas > 1 &&
   tx.groupId &&
-  (tx.isCreditCard || tx.paymentMethod === 'boleto' || tx.paymentMethod === 'Boleto');
+  (tx.isCreditCard || 
+   tx.paymentMethod === 'boleto' || 
+   tx.paymentMethod === 'Boleto');
 
 if (isParceladoSerie) {
   scopeBlock.classList.remove('hidden');
@@ -3470,10 +3473,13 @@ if (forma === 'cartao' || forma === 'boleto') {
                   // Preserve paymentMethod if not changing to/from credit card
                   if (isCard) {
                     t.paymentMethod = 'cartao';
-                  } else if (!txClicked.paymentMethod || txClicked.paymentMethod === 'cartao') {
+                  } else if (txClicked.paymentMethod === 'cartao') {
+                    // Was credit card, now isn't - change to debito_pix
                     t.paymentMethod = 'debito_pix';
+                  } else {
+                    // Keep existing paymentMethod (like 'boleto', 'debito_pix', etc)
+                    t.paymentMethod = txClicked.paymentMethod || 'debito_pix';
                   }
-                  // Otherwise keep existing paymentMethod (like 'boleto')
                   t.value = value;
                   const oldDate = new Date(t.date);
                   if (!isNaN(oldDate.getTime())) {
@@ -3491,10 +3497,13 @@ if (forma === 'cartao' || forma === 'boleto') {
             // Preserve paymentMethod if not changing to/from credit card
             if (isCard) {
               txClicked.paymentMethod = 'cartao';
-            } else if (!txClicked.paymentMethod || txClicked.paymentMethod === 'cartao') {
+            } else if (txClicked.paymentMethod === 'cartao') {
+              // Was credit card, now isn't - change to debito_pix
               txClicked.paymentMethod = 'debito_pix';
+            } else {
+              // Keep existing paymentMethod (like 'boleto', 'debito_pix', etc)
+              // No change needed - txClicked.paymentMethod stays as is
             }
-            // Otherwise keep existing paymentMethod (like 'boleto')
             
             showToast('Lançamento atualizado com sucesso', 'success');
           }
