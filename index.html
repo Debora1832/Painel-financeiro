@@ -947,23 +947,93 @@
           </div>
         </div>
 
-        <!-- Cards anuais -->
-        <div class="px-4 pt-4 grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-3">
-          <div class="bg-emerald-50 border border-emerald-100 rounded-xl px-3 py-3 flex flex-col">
-            <p class="text-[11px] font-medium text-emerald-700 uppercase tracking-wide">Receitas no ano</p>
-            <p id="annualTotalReceitas" class="mt-1 text-lg font-semibold text-emerald-900">R$ 0,00</p>
+        <!-- Cards anuais principais - Maiores e mais visuais -->
+        <div class="px-4 pt-4 grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-4">
+          <div class="bg-gradient-to-br from-emerald-50 to-emerald-100/50 border-2 border-emerald-200 rounded-xl px-4 py-4 flex flex-col shadow-sm hover:shadow-md transition-shadow">
+            <div class="flex items-center justify-between mb-2">
+              <p class="text-xs font-bold text-emerald-700 uppercase tracking-wide">Receitas no ano</p>
+              <i class="fa-solid fa-arrow-trend-up text-emerald-600 text-lg"></i>
+            </div>
+            <p id="annualTotalReceitas" class="text-2xl font-bold text-emerald-900 mb-1">R$ 0,00</p>
+            <div class="flex items-center gap-1 text-xs">
+              <span id="annualReceitasTrend" class="font-semibold text-emerald-700"></span>
+              <span class="text-emerald-600">vs média mensal</span>
+            </div>
           </div>
-          <div class="bg-orange-50 border border-orange-100 rounded-xl px-3 py-3 flex flex-col">
-            <p class="text-[11px] font-medium text-orange-700 uppercase tracking-wide">Despesas no ano</p>
-            <p id="annualTotalDespesas" class="mt-1 text-lg font-semibold text-orange-900">R$ 0,00</p>
+          
+          <div class="bg-gradient-to-br from-orange-50 to-orange-100/50 border-2 border-orange-200 rounded-xl px-4 py-4 flex flex-col shadow-sm hover:shadow-md transition-shadow">
+            <div class="flex items-center justify-between mb-2">
+              <p class="text-xs font-bold text-orange-700 uppercase tracking-wide">Despesas no ano</p>
+              <i class="fa-solid fa-arrow-trend-down text-orange-600 text-lg"></i>
+            </div>
+            <p id="annualTotalDespesas" class="text-2xl font-bold text-orange-900 mb-1">R$ 0,00</p>
+            <div class="flex items-center gap-1 text-xs">
+              <span id="annualDespesasTrend" class="font-semibold text-orange-700"></span>
+              <span class="text-orange-600">vs média mensal</span>
+            </div>
           </div>
-          <div class="bg-blue-50 border border-blue-100 rounded-xl px-3 py-3 flex flex-col">
-            <p class="text-[11px] font-medium text-blue-700 uppercase tracking-wide">Total investido</p>
-            <p id="annualTotalInvest" class="mt-1 text-lg font-semibold text-blue-900">R$ 0,00</p>
+          
+          <div class="bg-gradient-to-br from-blue-50 to-blue-100/50 border-2 border-blue-200 rounded-xl px-4 py-4 flex flex-col shadow-sm hover:shadow-md transition-shadow">
+            <div class="flex items-center justify-between mb-2">
+              <p class="text-xs font-bold text-blue-700 uppercase tracking-wide">Total investido</p>
+              <i class="fa-solid fa-piggy-bank text-blue-600 text-lg"></i>
+            </div>
+            <p id="annualTotalInvest" class="text-2xl font-bold text-blue-900 mb-1">R$ 0,00</p>
+            <div class="flex items-center gap-1 text-xs">
+              <span id="annualInvestTrend" class="font-semibold text-blue-700"></span>
+              <span class="text-blue-600">vs média mensal</span>
+            </div>
           </div>
-          <div class="bg-slate-50 border border-slate-100 rounded-xl px-3 py-3 flex flex-col">
-            <p class="text-[11px] font-medium text-slate-700 uppercase tracking-wide">Saldo do ano</p>
-            <p id="annualTotalSaldo" class="mt-1 text-lg font-semibold text-slate-900">R$ 0,00</p>
+          
+          <div class="bg-gradient-to-br from-slate-50 to-slate-100/50 border-2 border-slate-200 rounded-xl px-4 py-4 flex flex-col shadow-sm hover:shadow-md transition-shadow">
+            <div class="flex items-center justify-between mb-2">
+              <p class="text-xs font-bold text-slate-700 uppercase tracking-wide">Saldo do ano</p>
+              <i class="fa-solid fa-wallet text-slate-600 text-lg"></i>
+            </div>
+            <p id="annualTotalSaldo" class="text-2xl font-bold text-slate-900 mb-1">R$ 0,00</p>
+            <div class="flex items-center gap-1 text-xs">
+              <span id="annualSaldoTrend" class="font-semibold text-slate-700"></span>
+              <span class="text-slate-600">média mensal</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- KPIs Financeiros Adicionais -->
+        <div class="px-4 pt-4 grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-4">
+          <div class="bg-white border-2 border-purple-200 rounded-xl px-4 py-4 flex flex-col shadow-sm hover:shadow-md transition-shadow">
+            <div class="flex items-center justify-between mb-2">
+              <p class="text-xs font-bold text-purple-700 uppercase tracking-wide">Taxa de Poupança</p>
+              <i class="fa-solid fa-percent text-purple-600 text-lg"></i>
+            </div>
+            <p id="annualSavingsRate" class="text-2xl font-bold text-purple-900 mb-1">0%</p>
+            <p class="text-xs text-purple-600">Receitas → Investimentos</p>
+          </div>
+          
+          <div class="bg-white border-2 border-amber-200 rounded-xl px-4 py-4 flex flex-col shadow-sm hover:shadow-md transition-shadow">
+            <div class="flex items-center justify-between mb-2">
+              <p class="text-xs font-bold text-amber-700 uppercase tracking-wide">Fixas vs Variáveis</p>
+              <i class="fa-solid fa-balance-scale text-amber-600 text-lg"></i>
+            </div>
+            <p id="annualFixedVsVariable" class="text-2xl font-bold text-amber-900 mb-1">0% / 0%</p>
+            <p class="text-xs text-amber-600">Proporção de despesas</p>
+          </div>
+          
+          <div class="bg-white border-2 border-teal-200 rounded-xl px-4 py-4 flex flex-col shadow-sm hover:shadow-md transition-shadow">
+            <div class="flex items-center justify-between mb-2">
+              <p class="text-xs font-bold text-teal-700 uppercase tracking-wide">Crescimento MoM</p>
+              <i class="fa-solid fa-chart-line text-teal-600 text-lg"></i>
+            </div>
+            <p id="annualMoMGrowth" class="text-2xl font-bold text-teal-900 mb-1">0%</p>
+            <p class="text-xs text-teal-600">Variação média mês a mês</p>
+          </div>
+          
+          <div class="bg-white border-2 border-rose-200 rounded-xl px-4 py-4 flex flex-col shadow-sm hover:shadow-md transition-shadow">
+            <div class="flex items-center justify-between mb-2">
+              <p class="text-xs font-bold text-rose-700 uppercase tracking-wide">Ticket Médio</p>
+              <i class="fa-solid fa-receipt text-rose-600 text-lg"></i>
+            </div>
+            <p id="annualAvgTicket" class="text-2xl font-bold text-rose-900 mb-1">R$ 0,00</p>
+            <p class="text-xs text-rose-600">Gasto médio por despesa</p>
           </div>
         </div>
 
@@ -1011,15 +1081,16 @@
           </table>
         </div>
 
-        <!-- Gráficos -->
+        <!-- Gráficos Principais -->
         <div class="grid grid-cols-1 xl:grid-cols-2 gap-4 p-4 border-t border-gray-100">
-          <div class="h-64 flex flex-col">
-            <div class="flex items-center justify-between mb-2">
+          <div class="h-80 flex flex-col bg-white border border-gray-200 rounded-xl p-4 shadow-sm">
+            <div class="flex items-center justify-between mb-3">
               <div>
-                <h3 class="text-xs font-semibold text-gray-800 uppercase tracking-wide">
+                <h3 class="text-sm font-bold text-gray-800 uppercase tracking-wide flex items-center gap-2">
+                  <i class="fa-solid fa-chart-column text-indigo-600"></i>
                   Comparativo Mensal
                 </h3>
-                <p class="text-[11px] text-gray-500">
+                <p class="text-xs text-gray-500 mt-1">
                   Receitas x Despesas x Investimentos por mês.
                 </p>
               </div>
@@ -1029,13 +1100,31 @@
             </div>
           </div>
 
-          <div class="h-64 flex flex-col">
-            <div class="flex items-center justify-between mb-2">
+          <div class="h-80 flex flex-col bg-white border border-gray-200 rounded-xl p-4 shadow-sm">
+            <div class="flex items-center justify-between mb-3">
               <div>
-                <h3 class="text-xs font-semibold text-gray-800 uppercase tracking-wide">
+                <h3 class="text-sm font-bold text-gray-800 uppercase tracking-wide flex items-center gap-2">
+                  <i class="fa-solid fa-chart-area text-slate-600"></i>
+                  Acumulado Anual
+                </h3>
+                <p class="text-xs text-gray-500 mt-1">
+                  Evolução acumulada de receitas, despesas e investimentos.
+                </p>
+              </div>
+            </div>
+            <div class="flex-1">
+              <canvas id="chartAnnualAccumulated"></canvas>
+            </div>
+          </div>
+
+          <div class="h-80 flex flex-col bg-white border border-gray-200 rounded-xl p-4 shadow-sm">
+            <div class="flex items-center justify-between mb-3">
+              <div>
+                <h3 class="text-sm font-bold text-gray-800 uppercase tracking-wide flex items-center gap-2">
+                  <i class="fa-solid fa-chart-line text-slate-600"></i>
                   Evolução do Saldo
                 </h3>
-                <p class="text-[11px] text-gray-500">
+                <p class="text-xs text-gray-500 mt-1">
                   Saldo líquido de cada mês ao longo do ano.
                 </p>
               </div>
@@ -1044,27 +1133,45 @@
               <canvas id="chartAnnualSaldo"></canvas>
             </div>
           </div>
+
+          <div class="h-80 flex flex-col bg-white border border-gray-200 rounded-xl p-4 shadow-sm">
+            <div class="flex items-center justify-between mb-3">
+              <div>
+                <h3 class="text-sm font-bold text-gray-800 uppercase tracking-wide flex items-center gap-2">
+                  <i class="fa-solid fa-chart-pie text-orange-600"></i>
+                  Distribuição de Despesas
+                </h3>
+                <p class="text-xs text-gray-500 mt-1">
+                  Proporção entre despesas fixas e variáveis.
+                </p>
+              </div>
+            </div>
+            <div class="flex-1">
+              <canvas id="chartExpenseDistribution"></canvas>
+            </div>
+          </div>
         </div>
 
         <!-- Investimentos por tipo -->
         <div class="border-t border-gray-100 p-4">
-          <div class="flex items-center justify-between mb-2">
+          <div class="flex items-center justify-between mb-3">
             <div>
-              <h3 class="text-xs font-semibold text-gray-800 uppercase tracking-wide">
+              <h3 class="text-sm font-bold text-gray-800 uppercase tracking-wide flex items-center gap-2">
+                <i class="fa-solid fa-chart-pie text-blue-600"></i>
                 Resumo de Investimentos por Tipo
               </h3>
-              <p class="text-[11px] text-gray-500">
+              <p class="text-xs text-gray-500 mt-1">
                 Baseado nas transações de investimento do período selecionado.
               </p>
             </div>
           </div>
           <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mt-2">
-            <div class="h-64 flex flex-col">
+            <div class="h-80 flex flex-col bg-white border border-gray-200 rounded-xl p-4 shadow-sm">
               <div class="flex-1">
                 <canvas id="chartInvestTypes"></canvas>
               </div>
             </div>
-            <div class="overflow-x-auto">
+            <div class="bg-white border border-gray-200 rounded-xl p-4 shadow-sm overflow-x-auto">
               <table class="min-w-full text-sm">
                 <thead class="bg-gray-50 border-b border-gray-100">
                   <tr class="text-xs text-gray-500 uppercase tracking-wide">
@@ -1368,6 +1475,8 @@
       // Charts placeholders
       let annualBarChart = null;
       let annualLineChart = null;
+      let annualAccumulatedChart = null;
+      let expenseDistributionChart = null;
       let investPieChart = null;
 
       // ---------- HELPERS ----------
@@ -2089,7 +2198,7 @@
       // ---------- ANNUAL COMPUTATION & CHART RENDERS ----------
       function computeAnnualData() {
         const monthly = [];
-        for (let m = 0; m < 12; m++) monthly[m] = { monthIndex: m, receitas: 0, despesas: 0, investimentos: 0, saldo: 0, investMes: 0 };
+        for (let m = 0; m < 12; m++) monthly[m] = { monthIndex: m, receitas: 0, despesas: 0, despesasFixas: 0, despesasVariaveis: 0, investimentos: 0, saldo: 0, investMes: 0 };
 
         const txSource = state.transactions.filter((t) => {
           const d = new Date(t.date);
@@ -2099,7 +2208,9 @@
         });
 
         const investByType = {};
-        let totalReceitasYear = 0, totalDespesasYear = 0, totalInvestYear = 0, totalSaldoYear = 0, maxInvestSingle = 0;
+        let totalReceitasYear = 0, totalDespesasYear = 0, totalDespesasFixas = 0, totalDespesasVariaveis = 0;
+        let totalInvestYear = 0, totalSaldoYear = 0, maxInvestSingle = 0;
+        let totalDespesaCount = 0; // For average ticket calculation
 
         txSource.forEach((t) => {
           const d = new Date(t.date);
@@ -2107,69 +2218,241 @@
           const m = d.getMonth();
           const v = Number(t.value) || 0;
 
-          if (t.category === 'receita') { monthly[m].receitas += v; totalReceitasYear += v; }
+          if (t.category === 'receita') { 
+            monthly[m].receitas += v; 
+            totalReceitasYear += v; 
+          }
           else if (t.category === 'investimento') {
-            monthly[m].investimentos += v; monthly[m].investMes += v; totalInvestYear += v;
+            monthly[m].investimentos += v; 
+            monthly[m].investMes += v; 
+            totalInvestYear += v;
             if (v > maxInvestSingle) maxInvestSingle = v;
             if (t.subCategory) investByType[t.subCategory] = (investByType[t.subCategory] || 0) + v;
-          } else if (t.category === 'fixa' || t.category === 'variavel') {
-            monthly[m].despesas += v; totalDespesasYear += v;
+          } else if (t.category === 'fixa') {
+            monthly[m].despesas += v; 
+            monthly[m].despesasFixas += v;
+            totalDespesasYear += v;
+            totalDespesasFixas += v;
+            totalDespesaCount++;
+          } else if (t.category === 'variavel') {
+            monthly[m].despesas += v; 
+            monthly[m].despesasVariaveis += v;
+            totalDespesasYear += v;
+            totalDespesasVariaveis += v;
+            totalDespesaCount++;
           }
         });
 
         monthly.forEach((mData) => { mData.saldo = mData.receitas - mData.despesas - mData.investimentos; totalSaldoYear += mData.saldo; });
 
+        // Calculate new KPIs
+        const savingsRate = totalReceitasYear > 0 ? (totalInvestYear / totalReceitasYear * 100) : 0;
+        const fixedPercentage = totalDespesasYear > 0 ? (totalDespesasFixas / totalDespesasYear * 100) : 0;
+        const variablePercentage = totalDespesasYear > 0 ? (totalDespesasVariaveis / totalDespesasYear * 100) : 0;
+        const avgTicket = totalDespesaCount > 0 ? (totalDespesasYear / totalDespesaCount) : 0;
+        
+        // Calculate month-over-month growth (based on saldo)
+        let momGrowthSum = 0;
+        let momGrowthCount = 0;
+        for (let i = 1; i < 12; i++) {
+          if (monthly[i-1].saldo !== 0) {
+            const growth = ((monthly[i].saldo - monthly[i-1].saldo) / Math.abs(monthly[i-1].saldo)) * 100;
+            momGrowthSum += growth;
+            momGrowthCount++;
+          }
+        }
+        const avgMoMGrowth = momGrowthCount > 0 ? (momGrowthSum / momGrowthCount) : 0;
+
         return {
           monthly,
-          totals: { totalReceitasYear, totalDespesasYear, totalInvestYear, totalSaldoYear, maxInvestSingle },
+          totals: { 
+            totalReceitasYear, 
+            totalDespesasYear, 
+            totalDespesasFixas,
+            totalDespesasVariaveis,
+            totalInvestYear, 
+            totalSaldoYear, 
+            maxInvestSingle,
+            savingsRate,
+            fixedPercentage,
+            variablePercentage,
+            avgTicket,
+            avgMoMGrowth
+          },
           investByType,
           txSource
         };
       }
 
-      function renderAnnualCharts(monthly) {
+      function renderAnnualCharts(monthly, totals) {
         const labels = monthly.map(m => MONTH_NAMES[m.monthIndex].slice(0, 3));
         const receitas = monthly.map(m => m.receitas);
         const despesas = monthly.map(m => m.despesas);
         const investimentos = monthly.map(m => m.investimentos);
         const saldos = monthly.map(m => m.saldo);
 
+        // Calculate accumulated values
+        let accReceitas = 0, accDespesas = 0, accInvestimentos = 0;
+        const accumulatedReceitas = monthly.map(m => { accReceitas += m.receitas; return accReceitas; });
+        const accumulatedDespesas = monthly.map(m => { accDespesas += m.despesas; return accDespesas; });
+        const accumulatedInvestimentos = monthly.map(m => { accInvestimentos += m.investimentos; return accInvestimentos; });
+
+        // Bar Chart - Monthly comparison
         const barCanvas = document.getElementById('chartAnnualBars');
+        if (barCanvas && typeof Chart !== 'undefined') {
+          const barCtx = barCanvas.getContext('2d');
+          if (annualBarChart) annualBarChart.destroy();
+          
+          annualBarChart = new Chart(barCtx, {
+            type: 'bar',
+            data: {
+              labels,
+              datasets: [
+                { label: 'Receitas', data: receitas, backgroundColor: 'rgba(16,185,129,0.7)', borderColor: 'rgba(5,150,105,1)', borderWidth: 2 },
+                { label: 'Despesas', data: despesas, backgroundColor: 'rgba(249,115,22,0.7)', borderColor: 'rgba(234,88,12,1)', borderWidth: 2 },
+                { label: 'Investimentos', data: investimentos, backgroundColor: 'rgba(59,130,246,0.7)', borderColor: 'rgba(37,99,235,1)', borderWidth: 2 }
+              ]
+            },
+            options: {
+              responsive: true, 
+              maintainAspectRatio: false,
+              plugins: { 
+                legend: { position: 'top', labels: { font: { size: 11, weight: 'bold' } } }, 
+                tooltip: { callbacks: { label: ctx => `${ctx.dataset.label}: ${formatCurrency(ctx.parsed.y)}` } } 
+              },
+              scales: { y: { beginAtZero: true, ticks: { callback: v => formatCurrency(v), font: { size: 10 } } } }
+            }
+          });
+        }
+
+        // Line Chart - Balance evolution
         const saldoCanvas = document.getElementById('chartAnnualSaldo');
-        if (!barCanvas || !saldoCanvas || typeof Chart === 'undefined') return;
+        if (saldoCanvas && typeof Chart !== 'undefined') {
+          const saldoCtx = saldoCanvas.getContext('2d');
+          if (annualLineChart) annualLineChart.destroy();
+          
+          annualLineChart = new Chart(saldoCtx, {
+            type: 'line',
+            data: { 
+              labels, 
+              datasets: [{ 
+                label: 'Saldo Mensal', 
+                data: saldos, 
+                tension: 0.4, 
+                fill: true, 
+                backgroundColor: 'rgba(15,23,42,0.1)', 
+                borderColor: 'rgba(15,23,42,1)', 
+                borderWidth: 3,
+                pointRadius: 4,
+                pointBackgroundColor: 'rgba(15,23,42,1)',
+                pointBorderColor: '#fff',
+                pointBorderWidth: 2
+              }] 
+            },
+            options: {
+              responsive: true, 
+              maintainAspectRatio: false,
+              plugins: { 
+                legend: { display: false }, 
+                tooltip: { callbacks: { label: ctx => `Saldo: ${formatCurrency(ctx.parsed.y)}` } } 
+              },
+              scales: { y: { ticks: { callback: v => formatCurrency(v), font: { size: 10 } } } }
+            }
+          });
+        }
 
-        const barCtx = barCanvas.getContext('2d');
-        const saldoCtx = saldoCanvas.getContext('2d');
+        // Area Chart - Accumulated values
+        const accCanvas = document.getElementById('chartAnnualAccumulated');
+        if (accCanvas && typeof Chart !== 'undefined') {
+          const accCtx = accCanvas.getContext('2d');
+          if (annualAccumulatedChart) annualAccumulatedChart.destroy();
+          
+          annualAccumulatedChart = new Chart(accCtx, {
+            type: 'line',
+            data: {
+              labels,
+              datasets: [
+                { 
+                  label: 'Receitas Acumuladas', 
+                  data: accumulatedReceitas, 
+                  tension: 0.4, 
+                  fill: true, 
+                  backgroundColor: 'rgba(16,185,129,0.2)', 
+                  borderColor: 'rgba(5,150,105,1)', 
+                  borderWidth: 3,
+                  pointRadius: 3
+                },
+                { 
+                  label: 'Despesas Acumuladas', 
+                  data: accumulatedDespesas, 
+                  tension: 0.4, 
+                  fill: true, 
+                  backgroundColor: 'rgba(249,115,22,0.2)', 
+                  borderColor: 'rgba(234,88,12,1)', 
+                  borderWidth: 3,
+                  pointRadius: 3
+                },
+                { 
+                  label: 'Investimentos Acumulados', 
+                  data: accumulatedInvestimentos, 
+                  tension: 0.4, 
+                  fill: true, 
+                  backgroundColor: 'rgba(59,130,246,0.2)', 
+                  borderColor: 'rgba(37,99,235,1)', 
+                  borderWidth: 3,
+                  pointRadius: 3
+                }
+              ]
+            },
+            options: {
+              responsive: true, 
+              maintainAspectRatio: false,
+              plugins: { 
+                legend: { position: 'top', labels: { font: { size: 11, weight: 'bold' } } }, 
+                tooltip: { callbacks: { label: ctx => `${ctx.dataset.label}: ${formatCurrency(ctx.parsed.y)}` } } 
+              },
+              scales: { y: { beginAtZero: true, ticks: { callback: v => formatCurrency(v), font: { size: 10 } } } }
+            }
+          });
+        }
 
-        if (annualBarChart) annualBarChart.destroy();
-        if (annualLineChart) annualLineChart.destroy();
-
-        annualBarChart = new Chart(barCtx, {
-          type: 'bar',
-          data: {
-            labels,
-            datasets: [
-              { label: 'Receitas', data: receitas, backgroundColor: 'rgba(16,185,129,0.6)', borderColor: 'rgba(5,150,105,1)', borderWidth: 1 },
-              { label: 'Despesas', data: despesas, backgroundColor: 'rgba(249,115,22,0.6)', borderColor: 'rgba(234,88,12,1)', borderWidth: 1 },
-              { label: 'Investimentos', data: investimentos, backgroundColor: 'rgba(59,130,246,0.6)', borderColor: 'rgba(37,99,235,1)', borderWidth: 1 }
-            ]
-          },
-          options: {
-            responsive: true, maintainAspectRatio: false,
-            plugins: { legend: { position: 'top' }, tooltip: { callbacks: { label: ctx => `${ctx.dataset.label}: ${formatCurrency(ctx.parsed.y)}` } } },
-            scales: { y: { beginAtZero: true, ticks: { callback: v => formatCurrency(v) } } }
+        // Pie Chart - Expense distribution (Fixed vs Variable)
+        const expCanvas = document.getElementById('chartExpenseDistribution');
+        if (expCanvas && typeof Chart !== 'undefined' && totals) {
+          const expCtx = expCanvas.getContext('2d');
+          if (expenseDistributionChart) expenseDistributionChart.destroy();
+          
+          if (totals.totalDespesasYear > 0) {
+            expenseDistributionChart = new Chart(expCtx, {
+              type: 'doughnut',
+              data: {
+                labels: ['Despesas Fixas', 'Despesas Variáveis'],
+                datasets: [{
+                  data: [totals.totalDespesasFixas, totals.totalDespesasVariaveis],
+                  backgroundColor: ['rgba(249,115,22,0.8)', 'rgba(251,146,60,0.8)'],
+                  borderWidth: 3,
+                  borderColor: '#ffffff'
+                }]
+              },
+              options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                  legend: { position: 'bottom', labels: { font: { size: 11, weight: 'bold' } } },
+                  tooltip: {
+                    callbacks: {
+                      label: ctx => {
+                        const value = ctx.parsed || 0;
+                        const pct = totals.totalDespesasYear > 0 ? (value / totals.totalDespesasYear * 100).toFixed(1).replace('.', ',') : '0,0';
+                        return `${ctx.label}: ${formatCurrency(value)} (${pct}%)`;
+                      }
+                    }
+                  }
+                }
+              }
+            });
           }
-        });
-
-        annualLineChart = new Chart(saldoCtx, {
-          type: 'line',
-          data: { labels, datasets: [{ label: 'Saldo Mensal', data: saldos, tension: 0.3, fill: true, backgroundColor: 'rgba(15,23,42,0.08)', borderColor: 'rgba(15,23,42,1)', pointRadius: 3 }] },
-          options: {
-            responsive: true, maintainAspectRatio: false,
-            plugins: { legend: { display: false }, tooltip: { callbacks: { label: ctx => `Saldo: ${formatCurrency(ctx.parsed.y)}` } } },
-            scales: { y: { ticks: { callback: v => formatCurrency(v) } } }
-          }
-        });
+        }
       }
 
       function renderInvestTypeChart(investByType, totalInvestYear) {
@@ -2226,7 +2509,10 @@
 
       function renderAnnualView() {
         const { monthly, totals, investByType } = computeAnnualData();
-        const { totalReceitasYear, totalDespesasYear, totalInvestYear, totalSaldoYear, maxInvestSingle } = totals;
+        const { 
+          totalReceitasYear, totalDespesasYear, totalInvestYear, totalSaldoYear, maxInvestSingle,
+          savingsRate, fixedPercentage, variablePercentage, avgTicket, avgMoMGrowth
+        } = totals;
 
         const tbody = document.getElementById('annualBody');
         tbody.innerHTML = '';
@@ -2243,11 +2529,34 @@
         trTotal.innerHTML = `<td class="px-4 py-2 text-xs font-semibold text-gray-900">Total</td><td class="px-4 py-2 text-xs font-semibold text-gray-900 text-right">${formatCurrency(totalReceitasYear)}</td><td class="px-4 py-2 text-xs font-semibold text-gray-900 text-right">${formatCurrency(totalDespesasYear)}</td><td class="px-4 py-2 text-xs font-semibold text-gray-900 text-right">${formatCurrency(totalInvestYear)}</td><td class="px-4 py-2 text-xs font-semibold text-gray-900 text-right">${formatCurrency(totalSaldoYear)}</td>`;
         tbody.appendChild(trTotal);
 
+        // Update main KPI cards with trend indicators
+        const avgMonthlyReceitas = totalReceitasYear / 12;
+        const avgMonthlyDespesas = totalDespesasYear / 12;
+        const avgMonthlyInvest = totalInvestYear / 12;
+        const avgMonthlySaldo = totalSaldoYear / 12;
+
         document.getElementById('annualTotalReceitas').textContent = formatCurrency(totalReceitasYear);
         document.getElementById('annualTotalDespesas').textContent = formatCurrency(totalDespesasYear);
         document.getElementById('annualTotalInvest').textContent = formatCurrency(totalInvestYear);
         document.getElementById('annualTotalSaldo').textContent = formatCurrency(totalSaldoYear);
 
+        // Trend indicators (comparing with average)
+        document.getElementById('annualReceitasTrend').innerHTML = `<i class="fa-solid fa-equals text-xs"></i> ${formatCurrency(avgMonthlyReceitas)}`;
+        document.getElementById('annualDespesasTrend').innerHTML = `<i class="fa-solid fa-equals text-xs"></i> ${formatCurrency(avgMonthlyDespesas)}`;
+        document.getElementById('annualInvestTrend').innerHTML = `<i class="fa-solid fa-equals text-xs"></i> ${formatCurrency(avgMonthlyInvest)}`;
+        document.getElementById('annualSaldoTrend').textContent = formatCurrency(avgMonthlySaldo);
+
+        // Update new KPI cards
+        document.getElementById('annualSavingsRate').textContent = savingsRate.toFixed(1).replace('.', ',') + '%';
+        document.getElementById('annualFixedVsVariable').textContent = `${fixedPercentage.toFixed(0)}% / ${variablePercentage.toFixed(0)}%`;
+        
+        const momIcon = avgMoMGrowth >= 0 ? '↑' : '↓';
+        const momColor = avgMoMGrowth >= 0 ? 'text-teal-600' : 'text-rose-600';
+        document.getElementById('annualMoMGrowth').innerHTML = `<span class="${momColor}">${momIcon} ${Math.abs(avgMoMGrowth).toFixed(1).replace('.', ',')}%</span>`;
+        
+        document.getElementById('annualAvgTicket').textContent = formatCurrency(avgTicket);
+
+        // Investment summary card
         document.getElementById('annualCardInvestTotal').textContent = formatCurrency(totalInvestYear);
         document.getElementById('annualCardInvestMax').textContent = formatCurrency(maxInvestSingle);
 
@@ -2256,7 +2565,8 @@
         const bestMonthLabel = bestMonthIndex !== null ? MONTH_NAMES[bestMonthIndex] : '-';
         document.getElementById('annualCardInvestBestMonth').textContent = bestMonthValue > 0 ? `${bestMonthLabel} (${formatCurrency(bestMonthValue)})` : '-';
 
-        renderAnnualCharts(monthly);
+        // Render all charts with new totals parameter
+        renderAnnualCharts(monthly, totals);
         renderInvestTypeChart(investByType, totalInvestYear);
         renderAnnualInvestSummary(investByType, totalInvestYear);
       }
@@ -2453,7 +2763,7 @@
         card: isCreditCard ? card : null,
         parcelas: nParcelas,
         parcelaIndex: i + 1,
-        paymentMethod: isCreditCard ? 'cartao' : 'boleto',
+        paymentMethod: paymentMethod, // Preserve the actual payment method
         groupId,
         paid: false,
         aportado: category === 'investimento' ? !!aportado : false
@@ -2494,7 +2804,8 @@
           paymentContainer.classList.add('hidden'); editIsCartao.checked = false; editCartaoFields.classList.add('hidden');
         } else {
           paymentContainer.classList.remove('hidden');
-          const isCard = !!tx.isCreditCard;
+          // Check if it's a credit card transaction (both isCreditCard flag and paymentMethod)
+          const isCard = (tx.isCreditCard || tx.paymentMethod === 'cartao');
           editIsCartao.checked = isCard;
           if (isCard) { editCartaoFields.classList.remove('hidden'); editCartao.value = tx.card || 'caixa'; }
           else editCartaoFields.classList.add('hidden');
@@ -2504,10 +2815,25 @@
         const btnSingle = document.getElementById('btnScopeSingle');
         const btnAll = document.getElementById('btnScopeAll');
 
+        // Check if this is an installment transaction (credit card or boleto)
+        // Check for parcelas > 1 AND groupId AND (credit card OR boleto payment)
+        console.log('Edit Modal - Transaction data:', {
+          id: tx.id,
+          parcelas: tx.parcelas,
+          groupId: tx.groupId,
+          isCreditCard: tx.isCreditCard,
+          paymentMethod: tx.paymentMethod
+        });
+        
         const isParceladoSerie =
   tx.parcelas && tx.parcelas > 1 &&
   tx.groupId &&
-  (tx.isCreditCard || tx.paymentMethod === 'boleto');
+  (tx.isCreditCard || 
+   tx.paymentMethod === 'boleto' || 
+   tx.paymentMethod === 'Boleto' ||
+   tx.paymentMethod === 'cartao');
+   
+        console.log('Edit Modal - isParceladoSerie:', isParceladoSerie);
 
 if (isParceladoSerie) {
   scopeBlock.classList.remove('hidden');
@@ -2614,10 +2940,20 @@ if (previewBox) previewBox.classList.add('hidden');
         const deleteSingleText = document.getElementById('deleteSingleText');
 
         // Exibir bloco de escopo somente se fizer parte de um grupo parcelado
+        console.log('Delete Modal - Transaction data:', {
+          id: tx.id,
+          parcelas: tx.parcelas,
+          groupId: tx.groupId,
+          isCreditCard: tx.isCreditCard,
+          paymentMethod: tx.paymentMethod
+        });
+        
        const isParceladoSerie =
   tx.parcelas && tx.parcelas > 1 &&
   tx.groupId &&
-  (tx.isCreditCard || tx.paymentMethod === 'boleto');
+  (tx.isCreditCard || tx.paymentMethod === 'boleto' || tx.paymentMethod === 'Boleto' || tx.paymentMethod === 'cartao');
+  
+        console.log('Delete Modal - isParceladoSerie:', isParceladoSerie);
 
 if (isParceladoSerie) {
   const previewBox = document.getElementById('deleteParcelPreview');
@@ -3140,7 +3476,7 @@ if (forma === 'cartao' || forma === 'boleto') {
                   card: card,
                   parcelas: newParcelas,
                   parcelaIndex: i + 1,
-                  paymentMethod: isCard ? 'cartao' : 'boleto',
+                  paymentMethod: txClicked.paymentMethod, // Preserve original payment method
                   groupId: newGroupId,
                   paid: false,
                   aportado: mainCat === 'investimento' ? false : false
@@ -3155,8 +3491,18 @@ if (forma === 'cartao' || forma === 'boleto') {
                   const baseDesc = desc.replace(/\s*\(\d+\/\d+\)\s*$/, '');
                   if (t.parcelas && t.parcelaIndex) t.description = `${baseDesc} (${t.parcelaIndex}/${t.parcelas})`;
                   else t.description = baseDesc;
-                  t.category = mainCat; t.subCategory = subCat || null; t.isCreditCard = isCard; t.card = card;
-                  t.paymentMethod = isCard ? 'cartao' : 'debito_pix'; t.value = value;
+                   t.category = mainCat; t.subCategory = subCat || null; t.isCreditCard = isCard; t.card = card;
+                  // Preserve paymentMethod if not changing to/from credit card
+                  if (isCard) {
+                    t.paymentMethod = 'cartao';
+                  } else if (txClicked.paymentMethod === 'cartao') {
+                    // Was credit card, now isn't - change to debito_pix
+                    t.paymentMethod = 'debito_pix';
+                  } else {
+                    // Keep existing paymentMethod (like 'boleto', 'debito_pix', etc)
+                    t.paymentMethod = txClicked.paymentMethod || 'debito_pix';
+                  }
+                  t.value = value;
                   const oldDate = new Date(t.date);
                   if (!isNaN(oldDate.getTime())) {
                     const shifted = new Date(oldDate.getTime() + delta);
@@ -3170,7 +3516,16 @@ if (forma === 'cartao' || forma === 'boleto') {
           } else {
             txClicked.description = desc; txClicked.value = value; txClicked.date = newDate.toISOString();
             txClicked.category = mainCat; txClicked.subCategory = subCat || null; txClicked.isCreditCard = isCard; txClicked.card = card;
-            txClicked.paymentMethod = isCard ? 'cartao' : 'debito_pix';
+            // Preserve paymentMethod if not changing to/from credit card
+            if (isCard) {
+              txClicked.paymentMethod = 'cartao';
+            } else if (txClicked.paymentMethod === 'cartao') {
+              // Was credit card, now isn't - change to debito_pix
+              txClicked.paymentMethod = 'debito_pix';
+            } else {
+              // Keep existing paymentMethod (like 'boleto', 'debito_pix', etc)
+              // No change needed - txClicked.paymentMethod stays as is
+            }
             
             showToast('Lançamento atualizado com sucesso', 'success');
           }
