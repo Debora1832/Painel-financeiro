@@ -3472,7 +3472,7 @@ if (isParceladoSerie && previewBox && previewList) {
         }
 
         const formReceita = document.getElementById('formReceita');
-        formReceita.addEventListener('submit', (e) => {
+        formReceita.addEventListener('submit', async (e) => {
           e.preventDefault();
           const description = document.getElementById('recDesc').value.trim();
           const rawValue = document.getElementById('recValor').value;
@@ -3481,7 +3481,7 @@ if (isParceladoSerie && previewBox && previewList) {
           const subCategory = document.getElementById('recCategoria').value;
           if (!description || !date || isNaN(value)) return;
 
-          addTransaction({
+          await addTransaction({
             description,
             value,
             date,
@@ -3501,7 +3501,7 @@ if (isParceladoSerie && previewBox && previewList) {
         });
 
         const formDespesa = document.getElementById('formDespesa');
-        formDespesa.addEventListener('submit', (e) => {
+        formDespesa.addEventListener('submit', async (e) => {
           e.preventDefault();
           const description = document.getElementById('despDesc').value.trim();
           const rawValue = document.getElementById('despValor').value;
@@ -3523,7 +3523,7 @@ if (forma === 'cartao' || forma === 'boleto') {
 
           if (!description || !date || isNaN(value)) return;
 
-          addTransaction({
+          await addTransaction({
             description,
             value,
             date,
