@@ -2742,6 +2742,7 @@
         tx.paid = !tx.paid;
         await saveTransactions();
         renderDashboard(state.selectedMonth);
+        updatePaymentProgress(); // Ensure progress bar updates
         const isReceita = tx.category === 'receita';
         showToast(
           wasPaid 
@@ -2758,6 +2759,7 @@
         tx.aportado = !tx.aportado;
         await saveTransactions();
         renderDashboard(state.selectedMonth);
+        updatePaymentProgress(); // Ensure progress bar updates
         showToast(
           wasAportado ? 'Marcado como não aportado' : 'Marcado como aportado',
           'success'
