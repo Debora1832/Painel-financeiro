@@ -2654,7 +2654,10 @@
         monthly.forEach((mData, index) => {
           const tr = document.createElement('tr');
           tr.className = index%2===0 ? 'bg-white' : 'bg-gray-50/50';
-          tr.innerHTML = `<td class="px-4 py-2 text-xs text-gray-700">${MONTH_NAMES[mData.monthIndex]}</td><td class="px-4 py-2 text-xs text-gray-800 text-right">${formatCurrency(mData.receitas)}</td><td class="px-4 py-2 text-xs text-gray-800 text-right">${formatCurrency(mData.despesas)}</td><td class="px-4 py-2 text-xs text-gray-800 text-right">${formatCurrency(mData.investimentos)}</td><td class="px-4 py-2 text-xs text-gray-800 text-right">${formatCurrency(mData.saldo)}</td>`;
+          const saldoNegativo = mData.saldo < 0;
+          const saldoClass = saldoNegativo ? 'text-red-700 font-bold' : 'text-gray-800';
+          const saldoIcon = saldoNegativo ? '<i class="fa-solid fa-exclamation-triangle text-red-600 mr-1"></i>' : '';
+          tr.innerHTML = `<td class="px-4 py-2 text-xs text-gray-700">${MONTH_NAMES[mData.monthIndex]}</td><td class="px-4 py-2 text-xs text-gray-800 text-right">${formatCurrency(mData.receitas)}</td><td class="px-4 py-2 text-xs text-gray-800 text-right">${formatCurrency(mData.despesas)}</td><td class="px-4 py-2 text-xs text-gray-800 text-right">${formatCurrency(mData.investimentos)}</td><td class="px-4 py-2 text-xs ${saldoClass} text-right">${saldoIcon}${formatCurrency(mData.saldo)}</td>`;
           tbody.appendChild(tr);
         });
 
@@ -2672,7 +2675,24 @@
         document.getElementById('annualTotalReceitas').textContent = formatCurrency(totalReceitasYear);
         document.getElementById('annualTotalDespesas').textContent = formatCurrency(totalDespesasYear);
         document.getElementById('annualTotalInvest').textContent = formatCurrency(totalInvestYear);
-        document.getElementById('annualTotalSaldo').textContent = formatCurrency(totalSaldoYear);
+        
+        // Add red styling for negative annual balance
+        const annualSaldoElement = document.getElementById('annualTotalSaldo');
+        const annualSaldoCard = annualSaldoElement.closest('.bg-gradient-to-br');
+        annualSaldoElement.textContent = formatCurrency(totalSaldoYear);
+        if (totalSaldoYear < 0) {
+          annualSaldoElement.classList.add('text-red-700');
+          annualSaldoElement.classList.remove('text-slate-900');
+          // Add red border and background to card
+          annualSaldoCard.classList.remove('from-slate-50', 'to-slate-100/50', 'border-slate-200');
+          annualSaldoCard.classList.add('from-red-50', 'to-red-100/50', 'border-red-500');
+        } else {
+          annualSaldoElement.classList.remove('text-red-700');
+          annualSaldoElement.classList.add('text-slate-900');
+          // Restore original colors
+          annualSaldoCard.classList.remove('from-red-50', 'to-red-100/50', 'border-red-500');
+          annualSaldoCard.classList.add('from-slate-50', 'to-slate-100/50', 'border-slate-200');
+        }
 
         // Trend indicators (comparing with average)
         document.getElementById('annualReceitasTrend').innerHTML = `<i class="fa-solid fa-equals text-xs"></i> ${formatCurrency(avgMonthlyReceitas)}`;
