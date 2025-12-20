@@ -702,7 +702,32 @@
         </form>
       </section>
 
-      <!-- 4) TABELAS DE TRANSAÇÕES (mantidas) -->
+      <!-- 4) BARRA DE PROGRESSO DE PAGAMENTOS -->
+      <section class="bg-white rounded-lg shadow-sm border border-gray-100 px-4 py-3">
+        <div class="flex items-center justify-between mb-2">
+          <div class="flex items-center gap-2">
+            <i class="fa-solid fa-clipboard-check text-emerald-500 text-sm"></i>
+            <h2 class="text-sm font-medium text-gray-700">Progresso de Pagamentos</h2>
+          </div>
+          <div class="flex items-center gap-3">
+            <p class="text-xs text-gray-500" id="paymentCount">0 de 0 pagos</p>
+            <p class="text-lg font-semibold text-gray-900" id="paymentPercentage">0%</p>
+          </div>
+        </div>
+        
+        <!-- Progress Bar -->
+        <div class="relative w-full h-2 bg-gray-200 rounded-full overflow-hidden">
+          <div id="paymentProgressBar" class="h-full bg-gradient-to-r from-emerald-400 to-emerald-600 rounded-full transition-all duration-300 ease-out" style="width: 0%">
+          </div>
+        </div>
+        
+        <!-- Status Message -->
+        <div id="paymentStatusMessage" class="mt-1.5">
+          <p class="text-xs text-gray-500 text-center">Marque seus lançamentos como pagos para ver o progresso</p>
+        </div>
+      </section>
+
+      <!-- 5) TABELAS DE TRANSAÇÕES (mantidas) -->
       <section class="space-y-4">
         <div class="bg-white rounded-xl shadow-sm border border-gray-100">
           <div class="px-4 py-3 border-b border-gray-100 border-l-4 border-l-emerald-500 bg-emerald-50/30 flex items-center justify-between">
@@ -2235,6 +2260,67 @@
         
         // Re-initialize table filters after rendering
         setupTableFilters();
+        
+        // Update payment progress bar
+        updatePaymentProgress();
+      }
+      
+      // ---------- PAYMENT PROGRESS BAR ----------
+      function updatePaymentProgress() {
+        const filtered = getFilteredTransactions();
+        
+        // Only count items that can be marked as paid (exclude receitas)
+        const payableItems = filtered.filter(t => t.category !== 'receita');
+        const totalItems = payableItems.length;
+        
+        // Count paid items - include individual paid status AND credit card invoices marked as paid
+        const paidItems = payableItems.filter(t => {
+          // If individually marked as paid or aportado
+          if (t.paid || t.aportado) return true;
+          
+          // If it's a credit card transaction, check if the invoice is paid
+          if (t.isCreditCard || t.paymentMethod === 'cartao') {
+            const d = new Date(t.date);
+            if (!isNaN(d.getTime())) {
+              const year = d.getFullYear();
+              const month = d.getMonth();
+              const card = t.card || 'Sem cartão';
+              const key = keyInvoice(year, month, card);
+              if (state.invoicesPaid[key]) return true;
+            }
+          }
+          
+          return false;
+        }).length;
+        
+        const percentage = totalItems > 0 ? Math.round((paidItems / totalItems) * 100) : 0;
+        
+        // Update progress bar
+        const progressBar = document.getElementById('paymentProgressBar');
+        const percentageDisplay = document.getElementById('paymentPercentage');
+        const countDisplay = document.getElementById('paymentCount');
+        const statusMessage = document.getElementById('paymentStatusMessage');
+        
+        if (!progressBar || !percentageDisplay || !countDisplay || !statusMessage) return;
+        
+        progressBar.style.width = percentage + '%';
+        percentageDisplay.textContent = percentage + '%';
+        countDisplay.textContent = `${paidItems} de ${totalItems} pagos`;
+        
+        // Update status message and bar color - always green
+        if (percentage === 0) {
+          statusMessage.innerHTML = '<p class="text-xs text-emerald-600 text-center">Marque seus lançamentos como pagos para ver o progresso</p>';
+          progressBar.className = 'h-full bg-gradient-to-r from-emerald-400 to-emerald-600 rounded-full transition-all duration-300 ease-out';
+        } else if (percentage < 50) {
+          statusMessage.innerHTML = '<p class="text-xs text-emerald-600 text-center"><i class="fa-solid fa-hourglass-half mr-1"></i>Continue marcando seus pagamentos</p>';
+          progressBar.className = 'h-full bg-gradient-to-r from-emerald-400 to-emerald-600 rounded-full transition-all duration-300 ease-out';
+        } else if (percentage < 100) {
+          statusMessage.innerHTML = '<p class="text-xs text-emerald-600 text-center"><i class="fa-solid fa-chart-line mr-1"></i>Você está quase lá!</p>';
+          progressBar.className = 'h-full bg-gradient-to-r from-emerald-400 to-emerald-600 rounded-full transition-all duration-300 ease-out';
+        } else {
+          statusMessage.innerHTML = '<p class="text-xs text-emerald-600 font-semibold text-center"><i class="fa-solid fa-circle-check mr-1"></i>Parabéns! Todos os itens estão pagos! 🎉</p>';
+          progressBar.className = 'h-full bg-gradient-to-r from-emerald-400 to-emerald-600 rounded-full transition-all duration-300 ease-out';
+        }
       }
 
       // ---------- ANNUAL COMPUTATION & CHART RENDERS ----------
@@ -2654,8 +2740,19 @@
         if (!tx) return;
         const wasPaid = tx.paid;
         tx.paid = !tx.paid;
-        await saveTransactions();
+        console.log(`togglePaid: Changing tx ${id} paid from ${wasPaid} to ${tx.paid}`);
+        try {
+          await saveTransactions();
+          console.log(`togglePaid: saveTransactions completed successfully for tx ${id}`);
+        } catch (error) {
+          console.error(`togglePaid: Error saving transaction ${id}:`, error);
+          showToast('Erro ao salvar alteração. Verifique a conexão.', 'error');
+          // Revert the change if save failed
+          tx.paid = wasPaid;
+          return;
+        }
         renderDashboard(state.selectedMonth);
+        updatePaymentProgress(); // Ensure progress bar updates
         const isReceita = tx.category === 'receita';
         showToast(
           wasPaid 
@@ -2672,6 +2769,7 @@
         tx.aportado = !tx.aportado;
         await saveTransactions();
         renderDashboard(state.selectedMonth);
+        updatePaymentProgress(); // Ensure progress bar updates
         showToast(
           wasAportado ? 'Marcado como não aportado' : 'Marcado como aportado',
           'success'
@@ -2684,8 +2782,19 @@
         const key = keyInvoice(year, m, card);
         const wasPaid = state.invoicesPaid[key];
         state.invoicesPaid[key] = !state.invoicesPaid[key];
-        await saveInvoices();
+        console.log(`toggleInvoiceStatus: Changing invoice ${key} from ${wasPaid} to ${state.invoicesPaid[key]}`);
+        try {
+          await saveInvoices();
+          console.log(`toggleInvoiceStatus: saveInvoices completed successfully for ${key}`);
+        } catch (error) {
+          console.error(`toggleInvoiceStatus: Error saving invoice ${key}:`, error);
+          showToast('Erro ao salvar fatura. Verifique a conexão.', 'error');
+          // Revert the change if save failed
+          state.invoicesPaid[key] = wasPaid;
+          return;
+        }
         renderCardsFaturas();
+        updatePaymentProgress(); // Update progress bar when invoice status changes
         showToast(
           wasPaid ? 'Fatura marcada como não paga' : 'Fatura marcada como paga',
           'success'
