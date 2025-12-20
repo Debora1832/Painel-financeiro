@@ -2272,7 +2272,26 @@
         // Only count items that can be marked as paid (exclude receitas)
         const payableItems = filtered.filter(t => t.category !== 'receita');
         const totalItems = payableItems.length;
-        const paidItems = payableItems.filter(t => t.paid || t.aportado).length;
+        
+        // Count paid items - include individual paid status AND credit card invoices marked as paid
+        const paidItems = payableItems.filter(t => {
+          // If individually marked as paid or aportado
+          if (t.paid || t.aportado) return true;
+          
+          // If it's a credit card transaction, check if the invoice is paid
+          if (t.isCreditCard || t.paymentMethod === 'cartao') {
+            const d = new Date(t.date);
+            if (!isNaN(d.getTime())) {
+              const year = d.getFullYear();
+              const month = d.getMonth();
+              const card = t.card || 'Sem cartão';
+              const key = keyInvoice(year, month, card);
+              if (state.invoicesPaid[key]) return true;
+            }
+          }
+          
+          return false;
+        }).length;
         
         const percentage = totalItems > 0 ? Math.round((paidItems / totalItems) * 100) : 0;
         
@@ -2753,6 +2772,7 @@
         state.invoicesPaid[key] = !state.invoicesPaid[key];
         await saveInvoices();
         renderCardsFaturas();
+        updatePaymentProgress(); // Update progress bar when invoice status changes
         showToast(
           wasPaid ? 'Fatura marcada como não paga' : 'Fatura marcada como paga',
           'success'
