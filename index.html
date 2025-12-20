@@ -3481,23 +3481,28 @@ if (isParceladoSerie && previewBox && previewList) {
           const subCategory = document.getElementById('recCategoria').value;
           if (!description || !date || isNaN(value)) return;
 
-          await addTransaction({
-            description,
-            value,
-            date,
-            category: 'receita',
-            subCategory,
-            isCreditCard: false,
-            card: null,
-            parcelas: 1,
-            paymentMethod: 'debito_pix'
-          });
+          try {
+            await addTransaction({
+              description,
+              value,
+              date,
+              category: 'receita',
+              subCategory,
+              isCreditCard: false,
+              card: null,
+              parcelas: 1,
+              paymentMethod: 'debito_pix'
+            });
 
-          showToast('Receita lançada com sucesso', 'success');
-          formReceita.reset();
-          const today = new Date().toISOString().slice(0, 10);
-          const recDataInput = document.getElementById('recData');
-          if (recDataInput && !recDataInput.value) recDataInput.value = today;
+            showToast('Receita lançada com sucesso', 'success');
+            formReceita.reset();
+            const today = new Date().toISOString().slice(0, 10);
+            const recDataInput = document.getElementById('recData');
+            if (recDataInput && !recDataInput.value) recDataInput.value = today;
+          } catch (error) {
+            console.error('Erro ao lançar receita:', error);
+            showToast('Erro ao salvar receita. Tente novamente.', 'error');
+          }
         });
 
         const formDespesa = document.getElementById('formDespesa');
@@ -3523,35 +3528,40 @@ if (forma === 'cartao' || forma === 'boleto') {
 
           if (!description || !date || isNaN(value)) return;
 
-          await addTransaction({
-            description,
-            value,
-            date,
-            category,
-            subCategory,
-            isCreditCard,
-            card,
-            parcelas,
-            paymentMethod: isCreditCard ? 'cartao' : forma, // 'boleto' or 'debito_pix' or 'dinheiro'
-            aportado: false // sempre false vindo do formulário; o status pode ser alterado via tabela
-          });
+          try {
+            await addTransaction({
+              description,
+              value,
+              date,
+              category,
+              subCategory,
+              isCreditCard,
+              card,
+              parcelas,
+              paymentMethod: isCreditCard ? 'cartao' : forma, // 'boleto' or 'debito_pix' or 'dinheiro'
+              aportado: false // sempre false vindo do formulário; o status pode ser alterado via tabela
+            });
 
-          const categoryLabels = {
-            'fixa': 'Despesa fixa',
-            'variavel': 'Despesa variável',
-            'investimento': 'Investimento'
-          };
-          showToast(`${categoryLabels[category] || 'Lançamento'} adicionado com sucesso`, 'success');
-          
-          formDespesa.reset();
-          // esconder subseções pós-reset
-          document.getElementById('despCartaoFields').classList.add('hidden');
-          document.getElementById('despParcelasWrapper').classList.add('hidden');
+            const categoryLabels = {
+              'fixa': 'Despesa fixa',
+              'variavel': 'Despesa variável',
+              'investimento': 'Investimento'
+            };
+            showToast(`${categoryLabels[category] || 'Lançamento'} adicionado com sucesso`, 'success');
+            
+            formDespesa.reset();
+            // esconder subseções pós-reset
+            document.getElementById('despCartaoFields').classList.add('hidden');
+            document.getElementById('despParcelasWrapper').classList.add('hidden');
 
-          // repor datas para hoje caso precise
-          const today = new Date().toISOString().slice(0, 10);
-          const despDataInput = document.getElementById('despData');
-          if (despDataInput && !despDataInput.value) despDataInput.value = today;
+            // repor datas para hoje caso precise
+            const today = new Date().toISOString().slice(0, 10);
+            const despDataInput = document.getElementById('despData');
+            if (despDataInput && !despDataInput.value) despDataInput.value = today;
+          } catch (error) {
+            console.error('Erro ao lançar despesa/investimento:', error);
+            showToast('Erro ao salvar lançamento. Tente novamente.', 'error');
+          }
 
           // repopular subcategorias e visibilidade
           populateDespesaSubcategorias();
