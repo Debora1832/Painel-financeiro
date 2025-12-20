@@ -2740,7 +2740,17 @@
         if (!tx) return;
         const wasPaid = tx.paid;
         tx.paid = !tx.paid;
-        await saveTransactions();
+        console.log(`togglePaid: Changing tx ${id} paid from ${wasPaid} to ${tx.paid}`);
+        try {
+          await saveTransactions();
+          console.log(`togglePaid: saveTransactions completed successfully for tx ${id}`);
+        } catch (error) {
+          console.error(`togglePaid: Error saving transaction ${id}:`, error);
+          showToast('Erro ao salvar alteração. Verifique a conexão.', 'error');
+          // Revert the change if save failed
+          tx.paid = wasPaid;
+          return;
+        }
         renderDashboard(state.selectedMonth);
         updatePaymentProgress(); // Ensure progress bar updates
         const isReceita = tx.category === 'receita';
@@ -2772,7 +2782,17 @@
         const key = keyInvoice(year, m, card);
         const wasPaid = state.invoicesPaid[key];
         state.invoicesPaid[key] = !state.invoicesPaid[key];
-        await saveInvoices();
+        console.log(`toggleInvoiceStatus: Changing invoice ${key} from ${wasPaid} to ${state.invoicesPaid[key]}`);
+        try {
+          await saveInvoices();
+          console.log(`toggleInvoiceStatus: saveInvoices completed successfully for ${key}`);
+        } catch (error) {
+          console.error(`toggleInvoiceStatus: Error saving invoice ${key}:`, error);
+          showToast('Erro ao salvar fatura. Verifique a conexão.', 'error');
+          // Revert the change if save failed
+          state.invoicesPaid[key] = wasPaid;
+          return;
+        }
         renderCardsFaturas();
         updatePaymentProgress(); // Update progress bar when invoice status changes
         showToast(
