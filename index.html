@@ -2962,8 +2962,17 @@
     }
   }
 
-  await saveTransactions();
+  // Render immediately to show optimistic UI update
   renderDashboard(state.selectedMonth);
+  
+  // Save in background
+  try {
+    await saveTransactions();
+    console.log('✅ Transação salva com sucesso');
+  } catch (error) {
+    console.error('❌ Erro ao salvar transação:', error);
+    showToast('Erro ao salvar. Os dados podem não persistir.', 'error');
+  }
 }
 
 
