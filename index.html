@@ -2746,6 +2746,11 @@
         if (!tx) return;
         const wasPaid = tx.paid;
         tx.paid = !tx.paid;
+        
+        // Immediate UI update for instant feedback
+        renderTables();
+        updatePaymentProgress();
+        
         console.log(`togglePaid: Changing tx ${id} paid from ${wasPaid} to ${tx.paid}`);
         try {
           await saveTransactions();
@@ -2755,10 +2760,10 @@
           showToast('Erro ao salvar alteração. Verifique a conexão.', 'error');
           // Revert the change if save failed
           tx.paid = wasPaid;
+          renderTables();
+          updatePaymentProgress();
           return;
         }
-        renderDashboard(state.selectedMonth);
-        updatePaymentProgress(); // Ensure progress bar updates
         const isReceita = tx.category === 'receita';
         showToast(
           wasPaid 
@@ -2773,9 +2778,13 @@
         if (!tx) return;
         const wasAportado = tx.aportado;
         tx.aportado = !tx.aportado;
+        
+        // Immediate UI update for instant feedback
+        renderTables();
+        updatePaymentProgress();
+        
         await saveTransactions();
-        renderDashboard(state.selectedMonth);
-        updatePaymentProgress(); // Ensure progress bar updates
+        const isReceita = tx.category === 'receita';
         showToast(
           wasAportado ? 'Marcado como não aportado' : 'Marcado como aportado',
           'success'
@@ -2788,6 +2797,11 @@
         const key = keyInvoice(year, m, card);
         const wasPaid = state.invoicesPaid[key];
         state.invoicesPaid[key] = !state.invoicesPaid[key];
+        
+        // Immediate UI update for instant feedback
+        renderCardsFaturas();
+        updatePaymentProgress();
+        
         console.log(`toggleInvoiceStatus: Changing invoice ${key} from ${wasPaid} to ${state.invoicesPaid[key]}`);
         try {
           await saveInvoices();
@@ -2797,10 +2811,10 @@
           showToast('Erro ao salvar fatura. Verifique a conexão.', 'error');
           // Revert the change if save failed
           state.invoicesPaid[key] = wasPaid;
+          renderCardsFaturas();
+          updatePaymentProgress();
           return;
         }
-        renderCardsFaturas();
-        updatePaymentProgress(); // Update progress bar when invoice status changes
         showToast(
           wasPaid ? 'Fatura marcada como não paga' : 'Fatura marcada como paga',
           'success'
