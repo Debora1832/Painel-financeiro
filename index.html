@@ -1695,8 +1695,40 @@
         });
       }
 
+      // Calcula o saldo acumulado até um mês específico (para carregar saldo anterior)
+      function getCumulativeBalanceUntilMonth(monthIndex, year) {
+        let cumulativeBalance = 0;
+        
+        // Percorre todos os meses até o mês anterior
+        for (let m = 0; m < monthIndex; m++) {
+          let monthReceitas = 0, monthInvestimentos = 0, monthFixas = 0, monthVariaveis = 0;
+          
+          state.transactions.forEach(t => {
+            const d = new Date(t.date);
+            if (isNaN(d.getTime()) || d.getMonth() !== m) return;
+            if (year !== 'all' && d.getFullYear() !== year) return;
+            
+            const v = Number(t.value) || 0;
+            if (t.category === 'receita') monthReceitas += v;
+            else if (t.category === 'investimento') monthInvestimentos += v;
+            else if (t.category === 'fixa') monthFixas += v;
+            else if (t.category === 'variavel') monthVariaveis += v;
+          });
+          
+          // Saldo = Receitas - Investimentos - Despesas Fixas - Despesas Variáveis
+          const monthBalance = monthReceitas - monthInvestimentos - monthFixas - monthVariaveis;
+          cumulativeBalance += monthBalance;
+        }
+        
+        return cumulativeBalance;
+      }
+
       function getMonthTotals(monthIndex) {
-        const result = { receitas: 0, investimentos: 0, fixas: 0, variaveis: 0 };
+        const result = { receitas: 0, investimentos: 0, fixas: 0, variaveis: 0, saldoAnterior: 0 };
+        
+        // Calcula o saldo acumulado dos meses anteriores
+        result.saldoAnterior = getCumulativeBalanceUntilMonth(monthIndex, state.selectedYear);
+        
         state.transactions.forEach(t => {
           const d = new Date(t.date);
           if (isNaN(d.getTime()) || d.getMonth() !== monthIndex) return;
@@ -1707,6 +1739,10 @@
           else if (t.category === 'fixa') result.fixas += v;
           else if (t.category === 'variavel') result.variaveis += v;
         });
+        
+        // Adiciona o saldo anterior às receitas (conforme solicitado)
+        result.receitas += result.saldoAnterior;
+        
         return result;
       }
 
@@ -2332,7 +2368,7 @@
       // ---------- ANNUAL COMPUTATION & CHART RENDERS ----------
       function computeAnnualData() {
         const monthly = [];
-        for (let m = 0; m < 12; m++) monthly[m] = { monthIndex: m, receitas: 0, despesas: 0, despesasFixas: 0, despesasVariaveis: 0, investimentos: 0, saldo: 0, investMes: 0 };
+        for (let m = 0; m < 12; m++) monthly[m] = { monthIndex: m, receitas: 0, receitasProprias: 0, saldoAnterior: 0, despesas: 0, despesasFixas: 0, despesasVariaveis: 0, investimentos: 0, saldo: 0, investMes: 0 };
 
         const txSource = state.transactions.filter((t) => {
           const d = new Date(t.date);
@@ -2353,7 +2389,7 @@
           const v = Number(t.value) || 0;
 
           if (t.category === 'receita') { 
-            monthly[m].receitas += v; 
+            monthly[m].receitasProprias += v;  // Receitas próprias (sem saldo anterior)
             totalReceitasYear += v; 
           }
           else if (t.category === 'investimento') {
@@ -2377,7 +2413,15 @@
           }
         });
 
-        monthly.forEach((mData) => { mData.saldo = mData.receitas - mData.despesas - mData.investimentos; totalSaldoYear += mData.saldo; });
+        // Calcular saldo acumulado e adicionar às receitas
+        let saldoAcumulado = 0;
+        monthly.forEach((mData) => { 
+          mData.saldoAnterior = saldoAcumulado;
+          mData.receitas = mData.receitasProprias + saldoAcumulado;  // Receitas totais = próprias + saldo anterior
+          mData.saldo = mData.receitas - mData.despesas - mData.investimentos; 
+          saldoAcumulado += (mData.receitasProprias - mData.despesas - mData.investimentos);  // Atualiza acumulado com receitas próprias
+          totalSaldoYear += mData.saldo; 
+        });
 
         // Calculate new KPIs
         const savingsRate = totalReceitasYear > 0 ? (totalInvestYear / totalReceitasYear * 100) : 0;
