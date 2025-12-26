@@ -3114,7 +3114,8 @@
   (tx.isCreditCard || 
    tx.paymentMethod === 'boleto' || 
    tx.paymentMethod === 'Boleto' ||
-   tx.paymentMethod === 'cartao');
+   tx.paymentMethod === 'cartao' ||
+   tx.category === 'fixa');  // Incluir despesas fixas com parcelas
    
         console.log('Edit Modal - isParceladoSerie:', isParceladoSerie);
 
@@ -3234,7 +3235,11 @@ if (previewBox) previewBox.classList.add('hidden');
        const isParceladoSerie =
   tx.parcelas && tx.parcelas > 1 &&
   tx.groupId &&
-  (tx.isCreditCard || tx.paymentMethod === 'boleto' || tx.paymentMethod === 'Boleto' || tx.paymentMethod === 'cartao');
+  (tx.isCreditCard || 
+   tx.paymentMethod === 'boleto' || 
+   tx.paymentMethod === 'Boleto' || 
+   tx.paymentMethod === 'cartao' ||
+   tx.category === 'fixa');  // Incluir despesas fixas com parcelas
   
         console.log('Delete Modal - isParceladoSerie:', isParceladoSerie);
 
