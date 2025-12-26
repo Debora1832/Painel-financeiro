@@ -2019,6 +2019,34 @@
         const tbody = document.getElementById(tbodyId);
         tbody.innerHTML = '';
 
+        // Se for a tabela de receitas e houver um mês selecionado, adicionar linha com saldo anterior
+        if (tbodyId === 'tbodyReceitas' && state.selectedMonth !== null) {
+          const saldoAnterior = getCumulativeBalanceUntilMonth(state.selectedMonth, state.selectedYear);
+          
+          if (saldoAnterior !== 0) {  // Só mostra se houver saldo anterior
+            const tr = document.createElement('tr');
+            tr.className = 'bg-blue-50/30 border-l-4 border-l-blue-400';
+            tr.innerHTML = `
+              <td class="px-4 py-2 text-xs text-blue-700 whitespace-nowrap font-semibold" colspan="2">
+                <i class="fa-solid fa-arrow-right-arrow-left mr-1"></i>Saldo do mês anterior
+              </td>
+              <td class="px-4 py-2 text-xs text-blue-600">
+                <span class="inline-flex items-center px-2 py-0.5 rounded-full border text-[10px] font-medium bg-blue-50 text-blue-700 border-blue-200">Saldo Acumulado</span>
+              </td>
+              <td class="px-4 py-2 text-xs text-blue-600">-</td>
+              <td class="px-4 py-2 text-xs text-blue-800 text-right font-semibold">${formatCurrency(saldoAnterior)}</td>
+              <td class="px-4 py-2 text-xs text-center">
+                <span class="inline-flex items-center px-2.5 py-1 rounded-full border bg-blue-50 text-blue-600 border-blue-200">
+                  <i class="fa-solid fa-info-circle mr-1 text-[10px]"></i>
+                  <span class="text-[10px] font-medium">Automático</span>
+                </span>
+              </td>
+              <td class="px-4 py-2 text-xs text-center text-blue-400">-</td>
+            `;
+            tbody.appendChild(tr);
+          }
+        }
+
         if (!list.length) {
           const tr = document.createElement('tr');
           tr.innerHTML = `<td colspan="7" class="px-4 py-4 text-center text-xs text-gray-400">${emptyText}</td>`;
