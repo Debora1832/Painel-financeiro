@@ -2954,11 +2954,12 @@
   // DESPESA FIXA (mensal)
   // =========================
   if (category === 'fixa') {
-    const year = baseDate.getFullYear();
-    const startMonth = baseDate.getMonth();
-
-    for (let m = startMonth; m < 12; m++) {
-      const d = new Date(year, m, baseDate.getDate());
+    // Despesas fixas continuam para anos futuros (próximos 12 meses)
+    const groupId = generateId();
+    
+    for (let i = 0; i < 12; i++) {
+      const d = new Date(baseDate);
+      d.setMonth(d.getMonth() + i);
 
       state.transactions.push({
         id: generateId(),
@@ -2969,10 +2970,10 @@
         subCategory,
         isCreditCard,
         card: isCreditCard ? card : null,
-        parcelas: 1,
-        parcelaIndex: 1,
+        parcelas: 12,
+        parcelaIndex: i + 1,
         paymentMethod,
-        groupId: null,
+        groupId: groupId,
         paid: false,
         aportado: false
       });
