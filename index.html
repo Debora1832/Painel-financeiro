@@ -3816,6 +3816,11 @@ if (forma === 'cartao' || forma === 'boleto') {
       }
 
       async function init() {
+        // Garantir que a página abra no mês e ano atuais
+        state.selectedMonth = new Date().getMonth();
+        state.selectedYear = new Date().getFullYear();
+        console.log('Init: setting selectedMonth to', state.selectedMonth, 'and selectedYear to', state.selectedYear);
+        
         await loadTransactions();
         await loadInvoices();
         refreshYearFilterOptions();
