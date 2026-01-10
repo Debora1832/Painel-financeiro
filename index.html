@@ -1577,11 +1577,15 @@
           const result = [];
           snap.forEach(docSnap => {
             const data = docSnap.data();
+            let dateValue = data.date;
+            if (dateValue && typeof dateValue.toDate === 'function') {
+              dateValue = dateValue.toDate().toISOString();
+            }
             result.push({
               id: docSnap.id,
               description: data.description || '',
               value: Number(data.value) || 0,
-              date: data.date || new Date().toISOString(),
+              date: dateValue || new Date().toISOString(),
               category: data.category || 'variavel',
               subCategory: data.subCategory || null,
               isCreditCard: !!data.isCreditCard,
