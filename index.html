@@ -1579,7 +1579,7 @@
           typeof value === 'object' &&
           value !== null &&
           typeof value.toDate === 'function' &&
-          (typeof value.toMillis === 'function' || (typeof value.seconds === 'number' && typeof value.nanoseconds === 'number'))
+          typeof value.toMillis === 'function'
         );
       }
 
@@ -1602,9 +1602,8 @@
             return new Date().toISOString();
           }
         }
-        if (isValidDateNumber(value)) {
-          return new Date(value).toISOString();
-        }
+        const parsedNumber = isValidDateNumber(value) ? new Date(value) : null;
+        if (parsedNumber) return parsedNumber.toISOString();
         if (typeof value === 'number') {
           console.warn('normalizeDateValue: numeric date out of expected range, using current date', value);
           return new Date().toISOString();
