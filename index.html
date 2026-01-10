@@ -1570,6 +1570,9 @@
         return new Date().getFullYear();
       }
 
+      const MIN_VALID_YEAR = 1900;
+      const MAX_VALID_YEAR = 3000;
+
       // Normaliza diferentes formatos de data vindos do Firestore/localStorage
       function normalizeDateValue(value) {
         if (!value) return new Date().toISOString();
@@ -1591,9 +1594,11 @@
         if (typeof value === 'number') {
           const parsedFromNumber = new Date(value);
           const year = parsedFromNumber.getUTCFullYear();
-          if (!isNaN(parsedFromNumber.getTime()) && year >= 1900 && year <= 3000) {
+          if (!isNaN(parsedFromNumber.getTime()) && year >= MIN_VALID_YEAR && year <= MAX_VALID_YEAR) {
             return parsedFromNumber.toISOString();
           }
+          console.warn('normalizeDateValue: numeric date out of expected range, using current date', value);
+          return new Date().toISOString();
         }
         const parsed = new Date(value);
         if (!isNaN(parsed.getTime())) return parsed.toISOString();
