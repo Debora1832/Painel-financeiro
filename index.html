@@ -1573,17 +1573,28 @@
       const MIN_VALID_YEAR = 1900;
       const MAX_VALID_YEAR = 3000;
 
-      // Normaliza diferentes formatos de data vindos do Firestore/localStorage
-      function normalizeDateValue(value) {
-        if (!value) return new Date().toISOString();
-        if (typeof value === 'string') return value;
-        if (value instanceof Date) return value.toISOString();
-        if (
+      // Normalizes different date formats coming from Firestore/localStorage
+      function isFirestoreTimestamp(value) {
+        return (
           typeof value === 'object' &&
           value !== null &&
           typeof value.toDate === 'function' &&
           (typeof value.toMillis === 'function' || (typeof value.seconds === 'number' && typeof value.nanoseconds === 'number'))
-        ) {
+        );
+      }
+
+      function isValidDateNumber(value) {
+        if (typeof value !== 'number') return false;
+        const parsed = new Date(value);
+        const year = parsed.getUTCFullYear();
+        return !isNaN(parsed.getTime()) && year >= MIN_VALID_YEAR && year <= MAX_VALID_YEAR;
+      }
+
+      function normalizeDateValue(value) {
+        if (!value) return new Date().toISOString();
+        if (typeof value === 'string') return value;
+        if (value instanceof Date) return value.toISOString();
+        if (isFirestoreTimestamp(value)) {
           try {
             return value.toDate().toISOString();
           } catch (e) {
@@ -1591,12 +1602,10 @@
             return new Date().toISOString();
           }
         }
+        if (isValidDateNumber(value)) {
+          return new Date(value).toISOString();
+        }
         if (typeof value === 'number') {
-          const parsedFromNumber = new Date(value);
-          const year = parsedFromNumber.getUTCFullYear();
-          if (!isNaN(parsedFromNumber.getTime()) && year >= MIN_VALID_YEAR && year <= MAX_VALID_YEAR) {
-            return parsedFromNumber.toISOString();
-          }
           console.warn('normalizeDateValue: numeric date out of expected range, using current date', value);
           return new Date().toISOString();
         }
