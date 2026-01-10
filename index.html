@@ -1579,25 +1579,25 @@
           typeof value === 'object' &&
           value !== null &&
           typeof value.toDate === 'function' &&
-          (value.constructor?.name === 'Timestamp' || (typeof value.seconds === 'number' && typeof value.nanoseconds === 'number'))
+          (typeof value.toMillis === 'function' || (typeof value.seconds === 'number' && typeof value.nanoseconds === 'number'))
         ) {
           try {
             return value.toDate().toISOString();
           } catch (e) {
-            console.error('Erro ao converter Timestamp para Date:', e);
+            console.error('Timestamp conversion failed:', e);
             return new Date().toISOString();
           }
         }
         if (typeof value === 'number') {
           const parsedFromNumber = new Date(value);
           const year = parsedFromNumber.getUTCFullYear();
-          if (!isNaN(parsedFromNumber.getTime()) && year >= 1970 && year <= 2100) {
+          if (!isNaN(parsedFromNumber.getTime()) && year >= 1900 && year <= 3000) {
             return parsedFromNumber.toISOString();
           }
         }
         const parsed = new Date(value);
         if (!isNaN(parsed.getTime())) return parsed.toISOString();
-        console.warn('normalizeDateValue: formato de data inesperado, usando data atual', value);
+        console.warn('normalizeDateValue: unexpected date format, using current date', value);
         return new Date().toISOString();
       }
 
