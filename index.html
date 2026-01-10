@@ -1575,7 +1575,12 @@
         if (!value) return new Date().toISOString();
         if (typeof value === 'string') return value;
         if (value instanceof Date) return value.toISOString();
-        if (typeof value.toDate === 'function') {
+        if (
+          typeof value === 'object' &&
+          value !== null &&
+          typeof value.toDate === 'function' &&
+          (value.constructor?.name === 'Timestamp' || value.seconds !== undefined)
+        ) {
           try {
             return value.toDate().toISOString();
           } catch (e) {
@@ -1583,8 +1588,13 @@
             return new Date().toISOString();
           }
         }
+        if (typeof value === 'number') {
+          const parsedFromNumber = new Date(value);
+          if (!isNaN(parsedFromNumber.getTime())) return parsedFromNumber.toISOString();
+        }
         const parsed = new Date(value);
         if (!isNaN(parsed.getTime())) return parsed.toISOString();
+        console.warn('normalizeDateValue: formato de data inesperado, usando data atual', value);
         return new Date().toISOString();
       }
 
