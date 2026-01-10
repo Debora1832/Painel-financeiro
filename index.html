@@ -1570,6 +1570,24 @@
         return new Date().getFullYear();
       }
 
+      // Normaliza diferentes formatos de data vindos do Firestore/localStorage
+      function normalizeDateValue(value) {
+        if (!value) return new Date().toISOString();
+        if (typeof value === 'string') return value;
+        if (value instanceof Date) return value.toISOString();
+        if (typeof value.toDate === 'function') {
+          try {
+            return value.toDate().toISOString();
+          } catch (e) {
+            console.error('Erro ao converter Timestamp para Date:', e);
+            return new Date().toISOString();
+          }
+        }
+        const parsed = new Date(value);
+        if (!isNaN(parsed.getTime())) return parsed.toISOString();
+        return new Date().toISOString();
+      }
+
       // ---------- FIRESTORE PERSISTENCE ----------
       async function loadTransactions() {
         try {
@@ -1577,15 +1595,11 @@
           const result = [];
           snap.forEach(docSnap => {
             const data = docSnap.data();
-            let dateValue = data.date;
-            if (dateValue && typeof dateValue.toDate === 'function') {
-              dateValue = dateValue.toDate().toISOString();
-            }
             result.push({
               id: docSnap.id,
               description: data.description || '',
               value: Number(data.value) || 0,
-              date: dateValue || new Date().toISOString(),
+              date: normalizeDateValue(data.date),
               category: data.category || 'variavel',
               subCategory: data.subCategory || null,
               isCreditCard: !!data.isCreditCard,
