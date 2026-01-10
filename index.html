@@ -1570,6 +1570,49 @@
         return new Date().getFullYear();
       }
 
+      const MIN_VALID_YEAR = 1900;
+      const MAX_VALID_YEAR = 3000;
+
+      // Normalizes different date formats coming from Firestore/localStorage
+      function isFirestoreTimestamp(value) {
+        return (
+          typeof value === 'object' &&
+          value !== null &&
+          typeof value.toDate === 'function' &&
+          typeof value.toMillis === 'function'
+        );
+      }
+
+      function isValidDateNumber(value) {
+        if (typeof value !== 'number') return false;
+        const parsed = new Date(value);
+        const year = parsed.getUTCFullYear();
+        return !isNaN(parsed.getTime()) && year >= MIN_VALID_YEAR && year <= MAX_VALID_YEAR;
+      }
+
+      function normalizeDateValue(value) {
+        if (!value) return new Date().toISOString();
+        if (typeof value === 'string') return value;
+        if (value instanceof Date) return value.toISOString();
+        if (isFirestoreTimestamp(value)) {
+          try {
+            return value.toDate().toISOString();
+          } catch (e) {
+            console.error('Timestamp conversion failed:', e);
+            return new Date().toISOString();
+          }
+        }
+        if (typeof value === 'number') {
+          if (isValidDateNumber(value)) {
+            return new Date(value).toISOString();
+          }
+          console.warn('normalizeDateValue: numeric date out of expected range, using current date', value);
+          return new Date().toISOString();
+        }
+        console.warn('normalizeDateValue: unexpected date format, using current date', value);
+        return new Date().toISOString();
+      }
+
       // ---------- FIRESTORE PERSISTENCE ----------
       async function loadTransactions() {
         try {
@@ -1581,7 +1624,7 @@
               id: docSnap.id,
               description: data.description || '',
               value: Number(data.value) || 0,
-              date: data.date || new Date().toISOString(),
+              date: normalizeDateValue(data.date),
               category: data.category || 'variavel',
               subCategory: data.subCategory || null,
               isCreditCard: !!data.isCreditCard,
@@ -1595,14 +1638,19 @@
             });
           });
           state.transactions = result;
-        } catch (e) {
+          } catch (e) {
           console.error("Erro ao carregar transactions do Firestore", e);
           // fallback: tentar carregar do localStorage (se existir)
           try {
             const raw = localStorage.getItem(STORAGE_KEY);
             if (raw) {
               const parsed = JSON.parse(raw);
-              if (Array.isArray(parsed)) state.transactions = parsed;
+              if (Array.isArray(parsed)) {
+                state.transactions = parsed.map(t => ({
+                  ...t,
+                  date: normalizeDateValue(t.date)
+                }));
+              }
             }
           } catch (er) { state.transactions = []; }
         }
