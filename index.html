@@ -1579,7 +1579,7 @@
           typeof value === 'object' &&
           value !== null &&
           typeof value.toDate === 'function' &&
-          (value.constructor?.name === 'Timestamp' || value.seconds !== undefined)
+          (value.constructor?.name === 'Timestamp' || (typeof value.seconds === 'number' && typeof value.nanoseconds === 'number'))
         ) {
           try {
             return value.toDate().toISOString();
@@ -1590,7 +1590,10 @@
         }
         if (typeof value === 'number') {
           const parsedFromNumber = new Date(value);
-          if (!isNaN(parsedFromNumber.getTime())) return parsedFromNumber.toISOString();
+          const year = parsedFromNumber.getUTCFullYear();
+          if (!isNaN(parsedFromNumber.getTime()) && year >= 1970 && year <= 2100) {
+            return parsedFromNumber.toISOString();
+          }
         }
         const parsed = new Date(value);
         if (!isNaN(parsed.getTime())) return parsed.toISOString();
