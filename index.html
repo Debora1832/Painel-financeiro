@@ -1638,14 +1638,19 @@
             });
           });
           state.transactions = result;
-        } catch (e) {
+          } catch (e) {
           console.error("Erro ao carregar transactions do Firestore", e);
           // fallback: tentar carregar do localStorage (se existir)
           try {
             const raw = localStorage.getItem(STORAGE_KEY);
             if (raw) {
               const parsed = JSON.parse(raw);
-              if (Array.isArray(parsed)) state.transactions = parsed;
+              if (Array.isArray(parsed)) {
+                state.transactions = parsed.map(t => ({
+                  ...t,
+                  date: normalizeDateValue(t.date)
+                }));
+              }
             }
           } catch (er) { state.transactions = []; }
         }
