@@ -1602,14 +1602,13 @@
             return new Date().toISOString();
           }
         }
-        const parsedNumber = isValidDateNumber(value) ? new Date(value) : null;
-        if (parsedNumber) return parsedNumber.toISOString();
         if (typeof value === 'number') {
+          if (isValidDateNumber(value)) {
+            return new Date(value).toISOString();
+          }
           console.warn('normalizeDateValue: numeric date out of expected range, using current date', value);
           return new Date().toISOString();
         }
-        const parsed = new Date(value);
-        if (!isNaN(parsed.getTime())) return parsed.toISOString();
         console.warn('normalizeDateValue: unexpected date format, using current date', value);
         return new Date().toISOString();
       }
