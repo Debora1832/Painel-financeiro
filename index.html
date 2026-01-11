@@ -2066,7 +2066,10 @@
         let fixas = 0, variaveis = 0, lazer = 0, investimentos = 0;
         txs.forEach(t => {
           const v = Number(t.value) || 0;
-          if (t.category === 'fixa') fixas += v;
+          if (t.category === 'fixa') {
+            fixas += v;
+            if (t.extraLazer) lazer += v;
+          }
           else if (t.category === 'variavel') {
             variaveis += v;
             if ((t.subCategory || '') === 'lazer' || t.extraLazer) lazer += v;
@@ -2075,7 +2078,7 @@
           }
         });
 
-        const essenciais = Math.max(0, fixas + Math.max(0, variaveis - lazer));
+        const essenciais = Math.max(0, fixas + variaveis - lazer);
         const limiteEssenciais = renda * 0.50;
         const limiteLazer = renda * 0.30;
         const limiteInvest = renda * 0.20;
@@ -4097,3 +4100,4 @@ if (forma === 'cartao' || forma === 'boleto') {
   </script>
 </body>
 </html>
+
