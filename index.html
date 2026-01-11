@@ -27,16 +27,16 @@
   </script>
 
   <style>
-    /* Tabelas com layout fixo para evitar deslocamento das colunas */
-    table { table-layout: fixed; width: 100%; }
+    /* Tabelas auto para se ajustar ao conteúdo */
+    table { table-layout: auto; width: 100%; }
     table th, table td { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
-    .col-date { width: 12%; min-width: 90px; }
-    .col-desc { width: 36%; min-width: 160px; }
-    .col-cat { width: 20%; min-width: 120px; }
-    .col-payment { width: 12%; min-width: 100px; }
-    .col-value { width: 10%; min-width: 100px; text-align: right; }
-    .col-status { width: 8%; min-width: 80px; text-align: center; }
-    .col-action { width: 8%; min-width: 80px; text-align: center; }
+    .col-date { width: auto; min-width: 90px; }
+    .col-desc { width: auto; min-width: 160px; }
+    .col-cat { width: auto; min-width: 120px; }
+    .col-payment { width: auto; min-width: 100px; }
+    .col-value { width: auto; min-width: 100px; text-align: right; }
+    .col-status { width: auto; min-width: 80px; text-align: center; }
+    .col-action { width: auto; min-width: 80px; text-align: center; }
     
     /* Sorting styles */
     .sortable { cursor: pointer; user-select: none; position: relative; padding-right: 20px !important; }
@@ -2066,13 +2066,14 @@
         let fixas = 0, variaveis = 0, lazer = 0, investimentos = 0;
         txs.forEach(t => {
           const v = Number(t.value) || 0;
+          const sub = (t.subCategory || '').toLowerCase();
           if (t.category === 'fixa') {
             fixas += v;
-            if (t.extraLazer) lazer += v;
+            if (t.extraLazer || sub === 'lazer') lazer += v;
           }
           else if (t.category === 'variavel') {
             variaveis += v;
-            if ((t.subCategory || '') === 'lazer' || t.extraLazer) lazer += v;
+            if (sub === 'lazer' || t.extraLazer) lazer += v;
           } else if (t.category === 'investimento') {
             investimentos += v;
           }
@@ -2227,6 +2228,7 @@
           tr.className = zebra;
 
           const categoriaBaseLabel = CATEGORY_LABELS[t.category] || '-';
+          const sub = (t.subCategory || '').toLowerCase();
           let badgesHTML = `<span class="inline-flex items-center px-2 py-0.5 rounded-full border text-[10px] font-medium text-gray-600 bg-gray-50 border-gray-200 mr-1">${categoriaBaseLabel}</span>`;
 
           if (t.subCategory) {
@@ -2234,17 +2236,13 @@
             if (t.category === 'receita') map = RECEITA_SUBCATEGORIES;
             else if (t.category === 'investimento') map = INVEST_SUBCATEGORIES;
             else map = DESPESA_SUBCATEGORIES;
-            const subLabel = map[t.subCategory];
+            const subLabel = map[t.subCategory] || map[sub];
             if (subLabel) {
-              const colorClasses = SUBCATEGORY_COLOR_CLASSES[t.subCategory] || 'bg-gray-50 text-gray-700 border-gray-200';
+              const colorClasses = SUBCATEGORY_COLOR_CLASSES[t.subCategory] || SUBCATEGORY_COLOR_CLASSES[sub] || 'bg-gray-50 text-gray-700 border-gray-200';
               badgesHTML += `<span class="inline-flex items-center px-2 py-0.5 rounded-full border text-[10px] font-medium ${colorClasses}">${subLabel}</span>`;
             }
           }
-          if (t.extraLazer && t.subCategory !== 'lazer') {
-            const colorClasses = SUBCATEGORY_COLOR_CLASSES['lazer'] || 'bg-purple-50 text-purple-700 border-purple-200';
-            badgesHTML += `<span class="inline-flex items-center px-2 py-0.5 rounded-full border text-[10px] font-medium ${colorClasses}">Lazer</span>`;
-          }
-          if (t.extraLazer && t.subCategory !== 'lazer') {
+          if (t.extraLazer && sub !== 'lazer') {
             const colorClasses = SUBCATEGORY_COLOR_CLASSES['lazer'] || 'bg-purple-50 text-purple-700 border-purple-200';
             badgesHTML += `<span class="inline-flex items-center px-2 py-0.5 rounded-full border text-[10px] font-medium ${colorClasses}">Lazer</span>`;
           }
@@ -2339,6 +2337,7 @@
           card.className = 'transaction-card';
 
           const categoriaBaseLabel = CATEGORY_LABELS[t.category] || '-';
+          const sub = (t.subCategory || '').toLowerCase();
           let badgesHTML = `<span class="inline-flex items-center px-2 py-0.5 rounded-full border text-[10px] font-medium text-gray-600 bg-gray-50 border-gray-200 mr-1">${categoriaBaseLabel}</span>`;
 
           if (t.subCategory) {
@@ -2346,11 +2345,15 @@
             if (t.category === 'receita') map = RECEITA_SUBCATEGORIES;
             else if (t.category === 'investimento') map = INVEST_SUBCATEGORIES;
             else map = DESPESA_SUBCATEGORIES;
-            const subLabel = map[t.subCategory];
+            const subLabel = map[t.subCategory] || map[sub];
             if (subLabel) {
-              const colorClasses = SUBCATEGORY_COLOR_CLASSES[t.subCategory] || 'bg-gray-50 text-gray-700 border-gray-200';
+              const colorClasses = SUBCATEGORY_COLOR_CLASSES[t.subCategory] || SUBCATEGORY_COLOR_CLASSES[sub] || 'bg-gray-50 text-gray-700 border-gray-200';
               badgesHTML += `<span class="inline-flex items-center px-2 py-0.5 rounded-full border text-[10px] font-medium ${colorClasses}">${subLabel}</span>`;
             }
+          }
+          if (t.extraLazer && sub !== 'lazer') {
+            const colorClasses = SUBCATEGORY_COLOR_CLASSES['lazer'] || 'bg-purple-50 text-purple-700 border-purple-200';
+            badgesHTML += `<span class="inline-flex items-center px-2 py-0.5 rounded-full border text-[10px] font-medium ${colorClasses}">Lazer</span>`;
           }
 
           let pagamentoTexto = '-';
@@ -4100,4 +4103,3 @@ if (forma === 'cartao' || forma === 'boleto') {
   </script>
 </body>
 </html>
-
