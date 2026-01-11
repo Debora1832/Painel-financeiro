@@ -663,6 +663,11 @@
               </select>
             </div>
 
+            <div class="flex items-center gap-2 text-xs text-gray-700">
+              <input id="despTambemLazer" type="checkbox" class="rounded border-gray-300 text-indigo-600 focus:ring-indigo-500">
+              <label for="despTambemLazer" class="select-none">Somar também como Lazer</label>
+            </div>
+
             <!-- Nova: Forma de Pagamento -->
             <div class="space-y-2">
               <label for="despFormaPagamento" class="font-medium text-gray-700">Forma de Pagamento</label>
@@ -1322,6 +1327,11 @@
           </select>
         </div>
 
+        <div class="flex items-center gap-2 text-xs text-gray-700">
+          <input id="editTambemLazer" type="checkbox" class="rounded border-gray-300 text-indigo-600 focus:ring-indigo-500">
+          <label for="editTambemLazer" class="select-none">Somar também como Lazer</label>
+        </div>
+
         <div id="editPaymentContainer" class="space-y-2 pt-1">
           <div class="flex items-center gap-2">
             <input id="editIsCartao" type="checkbox"
@@ -1671,10 +1681,11 @@
               paymentMethod: data.paymentMethod || null,
               groupId: data.groupId || null,
               paid: !!data.paid,
-              aportado: !!data.aportado
-            });
+            aportado: !!data.aportado,
+            extraLazer: !!data.extraLazer
           });
-          state.transactions = result;
+        });
+        state.transactions = result;
           } catch (e) {
           console.error("Erro ao carregar transactions do Firestore", e);
           // fallback: tentar carregar do localStorage (se existir)
@@ -1685,7 +1696,8 @@
               if (Array.isArray(parsed)) {
                 state.transactions = parsed.map(t => ({
                   ...t,
-                  date: normalizeDateValue(t.date)
+                  date: normalizeDateValue(t.date),
+                  extraLazer: !!t.extraLazer
                 }));
               }
             }
@@ -1709,23 +1721,24 @@
           await Promise.all(state.transactions.map(t => {
             const { id, ...data } = t;
             // normalize fields (avoid undefined)
-            const payload = {
-              description: data.description || '',
-              value: Number(data.value) || 0,
-              date: data.date || new Date().toISOString(),
-              category: data.category || 'variavel',
-              subCategory: data.subCategory || null,
-              isCreditCard: !!data.isCreditCard,
-              card: data.card || null,
-              parcelas: data.parcelas || 1,
-              parcelaIndex: data.parcelaIndex || 1,
-              paymentMethod: data.paymentMethod || null,
-              groupId: data.groupId || null,
-              paid: !!data.paid,
-              aportado: !!data.aportado
-            };
-            return setDoc(doc(db, "transactions", id), payload);
-          }));
+              const payload = {
+                description: data.description || '',
+                value: Number(data.value) || 0,
+                date: data.date || new Date().toISOString(),
+                category: data.category || 'variavel',
+                subCategory: data.subCategory || null,
+                isCreditCard: !!data.isCreditCard,
+                card: data.card || null,
+                parcelas: data.parcelas || 1,
+                parcelaIndex: data.parcelaIndex || 1,
+                paymentMethod: data.paymentMethod || null,
+                groupId: data.groupId || null,
+                paid: !!data.paid,
+                aportado: !!data.aportado,
+                extraLazer: !!data.extraLazer
+              };
+              return setDoc(doc(db, "transactions", id), payload);
+            }));
 
           // opcional: também manter uma cópia em localStorage como fallback
           try { localStorage.setItem(STORAGE_KEY, JSON.stringify(state.transactions)); } catch (e) { /* ignore */ }
@@ -2056,7 +2069,7 @@
           if (t.category === 'fixa') fixas += v;
           else if (t.category === 'variavel') {
             variaveis += v;
-            if ((t.subCategory || '') === 'lazer') lazer += v;
+            if ((t.subCategory || '') === 'lazer' || t.extraLazer) lazer += v;
           } else if (t.category === 'investimento') {
             investimentos += v;
           }
@@ -2223,6 +2236,14 @@
               const colorClasses = SUBCATEGORY_COLOR_CLASSES[t.subCategory] || 'bg-gray-50 text-gray-700 border-gray-200';
               badgesHTML += `<span class="inline-flex items-center px-2 py-0.5 rounded-full border text-[10px] font-medium ${colorClasses}">${subLabel}</span>`;
             }
+          }
+          if (t.extraLazer && t.subCategory !== 'lazer') {
+            const colorClasses = SUBCATEGORY_COLOR_CLASSES['lazer'] || 'bg-purple-50 text-purple-700 border-purple-200';
+            badgesHTML += `<span class="inline-flex items-center px-2 py-0.5 rounded-full border text-[10px] font-medium ${colorClasses}">Lazer</span>`;
+          }
+          if (t.extraLazer && t.subCategory !== 'lazer') {
+            const colorClasses = SUBCATEGORY_COLOR_CLASSES['lazer'] || 'bg-purple-50 text-purple-700 border-purple-200';
+            badgesHTML += `<span class="inline-flex items-center px-2 py-0.5 rounded-full border text-[10px] font-medium ${colorClasses}">Lazer</span>`;
           }
 
           let pagamentoTexto = '-';
@@ -3089,6 +3110,7 @@
   parcelas,
   paymentMethod,
   aportado
+  extraLazer
 }) {
   const baseDate = new Date(date);
   if (isNaN(baseDate.getTime())) return;
@@ -3113,24 +3135,25 @@
       const d = new Date(baseDate);
       d.setMonth(d.getMonth() + i);
 
-      state.transactions.push({
-        id: generateId(),
-        description,
-        value: total,
-        date: d.toISOString(),
+        state.transactions.push({
+          id: generateId(),
+          description,
+          value: total,
+          date: d.toISOString(),
         category,
         subCategory,
         isCreditCard,
         card: isCreditCard ? card : null,
-        parcelas: 12,
-        parcelaIndex: i + 1,
-        paymentMethod,
-        groupId: groupId,
-        paid: false,
-        aportado: false
-      });
+          parcelas: 12,
+          parcelaIndex: i + 1,
+          paymentMethod,
+          groupId: groupId,
+          paid: false,
+          aportado: false,
+          extraLazer: category !== 'investimento' ? !!extraLazer : false
+        });
+      }
     }
-  }
 
   // =========================
   // LANÇAMENTO ÚNICO
@@ -3150,7 +3173,8 @@
       paymentMethod,
       groupId: null,
       paid: false,
-      aportado: category === 'investimento' ? !!aportado : false
+      aportado: category === 'investimento' ? !!aportado : false,
+      extraLazer: category !== 'investimento' ? !!extraLazer : false
     });
   }
 
@@ -3182,7 +3206,8 @@
         paymentMethod: paymentMethod, // Preserve the actual payment method
         groupId,
         paid: false,
-        aportado: category === 'investimento' ? !!aportado : false
+        aportado: category === 'investimento' ? !!aportado : false,
+        extraLazer: category !== 'investimento' ? !!extraLazer : false
       });
     }
   }
@@ -3224,6 +3249,7 @@
         const editIsCartao = document.getElementById('editIsCartao');
         const editCartaoFields = document.getElementById('editCartaoFields');
         const editCartao = document.getElementById('editCartao');
+        const editTambemLazer = document.getElementById('editTambemLazer');
 
         if (tx.category === 'receita') {
           paymentContainer.classList.add('hidden'); editIsCartao.checked = false; editCartaoFields.classList.add('hidden');
@@ -3235,6 +3261,8 @@
           if (isCard) { editCartaoFields.classList.remove('hidden'); editCartao.value = tx.card || 'caixa'; }
           else editCartaoFields.classList.add('hidden');
         }
+
+        if (editTambemLazer) editTambemLazer.checked = !!tx.extraLazer;
 
         const scopeBlock = document.getElementById('editParcelScope');
         const btnSingle = document.getElementById('btnScopeSingle');
@@ -3752,8 +3780,9 @@ if (isParceladoSerie && previewBox && previewList) {
           const value = parseFloat(rawValue.toString().replace(',', '.'));
           const date = document.getElementById('despData').value;
           const category = document.getElementById('despCategoria').value;
-          const subCategory = document.getElementById('despSubCategoria').value;
-          const forma = document.getElementById('despFormaPagamento').value;
+        const subCategory = document.getElementById('despSubCategoria').value;
+        const forma = document.getElementById('despFormaPagamento').value;
+        const extraLazer = document.getElementById('despTambemLazer').checked;
 
           // Decidir se é pagamento via cartão
           const isCreditCard = forma === 'cartao';
@@ -3778,7 +3807,8 @@ if (forma === 'cartao' || forma === 'boleto') {
               card,
               parcelas,
               paymentMethod: isCreditCard ? 'cartao' : forma, // 'boleto' or 'debito_pix' or 'dinheiro'
-              aportado: false // sempre false vindo do formulário; o status pode ser alterado via tabela
+              aportado: false, // sempre false vindo do formulário; o status pode ser alterado via tabela
+              extraLazer
             });
 
             const categoryLabels = {
@@ -3868,7 +3898,8 @@ if (forma === 'cartao' || forma === 'boleto') {
           const value = parseFloat(rawValue.toString().replace(',', '.'));
           const dateStr = document.getElementById('editData').value;
           const mainCat = document.getElementById('editMainCategory').value;
-          const subCat = document.getElementById('editSubCategory').value;
+        const subCat = document.getElementById('editSubCategory').value;
+        const extraLazer = document.getElementById('editTambemLazer')?.checked;
           if (!desc || !dateStr || isNaN(value)) return;
 
           const isCard = mainCat === 'receita' ? false : document.getElementById('editIsCartao').checked;
@@ -3919,7 +3950,8 @@ if (forma === 'cartao' || forma === 'boleto') {
                   paymentMethod: txClicked.paymentMethod, // Preserve original payment method
                   groupId: newGroupId,
                   paid: false,
-                  aportado: mainCat === 'investimento' ? false : false
+                  aportado: mainCat === 'investimento' ? false : false,
+                  extraLazer: mainCat !== 'investimento' ? !!extraLazer : false
                 });
               }
               
@@ -3932,6 +3964,7 @@ if (forma === 'cartao' || forma === 'boleto') {
                   if (t.parcelas && t.parcelaIndex) t.description = `${baseDesc} (${t.parcelaIndex}/${t.parcelas})`;
                   else t.description = baseDesc;
                    t.category = mainCat; t.subCategory = subCat || null; t.isCreditCard = isCard; t.card = card;
+                  t.extraLazer = mainCat !== 'investimento' ? !!extraLazer : false;
                   // Preserve paymentMethod if not changing to/from credit card
                   if (isCard) {
                     t.paymentMethod = 'cartao';
@@ -3956,19 +3989,20 @@ if (forma === 'cartao' || forma === 'boleto') {
           } else {
             txClicked.description = desc; txClicked.value = value; txClicked.date = newDate.toISOString();
             txClicked.category = mainCat; txClicked.subCategory = subCat || null; txClicked.isCreditCard = isCard; txClicked.card = card;
+            txClicked.extraLazer = mainCat !== 'investimento' ? !!extraLazer : false;
             // Preserve paymentMethod if not changing to/from credit card
             if (isCard) {
-              txClicked.paymentMethod = 'cartao';
-            } else if (txClicked.paymentMethod === 'cartao') {
-              // Was credit card, now isn't - change to debito_pix
-              txClicked.paymentMethod = 'debito_pix';
-            } else {
-              // Keep existing paymentMethod (like 'boleto', 'debito_pix', etc)
-              // No change needed - txClicked.paymentMethod stays as is
-            }
-            
-            showToast('Lançamento atualizado com sucesso', 'success');
+            txClicked.paymentMethod = 'cartao';
+          } else if (txClicked.paymentMethod === 'cartao') {
+            // Was credit card, now isn't - change to debito_pix
+            txClicked.paymentMethod = 'debito_pix';
+          } else {
+            // Keep existing paymentMethod (like 'boleto', 'debito_pix', etc)
+            // No change needed - txClicked.paymentMethod stays as is
           }
+          
+          showToast('Lançamento atualizado com sucesso', 'success');
+        }
 
           await saveTransactions();
           closeEditModal();
