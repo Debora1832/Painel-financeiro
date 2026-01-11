@@ -733,6 +733,39 @@
         </div>
       </section>
 
+      <!-- 4.1) REGRA 50 / 30 / 20 -->
+      <section class="grid grid-cols-1 md:grid-cols-3 gap-4">
+        <div class="bg-white rounded-xl shadow-sm border border-indigo-100 p-4 border-l-4 border-l-slate-600">
+          <div class="flex items-center justify-between mb-1">
+            <p class="text-xs uppercase tracking-wide text-gray-500">50% Essenciais</p>
+            <span class="text-[10px] px-2 py-0.5 rounded-full bg-slate-100 text-slate-700">Fixas + Variáveis (sem lazer)</span>
+          </div>
+          <p id="ruleNeedsValue" class="text-lg font-semibold text-gray-900">R$ 0,00</p>
+          <p id="ruleNeedsMeta" class="text-xs text-gray-500 mt-1">Limite: R$ 0,00</p>
+          <p id="ruleNeedsStatus" class="text-xs font-medium text-slate-700 mt-2"></p>
+        </div>
+
+        <div class="bg-white rounded-xl shadow-sm border border-indigo-100 p-4 border-l-4 border-l-purple-600">
+          <div class="flex items-center justify-between mb-1">
+            <p class="text-xs uppercase tracking-wide text-gray-500">30% Lazer</p>
+            <span class="text-[10px] px-2 py-0.5 rounded-full bg-purple-100 text-purple-700">Subcategoria: Lazer</span>
+          </div>
+          <p id="ruleLeisureValue" class="text-lg font-semibold text-gray-900">R$ 0,00</p>
+          <p id="ruleLeisureMeta" class="text-xs text-gray-500 mt-1">Limite: R$ 0,00</p>
+          <p id="ruleLeisureStatus" class="text-xs font-medium text-purple-700 mt-2"></p>
+        </div>
+
+        <div class="bg-white rounded-xl shadow-sm border border-indigo-100 p-4 border-l-4 border-l-emerald-600">
+          <div class="flex items-center justify-between mb-1">
+            <p class="text-xs uppercase tracking-wide text-gray-500">20% Investimentos</p>
+            <span class="text-[10px] px-2 py-0.5 rounded-full bg-emerald-100 text-emerald-700">Aportes</span>
+          </div>
+          <p id="ruleInvestValue" class="text-lg font-semibold text-gray-900">R$ 0,00</p>
+          <p id="ruleInvestMeta" class="text-xs text-gray-500 mt-1">Limite: R$ 0,00</p>
+          <p id="ruleInvestStatus" class="text-xs font-medium text-emerald-700 mt-2"></p>
+        </div>
+      </section>
+
       <!-- 5) TABELAS DE TRANSAÇÕES (mantidas) -->
       <section class="space-y-4">
         <div class="bg-white rounded-xl shadow-sm border border-gray-100">
@@ -2008,6 +2041,62 @@
         updateCardSaldoStyles(currentSaldo);
       }
 
+      function renderBudgetRuleCards() {
+        const totals = getMonthTotals(state.selectedMonth);
+        const renda = totals.receitas;
+        const txs = getFilteredTransactions();
+
+        let fixas = 0, variaveis = 0, lazer = 0, investimentos = 0;
+        txs.forEach(t => {
+          const v = Number(t.value) || 0;
+          if (t.category === 'fixa') fixas += v;
+          else if (t.category === 'variavel') {
+            variaveis += v;
+            if ((t.subCategory || '') === 'lazer') lazer += v;
+          } else if (t.category === 'investimento') {
+            investimentos += v;
+          }
+        });
+
+        const essenciais = Math.max(0, fixas + Math.max(0, variaveis - lazer));
+        const limiteEssenciais = renda * 0.50;
+        const limiteLazer = renda * 0.30;
+        const limiteInvest = renda * 0.20;
+
+        function pct(num) { return (num).toFixed(1).replace('.', ',') + '%'; }
+        function fillCard(valueId, metaId, statusId, gasto, limite, colorClass) {
+          const valueEl = document.getElementById(valueId);
+          const metaEl = document.getElementById(metaId);
+          const statusEl = document.getElementById(statusId);
+          if (!valueEl || !metaEl || !statusEl) return;
+
+          valueEl.textContent = formatCurrency(gasto);
+
+          if (renda <= 0) {
+            metaEl.textContent = 'Sem receitas no período';
+            statusEl.textContent = 'Adicione receitas para calcular os percentuais.';
+            statusEl.className = 'text-xs font-medium text-gray-500 mt-2';
+            return;
+          }
+
+          metaEl.textContent = `Limite: ${formatCurrency(limite)}`;
+          const usoDaRenda = (gasto / renda) * 100;
+          let statusText = `Usando ${pct(usoDaRenda)} da renda.`;
+          let statusClass = `text-xs font-medium ${colorClass} mt-2`;
+          if (limite > 0 && gasto > limite) {
+            const excedentePct = ((gasto - limite) / limite) * 100;
+            statusText += ` Excedeu ${pct(excedentePct)} do limite.`;
+            statusClass = 'text-xs font-medium text-red-600 mt-2';
+          }
+          statusEl.textContent = statusText;
+          statusEl.className = statusClass;
+        }
+
+        fillCard('ruleNeedsValue', 'ruleNeedsMeta', 'ruleNeedsStatus', essenciais, limiteEssenciais, 'text-slate-700');
+        fillCard('ruleLeisureValue', 'ruleLeisureMeta', 'ruleLeisureStatus', lazer, limiteLazer, 'text-purple-700');
+        fillCard('ruleInvestValue', 'ruleInvestMeta', 'ruleInvestStatus', investimentos, limiteInvest, 'text-emerald-700');
+      }
+
       function updateCardStatusButton(btn, paid) {
         if (!btn) return;
         btn.className = 'card-status-btn mt-1 inline-flex items-center px-2.5 py-1 rounded-full border text-[10px] font-medium';
@@ -2885,6 +2974,7 @@
           annualView.classList.add('hidden');
           monthlyView.classList.remove('hidden');
           renderSummaryCards();
+          renderBudgetRuleCards();
           renderCardsFaturas();
           renderTables();
         }
