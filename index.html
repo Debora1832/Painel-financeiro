@@ -1708,15 +1708,6 @@
       async function saveTransactions() {
         try {
           const colRef = collection(db, "transactions");
-          // recupera ids existentes
-          const snap = await getDocs(colRef);
-          const existingIds = new Set(snap.docs.map(d => d.id));
-
-          const currentIds = new Set(state.transactions.map(t => t.id));
-          // deletar docs que existem no Firestore mas não no state
-          const toDelete = [...existingIds].filter(id => !currentIds.has(id));
-          await Promise.all(toDelete.map(id => deleteDoc(doc(db, "transactions", id))));
-
           // upsert: setDoc para cada transação usando t.id como doc id
           await Promise.all(state.transactions.map(t => {
             const { id, ...data } = t;
@@ -1741,11 +1732,35 @@
             }));
 
           // opcional: também manter uma cópia em localStorage como fallback
-          try { localStorage.setItem(STORAGE_KEY, JSON.stringify(state.transactions)); } catch (e) { /* ignore */ }
+          updateLocalBackup();
         } catch (e) {
           console.error("Erro ao salvar transactions no Firestore", e);
-          // fallback: tentar salvar em localStorage
-          try { localStorage.setItem(STORAGE_KEY, JSON.stringify(state.transactions)); } catch (er) {}
+          updateLocalBackup();
+        }
+      }
+
+      function updateLocalBackup() {
+        try { 
+          localStorage.setItem(STORAGE_KEY, JSON.stringify(state.transactions)); 
+          return true;
+        }
+        catch (e) { 
+          console.error("Erro ao atualizar backup local", e); 
+          return false;
+        }
+      }
+
+      /**
+       * Executa uma operação assíncrona garantindo rollback em caso de erro.
+       * @param {Function} operation Função assíncrona que realiza a operação principal.
+       * @param {Function} rollback Função síncrona/assíncrona para restaurar o estado em caso de falha.
+       */
+      async function runWithRollback(operation, rollback) {
+        try {
+          await operation();
+        } catch (error) {
+          try { await rollback(); } catch (rollbackError) { console.error("Erro ao executar rollback", rollbackError); }
+          throw error;
         }
       }
 
@@ -3053,9 +3068,17 @@
         // Immediate UI update for instant feedback
         renderTables();
         updatePaymentProgress();
-        
-        await saveTransactions();
-        const isReceita = tx.category === 'receita';
+
+        try {
+          await saveTransactions();
+        } catch (error) {
+          console.error("toggleAportado: Error saving transaction:", error);
+          showToast('Erro ao salvar alteração. Verifique a conexão.', 'error');
+          tx.aportado = wasAportado;
+          renderTables();
+          updatePaymentProgress();
+          return;
+        }
         showToast(
           wasAportado ? 'Marcado como não aportado' : 'Marcado como aportado',
           'success'
@@ -3094,14 +3117,41 @@
 
       // Nota: a antiga função deleteTransaction(id) foi mantida mas a chamada direta foi substituída
       async function deleteTransactionById(id) {
+        const previous = [...state.transactions];
         state.transactions = state.transactions.filter((t) => t.id !== id);
-        await saveTransactions();
+        try {
+          await runWithRollback(
+            async () => {
+              await deleteDoc(doc(db, "transactions", id));
+              const backupOk = updateLocalBackup();
+              if (!backupOk) throw new Error("Falha ao atualizar backup local após excluir transação");
+            },
+            () => { state.transactions = previous; }
+          );
+        } catch (error) {
+          console.error(`Erro ao apagar transação ${id} no Firestore`, error);
+        }
         renderDashboard(state.selectedMonth);
       }
 
       async function deleteTransactionsByGroup(groupId) {
+        const previous = [...state.transactions];
+        const idsToDelete = state.transactions
+          .filter((t) => t.groupId === groupId)
+          .map((t) => t.id);
         state.transactions = state.transactions.filter((t) => t.groupId !== groupId);
-        await saveTransactions();
+        try {
+          await runWithRollback(
+            async () => {
+              await Promise.all(idsToDelete.map((id) => deleteDoc(doc(db, "transactions", id))));
+              const backupOk = updateLocalBackup();
+              if (!backupOk) throw new Error("Falha ao atualizar backup local após excluir grupo");
+            },
+            () => { state.transactions = previous; }
+          );
+        } catch (error) {
+          console.error(`Erro ao apagar grupo ${groupId} no Firestore`, error);
+        }
         renderDashboard(state.selectedMonth);
       }
 
