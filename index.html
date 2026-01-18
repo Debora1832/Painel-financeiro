@@ -1555,7 +1555,7 @@
         transactions: [],
         invoicesPaid: {},
         selectedMonth: new Date().getMonth(),
-        selectedYear: 'all',
+        selectedYear: new Date().getFullYear(), // Start with current year instead of 'all'
         editingId: null,
         editingMode: 'single',
         editingGroupId: null,
@@ -1663,6 +1663,7 @@
       // ---------- FIRESTORE PERSISTENCE ----------
       async function loadTransactions() {
         const previous = [...state.transactions];
+        console.log('🔄 Iniciando carregamento de transações do Firestore...');
         try {
           const colRef = collection(db, "transactions");
           const snap = await fetchCollectionPreferServer(colRef);
@@ -1688,14 +1689,16 @@
             });
           });
           state.transactions = result;
+          console.log(`✅ ${result.length} transações carregadas do Firestore com sucesso`);
           updateLocalBackup();
         } catch (e) {
-          console.error("Erro ao carregar transactions do Firestore", e);
+          console.error("❌ Erro ao carregar transactions do Firestore", e);
           if (e && (e.code === 'permission-denied' || /permission/i.test(e.message || ''))) {
             showToast('Permissão negada ao ler transações no Firestore. Confira regras e login.', 'error');
             // mantém estado anterior, se houver
             return;
           }
+          console.log('⚠️ Tentando carregar backup local...');
           try {
             const raw = localStorage.getItem(STORAGE_KEY);
             if (raw) {
@@ -1706,23 +1709,29 @@
                   date: normalizeDateValue(t.date),
                   extraLazer: !!t.extraLazer
                 }));
+                console.log(`💾 ${state.transactions.length} transações carregadas do backup local`);
                 showToast('Sem conexão. Exibindo dados salvos localmente.', 'warning');
                 return;
               }
+            } else {
+              console.log('⚠️ Nenhum backup local encontrado');
             }
           } catch (fallbackErr) {
-            console.error("Fallback localStorage para transactions falhou", fallbackErr);
+            console.error("❌ Fallback localStorage para transactions falhou", fallbackErr);
           }
           if (previous.length) {
             state.transactions = previous;
+            console.log(`↩️ Restaurando estado anterior: ${previous.length} transações`);
             return;
           }
           state.transactions = [];
+          console.log('⚠️ Iniciando com estado vazio');
           showToast('Erro ao carregar do Firestore. Tente recarregar ou verificar autorização.', 'error');
         }
       }
 
       async function saveTransactions() {
+        console.log(`🔄 Salvando ${state.transactions.length} transações no Firestore...`);
         try {
           const colRef = collection(db, "transactions");
           // upsert: setDoc para cada transação usando t.id como doc id
@@ -1748,21 +1757,24 @@
               return setDoc(doc(db, "transactions", id), payload);
             }));
 
+          console.log('✅ Transações salvas no Firestore com sucesso');
           // opcional: também manter uma cópia em localStorage como fallback
           updateLocalBackup();
         } catch (e) {
-          console.error("Erro ao salvar transactions no Firestore", e);
+          console.error("❌ Erro ao salvar transactions no Firestore", e);
           updateLocalBackup();
+          throw e; // Re-throw to allow caller to handle the error
         }
       }
 
       function updateLocalBackup() {
         try { 
           localStorage.setItem(STORAGE_KEY, JSON.stringify(state.transactions)); 
+          console.log(`💾 Backup local atualizado: ${state.transactions.length} transações`);
           return true;
         }
         catch (e) { 
-          console.error("Erro ao atualizar backup local", e); 
+          console.error("❌ Erro ao atualizar backup local", e); 
           return false;
         }
       }
@@ -1770,9 +1782,10 @@
       function updateInvoicesBackup() {
         try {
           localStorage.setItem(INVOICE_KEY, JSON.stringify(state.invoicesPaid || {}));
+          console.log(`💾 Backup local de faturas atualizado: ${Object.keys(state.invoicesPaid || {}).length} faturas`);
           return true;
         } catch (e) {
-          console.error("Erro ao atualizar backup local de faturas", e);
+          console.error("❌ Erro ao atualizar backup local de faturas", e);
           return false;
         }
       }
@@ -1803,6 +1816,7 @@
 
       async function loadInvoices() {
         const previous = { ...state.invoicesPaid };
+        console.log('🔄 Iniciando carregamento de faturas do Firestore...');
         try {
           const colRef = collection(db, "invoicesPaid");
           const snap = await fetchCollectionPreferServer(colRef);
@@ -1812,39 +1826,48 @@
             result[docSnap.id] = !!data.paid;
           });
           state.invoicesPaid = result;
+          console.log(`✅ ${Object.keys(result).length} faturas carregadas do Firestore com sucesso`);
           updateInvoicesBackup();
         } catch (e) {
-          console.error("Erro ao carregar invoicesPaid do Firestore", e);
+          console.error("❌ Erro ao carregar invoicesPaid do Firestore", e);
           if (e && (e.code === 'permission-denied' || /permission/i.test(e.message || ''))) {
             showToast('Permissão negada ao ler faturas no Firestore. Confira regras e login.', 'error');
             state.invoicesPaid = previous;
             return;
           }
+          console.log('⚠️ Tentando carregar backup local de faturas...');
           try {
             const raw = localStorage.getItem(INVOICE_KEY);
             if (raw) {
               state.invoicesPaid = JSON.parse(raw);
+              console.log(`💾 ${Object.keys(state.invoicesPaid).length} faturas carregadas do backup local`);
               showToast('Sem conexão. Exibindo faturas salvas localmente.', 'warning');
               return;
+            } else {
+              console.log('⚠️ Nenhum backup local de faturas encontrado');
             }
           } catch (fallbackErr) {
-            console.error("Fallback localStorage para invoices falhou", fallbackErr);
+            console.error("❌ Fallback localStorage para invoices falhou", fallbackErr);
           }
           state.invoicesPaid = previous;
+          console.log(`↩️ Restaurando estado anterior de faturas`);
           showToast('Erro ao carregar faturas do Firestore. Tente recarregar ou verificar autorização.', 'error');
         }
       }
 
       async function saveInvoices() {
+        console.log(`🔄 Salvando ${Object.keys(state.invoicesPaid).length} faturas no Firestore...`);
         try {
           const entries = Object.entries(state.invoicesPaid);
           await Promise.all(entries.map(([key, paid]) => {
             return setDoc(doc(db, "invoicesPaid", key), { paid: !!paid });
           }));
+          console.log('✅ Faturas salvas no Firestore com sucesso');
           try { localStorage.setItem(INVOICE_KEY, JSON.stringify(state.invoicesPaid)); } catch (e) {}
         } catch (e) {
-          console.error("Erro ao salvar invoicesPaid no Firestore", e);
+          console.error("❌ Erro ao salvar invoicesPaid no Firestore", e);
           try { localStorage.setItem(INVOICE_KEY, JSON.stringify(state.invoicesPaid)); } catch (er) {}
+          throw e; // Re-throw to allow caller to handle the error
         }
       }
 
@@ -4187,16 +4210,26 @@ if (forma === 'cartao' || forma === 'boleto') {
       }
 
       async function init() {
+        console.log('🚀 Inicializando aplicação...');
         // Garantir que a página abra no mês e ano atuais
         state.selectedMonth = new Date().getMonth();
         state.selectedYear = new Date().getFullYear();
-        console.log('Init: setting selectedMonth to', state.selectedMonth, 'and selectedYear to', state.selectedYear);
+        console.log(`📅 Mês selecionado: ${MONTH_NAMES[state.selectedMonth]} (${state.selectedMonth})`);
+        console.log(`📅 Ano selecionado: ${state.selectedYear}`);
         
-        await loadTransactions();
-        await loadInvoices();
+        try {
+          await loadTransactions();
+          await loadInvoices();
+          console.log('✅ Dados carregados com sucesso');
+        } catch (error) {
+          console.error('❌ Erro ao carregar dados iniciais:', error);
+          showToast('Erro ao carregar dados. Verifique sua conexão e tente novamente.', 'error');
+        }
+        
         refreshYearFilterOptions();
         setupEvents();
         renderDashboard(state.selectedMonth);
+        console.log('✅ Aplicação inicializada com sucesso');
       }
 
       document.addEventListener('DOMContentLoaded', init);
