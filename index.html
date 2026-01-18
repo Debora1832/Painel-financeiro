@@ -1690,11 +1690,12 @@
               groupId: data.groupId || null,
               paid: !!data.paid,
             aportado: !!data.aportado,
-            extraLazer: !!data.extraLazer
+              extraLazer: !!data.extraLazer
+            });
           });
-        });
-        state.transactions = result;
-          } catch (e) {
+          state.transactions = result;
+          updateLocalBackup();
+        } catch (e) {
           console.error("Erro ao carregar transactions do Firestore", e);
           // fallback: tentar carregar do localStorage (se existir)
           try {
@@ -1758,6 +1759,16 @@
         }
       }
 
+      function updateInvoicesBackup() {
+        try {
+          localStorage.setItem(INVOICE_KEY, JSON.stringify(state.invoicesPaid || {}));
+          return true;
+        } catch (e) {
+          console.error("Erro ao atualizar backup local de faturas", e);
+          return false;
+        }
+      }
+
       /**
        * Executa uma operação assíncrona garantindo rollback em caso de erro.
        * @param {Function} operation Função assíncrona que realiza a operação principal.
@@ -1789,6 +1800,7 @@
             result[docSnap.id] = !!data.paid;
           });
           state.invoicesPaid = result;
+          updateInvoicesBackup();
         } catch (e) {
           console.error("Erro ao carregar invoicesPaid do Firestore", e);
           // fallback localStorage
