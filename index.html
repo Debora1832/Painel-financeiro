@@ -1708,7 +1708,7 @@
             console.error("Fallback localStorage para transactions falhou", fallbackErr);
           }
           state.transactions = [];
-          showToast('Não foi possível atualizar do servidor. Verifique a conexão.', 'error');
+          showToast('Erro ao carregar do Firestore. Tente recarregar ou verificar autorização.', 'error');
         }
       }
 
@@ -1815,7 +1815,7 @@
             console.error("Fallback localStorage para invoices falhou", fallbackErr);
           }
           state.invoicesPaid = {};
-          showToast('Não foi possível atualizar faturas do servidor. Verifique a conexão.', 'error');
+          showToast('Erro ao carregar faturas do Firestore. Tente recarregar ou verificar autorização.', 'error');
         }
       }
 
