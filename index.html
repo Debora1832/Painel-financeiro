@@ -1664,7 +1664,7 @@
       async function loadTransactions() {
         try {
           const colRef = collection(db, "transactions");
-          const snap = await getDocsFromServer(colRef);
+          const snap = await fetchCollectionPreferServer(colRef);
           const result = [];
           snap.forEach(docSnap => {
             const data = docSnap.data();
@@ -1689,7 +1689,24 @@
           state.transactions = result;
           updateLocalBackup();
         } catch (e) {
-          console.error("Erro ao carregar transactions do Firestore (somente servidor)", e);
+          console.error("Erro ao carregar transactions do Firestore", e);
+          try {
+            const raw = localStorage.getItem(STORAGE_KEY);
+            if (raw) {
+              const parsed = JSON.parse(raw);
+              if (Array.isArray(parsed)) {
+                state.transactions = parsed.map(t => ({
+                  ...t,
+                  date: normalizeDateValue(t.date),
+                  extraLazer: !!t.extraLazer
+                }));
+                showToast('Sem conexão. Exibindo dados salvos localmente.', 'warning');
+                return;
+              }
+            }
+          } catch (fallbackErr) {
+            console.error("Fallback localStorage para transactions falhou", fallbackErr);
+          }
           state.transactions = [];
           showToast('Não foi possível atualizar do servidor. Verifique a conexão.', 'error');
         }
@@ -1750,6 +1767,16 @@
         }
       }
 
+      // Busca preferindo servidor; se falhar, tenta getDocs (que pode usar cache/navegador).
+      async function fetchCollectionPreferServer(colRef) {
+        try {
+          return await getDocsFromServer(colRef);
+        } catch (serverErr) {
+          console.warn("getDocsFromServer falhou, tentando getDocs fallback:", serverErr);
+          return await getDocs(colRef);
+        }
+      }
+
       /**
        * Executa uma operação assíncrona garantindo rollback em caso de erro.
        * @param {Function} operation Função assíncrona que realiza a operação principal.
@@ -1767,7 +1794,7 @@
       async function loadInvoices() {
         try {
           const colRef = collection(db, "invoicesPaid");
-          const snap = await getDocsFromServer(colRef);
+          const snap = await fetchCollectionPreferServer(colRef);
           const result = {};
           snap.forEach(docSnap => {
             const data = docSnap.data();
@@ -1776,7 +1803,17 @@
           state.invoicesPaid = result;
           updateInvoicesBackup();
         } catch (e) {
-          console.error("Erro ao carregar invoicesPaid do Firestore (somente servidor)", e);
+          console.error("Erro ao carregar invoicesPaid do Firestore", e);
+          try {
+            const raw = localStorage.getItem(INVOICE_KEY);
+            if (raw) {
+              state.invoicesPaid = JSON.parse(raw);
+              showToast('Sem conexão. Exibindo faturas salvas localmente.', 'warning');
+              return;
+            }
+          } catch (fallbackErr) {
+            console.error("Fallback localStorage para invoices falhou", fallbackErr);
+          }
           state.invoicesPaid = {};
           showToast('Não foi possível atualizar faturas do servidor. Verifique a conexão.', 'error');
         }
