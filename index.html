@@ -1472,9 +1472,9 @@
   <script type="module">
     // 1) IMPORTS DO FIREBASE (CDN modular)
     import { initializeApp } from "https://www.gstatic.com/firebasejs/11.10.0/firebase-app.js";
-    import {
-      getFirestore, collection, doc, getDocs, setDoc, deleteDoc
-    } from "https://www.gstatic.com/firebasejs/11.10.0/firebase-firestore.js";
+      import {
+        getFirestore, collection, doc, getDocs, getDocsFromServer, setDoc, deleteDoc
+      } from "https://www.gstatic.com/firebasejs/11.10.0/firebase-firestore.js";
 
     // 2) SUA CONFIG (você já forneceu esta config)
     const firebaseConfig = {
@@ -1663,7 +1663,15 @@
       // ---------- FIRESTORE PERSISTENCE ----------
       async function loadTransactions() {
         try {
-          const snap = await getDocs(collection(db, "transactions"));
+          const colRef = collection(db, "transactions");
+          let snap;
+          try {
+            snap = await getDocsFromServer(colRef);
+          } catch (serverErr) {
+            console.warn("getDocsFromServer falhou, tentando cache local:", serverErr);
+            snap = await getDocs(colRef);
+            showToast('Sem conexão. Exibindo última versão disponível.', 'warning');
+          }
           const result = [];
           snap.forEach(docSnap => {
             const data = docSnap.data();
@@ -1766,7 +1774,15 @@
 
       async function loadInvoices() {
         try {
-          const snap = await getDocs(collection(db, "invoicesPaid"));
+          const colRef = collection(db, "invoicesPaid");
+          let snap;
+          try {
+            snap = await getDocsFromServer(colRef);
+          } catch (serverErr) {
+            console.warn("getDocsFromServer (invoices) falhou, tentando cache local:", serverErr);
+            snap = await getDocs(colRef);
+            showToast('Sem conexão. Exibindo última versão disponível.', 'warning');
+          }
           const result = {};
           snap.forEach(docSnap => {
             const data = docSnap.data();
