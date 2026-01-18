@@ -1664,14 +1664,7 @@
       async function loadTransactions() {
         try {
           const colRef = collection(db, "transactions");
-          let snap;
-          try {
-            snap = await getDocsFromServer(colRef);
-          } catch (serverErr) {
-            console.warn("getDocsFromServer falhou, tentando cache local:", serverErr);
-            snap = await getDocs(colRef);
-            showToast('Sem conexão. Exibindo última versão disponível.', 'warning');
-          }
+          const snap = await getDocsFromServer(colRef);
           const result = [];
           snap.forEach(docSnap => {
             const data = docSnap.data();
@@ -1696,21 +1689,9 @@
           state.transactions = result;
           updateLocalBackup();
         } catch (e) {
-          console.error("Erro ao carregar transactions do Firestore", e);
-          // fallback: tentar carregar do localStorage (se existir)
-          try {
-            const raw = localStorage.getItem(STORAGE_KEY);
-            if (raw) {
-              const parsed = JSON.parse(raw);
-              if (Array.isArray(parsed)) {
-                state.transactions = parsed.map(t => ({
-                  ...t,
-                  date: normalizeDateValue(t.date),
-                  extraLazer: !!t.extraLazer
-                }));
-              }
-            }
-          } catch (er) { state.transactions = []; }
+          console.error("Erro ao carregar transactions do Firestore (somente servidor)", e);
+          state.transactions = [];
+          showToast('Não foi possível atualizar do servidor. Verifique a conexão.', 'error');
         }
       }
 
@@ -1786,14 +1767,7 @@
       async function loadInvoices() {
         try {
           const colRef = collection(db, "invoicesPaid");
-          let snap;
-          try {
-            snap = await getDocsFromServer(colRef);
-          } catch (serverErr) {
-            console.warn("getDocsFromServer (invoices) falhou, tentando cache local:", serverErr);
-            snap = await getDocs(colRef);
-            showToast('Sem conexão. Exibindo última versão disponível.', 'warning');
-          }
+          const snap = await getDocsFromServer(colRef);
           const result = {};
           snap.forEach(docSnap => {
             const data = docSnap.data();
@@ -1802,13 +1776,9 @@
           state.invoicesPaid = result;
           updateInvoicesBackup();
         } catch (e) {
-          console.error("Erro ao carregar invoicesPaid do Firestore", e);
-          // fallback localStorage
-          try {
-            const raw = localStorage.getItem(INVOICE_KEY);
-            if (raw) state.invoicesPaid = JSON.parse(raw);
-            else state.invoicesPaid = {};
-          } catch (er) { state.invoicesPaid = {}; }
+          console.error("Erro ao carregar invoicesPaid do Firestore (somente servidor)", e);
+          state.invoicesPaid = {};
+          showToast('Não foi possível atualizar faturas do servidor. Verifique a conexão.', 'error');
         }
       }
 
