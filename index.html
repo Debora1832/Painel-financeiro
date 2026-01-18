@@ -1708,15 +1708,6 @@
       async function saveTransactions() {
         try {
           const colRef = collection(db, "transactions");
-          // recupera ids existentes
-          const snap = await getDocs(colRef);
-          const existingIds = new Set(snap.docs.map(d => d.id));
-
-          const currentIds = new Set(state.transactions.map(t => t.id));
-          // deletar docs que existem no Firestore mas não no state
-          const toDelete = [...existingIds].filter(id => !currentIds.has(id));
-          await Promise.all(toDelete.map(id => deleteDoc(doc(db, "transactions", id))));
-
           // upsert: setDoc para cada transação usando t.id como doc id
           await Promise.all(state.transactions.map(t => {
             const { id, ...data } = t;
@@ -3095,12 +3086,19 @@
       // Nota: a antiga função deleteTransaction(id) foi mantida mas a chamada direta foi substituída
       async function deleteTransactionById(id) {
         state.transactions = state.transactions.filter((t) => t.id !== id);
+        try { await deleteDoc(doc(db, "transactions", id)); } catch (error) { console.error("Erro ao apagar transação no Firestore", error); }
         await saveTransactions();
         renderDashboard(state.selectedMonth);
       }
 
       async function deleteTransactionsByGroup(groupId) {
+        const idsToDelete = state.transactions
+          .filter((t) => t.groupId === groupId)
+          .map((t) => t.id);
         state.transactions = state.transactions.filter((t) => t.groupId !== groupId);
+        try {
+          await Promise.all(idsToDelete.map((id) => deleteDoc(doc(db, "transactions", id))));
+        } catch (error) { console.error("Erro ao apagar grupo no Firestore", error); }
         await saveTransactions();
         renderDashboard(state.selectedMonth);
       }
