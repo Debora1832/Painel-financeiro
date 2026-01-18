@@ -1662,6 +1662,7 @@
 
       // ---------- FIRESTORE PERSISTENCE ----------
       async function loadTransactions() {
+        const previous = [...state.transactions];
         try {
           const colRef = collection(db, "transactions");
           const snap = await fetchCollectionPreferServer(colRef);
@@ -1690,6 +1691,11 @@
           updateLocalBackup();
         } catch (e) {
           console.error("Erro ao carregar transactions do Firestore", e);
+          if (e && (e.code === 'permission-denied' || /permission/i.test(e.message || ''))) {
+            showToast('Permissão negada ao ler transações no Firestore. Confira regras e login.', 'error');
+            // mantém estado anterior, se houver
+            return;
+          }
           try {
             const raw = localStorage.getItem(STORAGE_KEY);
             if (raw) {
@@ -1706,6 +1712,10 @@
             }
           } catch (fallbackErr) {
             console.error("Fallback localStorage para transactions falhou", fallbackErr);
+          }
+          if (previous.length) {
+            state.transactions = previous;
+            return;
           }
           state.transactions = [];
           showToast('Erro ao carregar do Firestore. Tente recarregar ou verificar autorização.', 'error');
@@ -1792,6 +1802,7 @@
       }
 
       async function loadInvoices() {
+        const previous = { ...state.invoicesPaid };
         try {
           const colRef = collection(db, "invoicesPaid");
           const snap = await fetchCollectionPreferServer(colRef);
@@ -1804,6 +1815,11 @@
           updateInvoicesBackup();
         } catch (e) {
           console.error("Erro ao carregar invoicesPaid do Firestore", e);
+          if (e && (e.code === 'permission-denied' || /permission/i.test(e.message || ''))) {
+            showToast('Permissão negada ao ler faturas no Firestore. Confira regras e login.', 'error');
+            state.invoicesPaid = previous;
+            return;
+          }
           try {
             const raw = localStorage.getItem(INVOICE_KEY);
             if (raw) {
@@ -1814,7 +1830,7 @@
           } catch (fallbackErr) {
             console.error("Fallback localStorage para invoices falhou", fallbackErr);
           }
-          state.invoicesPaid = {};
+          state.invoicesPaid = previous;
           showToast('Erro ao carregar faturas do Firestore. Tente recarregar ou verificar autorização.', 'error');
         }
       }
