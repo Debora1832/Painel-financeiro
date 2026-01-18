@@ -1756,6 +1756,65 @@
         }
       }
 
+      // ---------- SINCRONIZAÇÃO EM BACKGROUND ----------
+      async function syncTransactionsOnce() {
+        try {
+          const colRef = collection(db, "transactions");
+          const snap = await fetchCollectionPreferServer(colRef);
+          const result = [];
+          snap.forEach(docSnap => {
+            const data = docSnap.data();
+            result.push({
+              id: docSnap.id,
+              description: data.description || '',
+              value: Number(data.value) || 0,
+              date: normalizeDateValue(data.date),
+              category: data.category || 'variavel',
+              subCategory: data.subCategory || null,
+              isCreditCard: !!data.isCreditCard,
+              card: data.card || null,
+              parcelas: data.parcelas || 1,
+              parcelaIndex: data.parcelaIndex || 1,
+              paymentMethod: data.paymentMethod || null,
+              groupId: data.groupId || null,
+              paid: !!data.paid,
+              aportado: !!data.aportado,
+              extraLazer: !!data.extraLazer
+            });
+          });
+          state.transactions = result;
+          updateLocalBackup();
+          renderDashboard(state.selectedMonth);
+        } catch (e) {
+          console.error("syncTransactionsOnce: erro ao atualizar silenciosamente", e);
+        }
+      }
+
+      async function syncInvoicesOnce() {
+        try {
+          const colRef = collection(db, "invoicesPaid");
+          const snap = await fetchCollectionPreferServer(colRef);
+          const result = {};
+          snap.forEach(docSnap => {
+            const data = docSnap.data();
+            result[docSnap.id] = !!data.paid;
+          });
+          state.invoicesPaid = result;
+          updateInvoicesBackup();
+          renderDashboard(state.selectedMonth);
+        } catch (e) {
+          console.error("syncInvoicesOnce: erro ao atualizar silenciosamente", e);
+        }
+      }
+
+      function startBackgroundSync() {
+        // Atualiza a cada 30s para refletir lançamentos feitos em outros dispositivos
+        setInterval(() => {
+          syncTransactionsOnce();
+          syncInvoicesOnce();
+        }, 30000);
+      }
+
       function updateLocalBackup() {
         try { 
           localStorage.setItem(STORAGE_KEY, JSON.stringify(state.transactions)); 
@@ -4197,6 +4256,7 @@ if (forma === 'cartao' || forma === 'boleto') {
         refreshYearFilterOptions();
         setupEvents();
         renderDashboard(state.selectedMonth);
+        startBackgroundSync();
       }
 
       document.addEventListener('DOMContentLoaded', init);
