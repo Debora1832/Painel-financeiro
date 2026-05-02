@@ -1510,7 +1510,11 @@
     const db = getFirestore(app);
     const auth = getAuth(app);
     // Login anônimo para permitir escrita no Firestore com regras de autenticação
-    signInAnonymously(auth).catch(e => console.warn("Login anônimo falhou:", e));
+    let _authError = null;
+    signInAnonymously(auth).catch(e => {
+      console.warn("Login anônimo falhou:", e);
+      _authError = e;
+    });
 
     (function () {
       // KEYs (mantive para compatibilidade se quiser fallback)
@@ -1776,7 +1780,7 @@
         } catch (e) {
           console.error("Erro ao salvar transactions no Firestore", e);
           updateLocalBackup();
-          if (e && (e.code === 'permission-denied' || /permission/i.test(e.message || ''))) {
+          if (e?.code === 'permission-denied' || /permission/i.test(e?.message || '')) {
             showToast('Sem permissão no Firebase. Verifique as regras do Firestore.', 'error');
           } else {
             showToast('Erro ao sincronizar com Firebase. Dados salvos localmente.', 'warning');
@@ -4027,8 +4031,8 @@ if (forma === 'cartao' || forma === 'boleto') {
               renderTables();
               // Rola para a seção de tabelas
               if (state.selectedCard) {
-                const tablesSection = document.getElementById('cardFilterIndicator');
-                if (tablesSection) tablesSection.scrollIntoView({ behavior: 'smooth', block: 'start' });
+                const filterIndicator = document.getElementById('cardFilterIndicator');
+                if (filterIndicator) filterIndicator.scrollIntoView({ behavior: 'smooth', block: 'start' });
               }
             });
           }
@@ -4284,6 +4288,11 @@ if (forma === 'cartao' || forma === 'boleto') {
         state.selectedMonth = new Date().getMonth();
         state.selectedYear = new Date().getFullYear();
         console.log('Init: setting selectedMonth to', state.selectedMonth, 'and selectedYear to', state.selectedYear);
+
+        // Avisa o usuário se a autenticação anônima falhou
+        if (_authError) {
+          showToast('Falha na autenticação Firebase. Dados serão salvos somente localmente.', 'warning');
+        }
         
         await loadTransactions();
         await loadInvoices();
