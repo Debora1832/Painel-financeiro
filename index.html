@@ -378,7 +378,7 @@
       <!-- 1) RESUMO CARDS (COM SALDO LÍQUIDO) -->
       <section class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-5 gap-4">
         <!-- Receitas -->
-        <div class="bg-white rounded-xl shadow-sm border border-gray-100 flex flex-col p-4 border-l-4 border-l-emerald-500">
+        <div id="summaryCard-receita" data-filter-cat="receita" class="bg-white rounded-xl shadow-sm border border-gray-100 flex flex-col p-4 border-l-4 border-l-emerald-500 cursor-pointer hover:shadow-md transition-shadow" title="Clique para filtrar por Receitas">
           <div class="flex items-center justify-between mb-2">
             <div>
               <p class="text-xs uppercase tracking-wide text-gray-500">Receitas</p>
@@ -393,7 +393,7 @@
         </div>
 
         <!-- Investimentos -->
-        <div class="bg-white rounded-xl shadow-sm border border-gray-100 flex flex-col p-4 border-l-4 border-l-blue-500">
+        <div id="summaryCard-investimento" data-filter-cat="investimento" class="bg-white rounded-xl shadow-sm border border-gray-100 flex flex-col p-4 border-l-4 border-l-blue-500 cursor-pointer hover:shadow-md transition-shadow" title="Clique para filtrar por Investimentos">
           <div class="flex items-center justify-between mb-2">
             <div>
               <p class="text-xs uppercase tracking-wide text-gray-500">Investimentos</p>
@@ -408,7 +408,7 @@
         </div>
 
         <!-- Despesas Fixas -->
-        <div class="bg-white rounded-xl shadow-sm border border-gray-100 flex flex-col p-4 border-l-4 border-l-amber-400">
+        <div id="summaryCard-fixa" data-filter-cat="fixa" class="bg-white rounded-xl shadow-sm border border-gray-100 flex flex-col p-4 border-l-4 border-l-amber-400 cursor-pointer hover:shadow-md transition-shadow" title="Clique para filtrar por Despesas Fixas">
           <div class="flex items-center justify-between mb-2">
             <div>
               <p class="text-xs uppercase tracking-wide text-gray-500">Despesas Fixas</p>
@@ -423,7 +423,7 @@
         </div>
 
         <!-- Despesas Variáveis -->
-        <div class="bg-white rounded-xl shadow-sm border border-gray-100 flex flex-col p-4 border-l-4 border-l-orange-500">
+        <div id="summaryCard-variavel" data-filter-cat="variavel" class="bg-white rounded-xl shadow-sm border border-gray-100 flex flex-col p-4 border-l-4 border-l-orange-500 cursor-pointer hover:shadow-md transition-shadow" title="Clique para filtrar por Despesas Variáveis">
           <div class="flex items-center justify-between mb-2">
             <div>
               <p class="text-xs uppercase tracking-wide text-gray-500">Despesas Variáveis</p>
@@ -777,11 +777,11 @@
         </div>
       </section>
 
-      <!-- Card filter indicator -->
+      <!-- Card/Category filter indicator -->
       <div id="cardFilterIndicator" class="hidden flex items-center justify-between bg-indigo-50 border border-indigo-200 rounded-xl px-4 py-2.5">
         <div class="flex items-center gap-2 text-sm text-indigo-700">
-          <i class="fa-solid fa-credit-card text-indigo-500"></i>
-          <span>Filtrando por cartão: <strong id="activeCardName"></strong></span>
+          <i id="filterIndicatorIcon" class="fa-solid fa-credit-card text-indigo-500"></i>
+          <span id="filterIndicatorText">Filtrando por: <strong id="activeCardName"></strong></span>
         </div>
         <button id="btnClearCardFilter" class="text-xs text-indigo-600 hover:text-indigo-800 font-medium flex items-center gap-1 px-2 py-1 rounded hover:bg-indigo-100 transition">
           <i class="fa-solid fa-xmark"></i>
@@ -1589,7 +1589,8 @@
         deletingId: null,
         deletingGroupId: null,
         deletingMode: 'single', // 'single' | 'all'
-        selectedCard: null // filtro de cartão: 'caixa' | 'inter_debora' | 'inter_cristiano' | 'nubank' | 'c6' | null
+        selectedCard: null,     // filtro de cartão: 'caixa' | 'inter_debora' | 'inter_cristiano' | 'nubank' | 'c6' | null
+        selectedCategory: null  // filtro de categoria: 'receita' | 'fixa' | 'variavel' | 'investimento' | null
       };
 
       // Charts placeholders
@@ -1892,6 +1893,9 @@
           if (state.selectedCard !== null) {
             return !!(t.isCreditCard && t.card === state.selectedCard);
           }
+          if (state.selectedCategory !== null) {
+            return t.category === state.selectedCategory;
+          }
           return true;
         });
       }
@@ -2140,11 +2144,30 @@
         const currentMonth = state.selectedMonth;
         const prevMonth = (currentMonth + 11) % 12;
 
-        const currentTotals = getMonthTotals(currentMonth);
-        const prevTotals = getMonthTotals(prevMonth);
+        let currentTotals, prevTotals, currentSaldo, prevSaldo;
 
-        const currentSaldo = currentTotals.receitas - currentTotals.investimentos - currentTotals.fixas - currentTotals.variaveis;
-        const prevSaldo = prevTotals.receitas - prevTotals.investimentos - prevTotals.fixas - prevTotals.variaveis;
+        if (state.selectedCard !== null || state.selectedCategory !== null) {
+          // Quando um filtro de cartão ou categoria está ativo, calcula totais a partir
+          // das transações filtradas (getFilteredTransactions já respeita selectedCard/selectedCategory)
+          const txs = getFilteredTransactions();
+          currentTotals = { receitas: 0, investimentos: 0, fixas: 0, variaveis: 0 };
+          txs.forEach(t => {
+            const v = Number(t.value) || 0;
+            if (t.category === 'receita') currentTotals.receitas += v;
+            else if (t.category === 'investimento') currentTotals.investimentos += v;
+            else if (t.category === 'fixa') currentTotals.fixas += v;
+            else if (t.category === 'variavel') currentTotals.variaveis += v;
+          });
+          currentSaldo = currentTotals.receitas - currentTotals.investimentos - currentTotals.fixas - currentTotals.variaveis;
+          // Sem comparativo com mês anterior quando filtro ativo
+          prevTotals = { receitas: 0, investimentos: 0, fixas: 0, variaveis: 0 };
+          prevSaldo = 0;
+        } else {
+          currentTotals = getMonthTotals(currentMonth);
+          prevTotals = getMonthTotals(prevMonth);
+          currentSaldo = currentTotals.receitas - currentTotals.investimentos - currentTotals.fixas - currentTotals.variaveis;
+          prevSaldo = prevTotals.receitas - prevTotals.investimentos - prevTotals.fixas - prevTotals.variaveis;
+        }
 
         document.getElementById('totalReceitas').textContent = formatCurrency(currentTotals.receitas);
         document.getElementById('totalInvestimentos').textContent = formatCurrency(currentTotals.investimentos);
@@ -2162,25 +2185,42 @@
       }
 
       function renderBudgetRuleCards() {
-        const totals = getMonthTotals(state.selectedMonth);
-        const renda = totals.receitas;
         const txs = getFilteredTransactions();
+        let renda = 0, fixas = 0, variaveis = 0, lazer = 0, investimentos = 0;
 
-        let fixas = 0, variaveis = 0, lazer = 0, investimentos = 0;
-        txs.forEach(t => {
-          const v = Number(t.value) || 0;
-          const sub = (t.subCategory || '').toLowerCase();
-          if (t.category === 'fixa') {
-            fixas += v;
-            if (t.extraLazer || sub === 'lazer') lazer += v;
-          }
-          else if (t.category === 'variavel') {
-            variaveis += v;
-            if (sub === 'lazer' || t.extraLazer) lazer += v;
-          } else if (t.category === 'investimento') {
-            investimentos += v;
-          }
-        });
+        if (state.selectedCard !== null || state.selectedCategory !== null) {
+          // Com filtro ativo, calcula renda também a partir das transações filtradas
+          txs.forEach(t => {
+            const v = Number(t.value) || 0;
+            const sub = (t.subCategory || '').toLowerCase();
+            if (t.category === 'receita') renda += v;
+            else if (t.category === 'fixa') {
+              fixas += v;
+              if (t.extraLazer || sub === 'lazer') lazer += v;
+            } else if (t.category === 'variavel') {
+              variaveis += v;
+              if (sub === 'lazer' || t.extraLazer) lazer += v;
+            } else if (t.category === 'investimento') {
+              investimentos += v;
+            }
+          });
+        } else {
+          const totals = getMonthTotals(state.selectedMonth);
+          renda = totals.receitas;
+          txs.forEach(t => {
+            const v = Number(t.value) || 0;
+            const sub = (t.subCategory || '').toLowerCase();
+            if (t.category === 'fixa') {
+              fixas += v;
+              if (t.extraLazer || sub === 'lazer') lazer += v;
+            } else if (t.category === 'variavel') {
+              variaveis += v;
+              if (sub === 'lazer' || t.extraLazer) lazer += v;
+            } else if (t.category === 'investimento') {
+              investimentos += v;
+            }
+          });
+        }
 
         const essenciais = Math.max(0, fixas + variaveis - lazer);
         const limiteEssenciais = renda * 0.50;
@@ -2286,6 +2326,7 @@
       }
 
       function updateCardFilterVisual() {
+        // Credit card container ring highlight
         const CARD_KEYS = ['caixa', 'inter_debora', 'inter_cristiano', 'nubank', 'c6'];
         CARD_KEYS.forEach(card => {
           const container = document.getElementById(`cardContainer-${card}`);
@@ -2296,15 +2337,38 @@
             container.classList.remove('ring-2', 'ring-indigo-500', 'ring-offset-2');
           }
         });
-        const indicator = document.getElementById('cardFilterIndicator');
-        if (indicator) {
-          if (state.selectedCard) {
-            indicator.classList.remove('hidden');
-            const nameEl = document.getElementById('activeCardName');
-            if (nameEl) nameEl.textContent = CARD_LABELS[state.selectedCard] || state.selectedCard;
+
+        // Summary card ring highlight
+        const SUMMARY_CATS = ['receita', 'investimento', 'fixa', 'variavel'];
+        SUMMARY_CATS.forEach(cat => {
+          const el = document.getElementById(`summaryCard-${cat}`);
+          if (!el) return;
+          if (state.selectedCategory === cat) {
+            el.classList.add('ring-2', 'ring-indigo-500', 'ring-offset-2');
           } else {
-            indicator.classList.add('hidden');
+            el.classList.remove('ring-2', 'ring-indigo-500', 'ring-offset-2');
           }
+        });
+
+        // Filter indicator banner
+        const indicator = document.getElementById('cardFilterIndicator');
+        if (!indicator) return;
+        const hasFilter = state.selectedCard !== null || state.selectedCategory !== null;
+        if (hasFilter) {
+          indicator.classList.remove('hidden');
+          const nameEl = document.getElementById('activeCardName');
+          const iconEl = document.getElementById('filterIndicatorIcon');
+          const textEl = document.getElementById('filterIndicatorText');
+          if (state.selectedCard) {
+            if (iconEl) { iconEl.className = 'fa-solid fa-credit-card text-indigo-500'; }
+            if (textEl) textEl.innerHTML = `Filtrando por cartão: <strong>${CARD_LABELS[state.selectedCard] || state.selectedCard}</strong>`;
+          } else if (state.selectedCategory) {
+            const catLabel = CATEGORY_LABELS[state.selectedCategory] || state.selectedCategory;
+            if (iconEl) { iconEl.className = 'fa-solid fa-filter text-indigo-500'; }
+            if (textEl) textEl.innerHTML = `Filtrando por categoria: <strong>${catLabel}</strong>`;
+          }
+        } else {
+          indicator.classList.add('hidden');
         }
       }
 
@@ -3115,9 +3179,10 @@
       }
 
       function renderDashboard(selectedMonth) {
-        // Reseta filtro de cartão quando troca de mês
+        // Reseta filtros quando troca de mês
         if (state.selectedMonth !== selectedMonth) {
           state.selectedCard = null;
+          state.selectedCategory = null;
         }
         state.selectedMonth = selectedMonth;
         refreshYearFilterOptions();
@@ -4016,24 +4081,42 @@ if (forma === 'cartao' || forma === 'boleto') {
           });
         });
 
-        // Clique nos cartões para filtrar transações
+        // Helper: aplica filtro e re-renderiza toda a página
+        function applyPageFilter() {
+          updateCardFilterVisual();
+          renderSummaryCards();
+          renderBudgetRuleCards();
+          renderCardsFaturas();
+          renderTables();
+          updatePaymentProgress();
+          if (state.selectedCard !== null || state.selectedCategory !== null) {
+            const filterIndicator = document.getElementById('cardFilterIndicator');
+            if (filterIndicator) filterIndicator.scrollIntoView({ behavior: 'smooth', block: 'start' });
+          }
+        }
+
+        // Clique nos cartões de crédito para filtrar transações
         ['caixa', 'inter_debora', 'inter_cristiano', 'nubank', 'c6'].forEach(card => {
           const container = document.getElementById(`cardContainer-${card}`);
           if (container) {
-            container.style.cursor = 'pointer';
-            container.title = 'Clique para filtrar as transações deste cartão';
             container.addEventListener('click', (e) => {
               // Não aciona se clicou no botão de status da fatura
               if (e.target.closest('.card-status-btn')) return;
+              state.selectedCategory = null;
               state.selectedCard = (state.selectedCard === card) ? null : card;
-              updateCardFilterVisual();
-              renderSummaryCards();
-              renderTables();
-              // Rola para a seção de tabelas
-              if (state.selectedCard) {
-                const filterIndicator = document.getElementById('cardFilterIndicator');
-                if (filterIndicator) filterIndicator.scrollIntoView({ behavior: 'smooth', block: 'start' });
-              }
+              applyPageFilter();
+            });
+          }
+        });
+
+        // Clique nos cartões de resumo (Receitas, Investimentos, etc.) para filtrar por categoria
+        ['receita', 'investimento', 'fixa', 'variavel'].forEach(cat => {
+          const el = document.getElementById(`summaryCard-${cat}`);
+          if (el) {
+            el.addEventListener('click', () => {
+              state.selectedCard = null;
+              state.selectedCategory = (state.selectedCategory === cat) ? null : cat;
+              applyPageFilter();
             });
           }
         });
@@ -4042,9 +4125,8 @@ if (forma === 'cartao' || forma === 'boleto') {
         if (btnClearCardFilter) {
           btnClearCardFilter.addEventListener('click', () => {
             state.selectedCard = null;
-            updateCardFilterVisual();
-            renderSummaryCards();
-            renderTables();
+            state.selectedCategory = null;
+            applyPageFilter();
           });
         }
 
