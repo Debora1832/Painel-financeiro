@@ -252,6 +252,12 @@
         display: none !important;
       }
     }
+
+    /* Card filter active style */
+    .card-filter-active {
+      outline: 2px solid rgb(99, 102, 241);
+      outline-offset: 2px;
+    }
   </style>
 </head>
 <body class="min-h-screen bg-gray-50 flex text-gray-900">
@@ -770,6 +776,18 @@
           <p id="ruleInvestStatus" class="text-xs font-medium text-emerald-700 mt-2"></p>
         </div>
       </section>
+
+      <!-- Card filter indicator -->
+      <div id="cardFilterIndicator" class="hidden flex items-center justify-between bg-indigo-50 border border-indigo-200 rounded-xl px-4 py-2.5">
+        <div class="flex items-center gap-2 text-sm text-indigo-700">
+          <i class="fa-solid fa-credit-card text-indigo-500"></i>
+          <span>Filtrando por cartão: <strong id="activeCardName"></strong></span>
+        </div>
+        <button id="btnClearCardFilter" class="text-xs text-indigo-600 hover:text-indigo-800 font-medium flex items-center gap-1 px-2 py-1 rounded hover:bg-indigo-100 transition">
+          <i class="fa-solid fa-xmark"></i>
+          Limpar filtro
+        </button>
+      </div>
 
       <!-- 5) TABELAS DE TRANSAÇÕES (mantidas) -->
       <section class="space-y-4">
@@ -1475,6 +1493,7 @@
       import {
         getFirestore, collection, doc, getDocs, getDocsFromServer, setDoc, deleteDoc
       } from "https://www.gstatic.com/firebasejs/11.10.0/firebase-firestore.js";
+      import { getAuth, signInAnonymously } from "https://www.gstatic.com/firebasejs/11.10.0/firebase-auth.js";
 
     // 2) SUA CONFIG (você já forneceu esta config)
     const firebaseConfig = {
@@ -1489,6 +1508,13 @@
     // 3) Inicializa Firebase e Firestore
     const app = initializeApp(firebaseConfig);
     const db = getFirestore(app);
+    const auth = getAuth(app);
+    // Login anônimo para permitir escrita no Firestore com regras de autenticação
+    let _authError = null;
+    signInAnonymously(auth).catch(e => {
+      console.warn("Login anônimo falhou:", e);
+      _authError = e;
+    });
 
     (function () {
       // KEYs (mantive para compatibilidade se quiser fallback)
@@ -1562,7 +1588,8 @@
         // novos campos para exclusão
         deletingId: null,
         deletingGroupId: null,
-        deletingMode: 'single' // 'single' | 'all'
+        deletingMode: 'single', // 'single' | 'all'
+        selectedCard: null // filtro de cartão: 'caixa' | 'inter_debora' | 'inter_cristiano' | 'nubank' | 'c6' | null
       };
 
       // Charts placeholders
@@ -1753,6 +1780,12 @@
         } catch (e) {
           console.error("Erro ao salvar transactions no Firestore", e);
           updateLocalBackup();
+          if (e?.code === 'permission-denied' || /permission/i.test(e?.message || '')) {
+            showToast('Sem permissão no Firebase. Verifique as regras do Firestore.', 'error');
+          } else {
+            showToast('Erro ao sincronizar com Firebase. Dados salvos localmente.', 'warning');
+          }
+          throw e;
         }
       }
 
@@ -1845,6 +1878,7 @@
         } catch (e) {
           console.error("Erro ao salvar invoicesPaid no Firestore", e);
           try { localStorage.setItem(INVOICE_KEY, JSON.stringify(state.invoicesPaid)); } catch (er) {}
+          throw e;
         }
       }
 
@@ -1855,6 +1889,9 @@
           if (isNaN(d.getTime())) return false;
           if (state.selectedMonth !== null && d.getMonth() !== state.selectedMonth) return false;
           if (state.selectedYear !== 'all' && d.getFullYear() !== state.selectedYear) return false;
+          if (state.selectedCard !== null) {
+            return !!(t.isCreditCard && t.card === state.selectedCard);
+          }
           return true;
         });
       }
@@ -2246,6 +2283,29 @@
           const btn = document.querySelector(`.card-status-btn[data-card="${card}"]`);
           updateCardStatusButton(btn, paid);
         });
+      }
+
+      function updateCardFilterVisual() {
+        const CARD_KEYS = ['caixa', 'inter_debora', 'inter_cristiano', 'nubank', 'c6'];
+        CARD_KEYS.forEach(card => {
+          const container = document.getElementById(`cardContainer-${card}`);
+          if (!container) return;
+          if (state.selectedCard === card) {
+            container.classList.add('ring-2', 'ring-indigo-500', 'ring-offset-2');
+          } else {
+            container.classList.remove('ring-2', 'ring-indigo-500', 'ring-offset-2');
+          }
+        });
+        const indicator = document.getElementById('cardFilterIndicator');
+        if (indicator) {
+          if (state.selectedCard) {
+            indicator.classList.remove('hidden');
+            const nameEl = document.getElementById('activeCardName');
+            if (nameEl) nameEl.textContent = CARD_LABELS[state.selectedCard] || state.selectedCard;
+          } else {
+            indicator.classList.add('hidden');
+          }
+        }
       }
 
       // Build generic rows (receitas / fixas / variaveis)
@@ -3055,6 +3115,10 @@
       }
 
       function renderDashboard(selectedMonth) {
+        // Reseta filtro de cartão quando troca de mês
+        if (state.selectedMonth !== selectedMonth) {
+          state.selectedCard = null;
+        }
         state.selectedMonth = selectedMonth;
         refreshYearFilterOptions();
         renderHeader();
@@ -3073,6 +3137,7 @@
           renderSummaryCards();
           renderBudgetRuleCards();
           renderCardsFaturas();
+          updateCardFilterVisual();
           renderTables();
         }
       }
@@ -3328,7 +3393,7 @@
     console.log('✅ Transação salva com sucesso');
   } catch (error) {
     console.error('❌ Erro ao salvar transação:', error);
-    showToast('Erro ao salvar. Os dados podem não persistir.', 'error');
+    // saveTransactions já exibiu o toast de erro
   }
 }
 
@@ -3951,6 +4016,38 @@ if (forma === 'cartao' || forma === 'boleto') {
           });
         });
 
+        // Clique nos cartões para filtrar transações
+        ['caixa', 'inter_debora', 'inter_cristiano', 'nubank', 'c6'].forEach(card => {
+          const container = document.getElementById(`cardContainer-${card}`);
+          if (container) {
+            container.style.cursor = 'pointer';
+            container.title = 'Clique para filtrar as transações deste cartão';
+            container.addEventListener('click', (e) => {
+              // Não aciona se clicou no botão de status da fatura
+              if (e.target.closest('.card-status-btn')) return;
+              state.selectedCard = (state.selectedCard === card) ? null : card;
+              updateCardFilterVisual();
+              renderSummaryCards();
+              renderTables();
+              // Rola para a seção de tabelas
+              if (state.selectedCard) {
+                const filterIndicator = document.getElementById('cardFilterIndicator');
+                if (filterIndicator) filterIndicator.scrollIntoView({ behavior: 'smooth', block: 'start' });
+              }
+            });
+          }
+        });
+
+        const btnClearCardFilter = document.getElementById('btnClearCardFilter');
+        if (btnClearCardFilter) {
+          btnClearCardFilter.addEventListener('click', () => {
+            state.selectedCard = null;
+            updateCardFilterVisual();
+            renderSummaryCards();
+            renderTables();
+          });
+        }
+
         const mainCatSelect = document.getElementById('editMainCategory');
         const editIsCartao = document.getElementById('editIsCartao');
         const editCartaoFields = document.getElementById('editCartaoFields');
@@ -4191,6 +4288,11 @@ if (forma === 'cartao' || forma === 'boleto') {
         state.selectedMonth = new Date().getMonth();
         state.selectedYear = new Date().getFullYear();
         console.log('Init: setting selectedMonth to', state.selectedMonth, 'and selectedYear to', state.selectedYear);
+
+        // Avisa o usuário se a autenticação anônima falhou
+        if (_authError) {
+          showToast('Falha na autenticação Firebase. Dados serão salvos somente localmente.', 'warning');
+        }
         
         await loadTransactions();
         await loadInvoices();
