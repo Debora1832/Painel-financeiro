@@ -781,7 +781,7 @@
       <div id="cardFilterIndicator" class="hidden flex items-center justify-between bg-indigo-50 border border-indigo-200 rounded-xl px-4 py-2.5">
         <div class="flex items-center gap-2 text-sm text-indigo-700">
           <i id="filterIndicatorIcon" class="fa-solid fa-credit-card text-indigo-500"></i>
-          <span id="filterIndicatorText">Filtrando por: <strong id="activeCardName"></strong></span>
+          <span id="filterIndicatorText">Filtrando por: <strong id="activeFilterName"></strong></span>
         </div>
         <button id="btnClearCardFilter" class="text-xs text-indigo-600 hover:text-indigo-800 font-medium flex items-center gap-1 px-2 py-1 rounded hover:bg-indigo-100 transition">
           <i class="fa-solid fa-xmark"></i>
@@ -2356,16 +2356,25 @@
         const hasFilter = state.selectedCard !== null || state.selectedCategory !== null;
         if (hasFilter) {
           indicator.classList.remove('hidden');
-          const nameEl = document.getElementById('activeCardName');
           const iconEl = document.getElementById('filterIndicatorIcon');
           const textEl = document.getElementById('filterIndicatorText');
           if (state.selectedCard) {
             if (iconEl) { iconEl.className = 'fa-solid fa-credit-card text-indigo-500'; }
-            if (textEl) textEl.innerHTML = `Filtrando por cartão: <strong>${CARD_LABELS[state.selectedCard] || state.selectedCard}</strong>`;
+            if (textEl) {
+              textEl.textContent = 'Filtrando por cartão: ';
+              const strong = document.createElement('strong');
+              strong.textContent = CARD_LABELS[state.selectedCard] || state.selectedCard;
+              textEl.appendChild(strong);
+            }
           } else if (state.selectedCategory) {
             const catLabel = CATEGORY_LABELS[state.selectedCategory] || state.selectedCategory;
             if (iconEl) { iconEl.className = 'fa-solid fa-filter text-indigo-500'; }
-            if (textEl) textEl.innerHTML = `Filtrando por categoria: <strong>${catLabel}</strong>`;
+            if (textEl) {
+              textEl.textContent = 'Filtrando por categoria: ';
+              const strong = document.createElement('strong');
+              strong.textContent = catLabel;
+              textEl.appendChild(strong);
+            }
           }
         } else {
           indicator.classList.add('hidden');
