@@ -493,7 +493,7 @@
               </div>
               <div class="space-y-1.5">
                 <div class="flex items-center justify-between text-[11px]">
-                  <span class="text-gray-500">Utilizado (parcelas pendentes)</span>
+                  <span class="text-gray-500">Utilizado (pendente de pagamento)</span>
                   <span id="totalCreditoUtilizado" class="font-semibold text-rose-600">R$ 0,00</span>
                 </div>
                 <div class="w-full h-1.5 bg-gray-100 rounded-full overflow-hidden">
@@ -2682,13 +2682,15 @@
           if (!t.isCreditCard || !t.card) return;
           if (!allCommitted.hasOwnProperty(t.card)) return;
           if (!t.paid) {
+            const d = new Date(t.date);
+            const txYear = d.getFullYear();
+            const txMonth = d.getMonth();
             // Exclude future fixed recurring charges — they haven't hit the card yet
             if (t.category === 'fixa') {
-              const d = new Date(t.date);
-              const txYear = d.getFullYear();
-              const txMonth = d.getMonth();
               if (txYear > _nowYear || (txYear === _nowYear && txMonth > _nowMonth)) return;
             }
+            // If the monthly invoice for this card was paid, that charge is settled — free the limit
+            if (state.invoicesPaid[keyInvoice(txYear, txMonth, t.card)]) return;
             allCommitted[t.card] += Number(t.value) || 0;
           }
         });
