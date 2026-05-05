@@ -2669,14 +2669,26 @@
         document.getElementById('totalFaturas').textContent = formatCurrency(totalFaturas);
 
         // --- ALL MONTHS: total committed = all unpaid credit card transactions ---
-        // This reflects real credit limit usage (current + future installments not yet paid)
+        // Fixed (category='fixa') transactions dated after the current real month are excluded
+        // because they haven't actually consumed credit yet.
         const allCommitted = {};
         state.cards.forEach(c => { allCommitted[c.id] = 0; });
+
+        const _now = new Date();
+        const _nowYear = _now.getFullYear();
+        const _nowMonth = _now.getMonth(); // 0-indexed
 
         state.transactions.forEach(t => {
           if (!t.isCreditCard || !t.card) return;
           if (!allCommitted.hasOwnProperty(t.card)) return;
           if (!t.paid) {
+            // Exclude future fixed recurring charges — they haven't hit the card yet
+            if (t.category === 'fixa') {
+              const d = new Date(t.date);
+              const txYear = d.getFullYear();
+              const txMonth = d.getMonth();
+              if (txYear > _nowYear || (txYear === _nowYear && txMonth > _nowMonth)) return;
+            }
             allCommitted[t.card] += Number(t.value) || 0;
           }
         });
