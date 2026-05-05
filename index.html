@@ -2683,11 +2683,11 @@
             ${card.limit > 0 ? `
             <div class="flex flex-col gap-1 mt-1 pt-1 border-t border-gray-100">
               <div class="flex items-center justify-between text-[10px]">
-                <span class="text-gray-400">Utilizado no período</span>
+                <span class="text-gray-400">Utilizado (pendente de pagamento)</span>
                 <span id="cardCommitted-${card.id}" class="font-semibold text-rose-600">R$ 0,00</span>
               </div>
               <div class="flex items-center justify-between text-[10px]">
-                <span class="text-gray-400">Disponível no período</span>
+                <span class="text-gray-400">Disponível</span>
                 <span id="cardAvailable-${card.id}" class="font-semibold text-emerald-600">R$ 0,00</span>
               </div>
               <div class="w-full h-1.5 bg-gray-100 rounded-full overflow-hidden mt-0.5">
@@ -2809,16 +2809,16 @@
           if (cntEl) cntEl.textContent = count;
 
           if (card.limit > 0) {
-            // Use period-specific spend so the card shows how much of the limit is consumed THIS month
-            const available = Math.max(0, card.limit - periodSpent);
-            const usedPct = Math.min(100, (periodSpent / card.limit) * 100);
+            // Use allCommitted so the card reflects total unpaid charges (freed when invoice is paid)
+            const available = Math.max(0, card.limit - committed);
+            const usedPct = Math.min(100, (committed / card.limit) * 100);
 
             const committedEl = document.getElementById(`cardCommitted-${card.id}`);
             const avEl = document.getElementById(`cardAvailable-${card.id}`);
             const barEl = document.getElementById(`cardUsageBar-${card.id}`);
             const pctEl = document.getElementById(`cardPct-${card.id}`);
 
-            if (committedEl) committedEl.textContent = formatCurrency(periodSpent);
+            if (committedEl) committedEl.textContent = formatCurrency(committed);
             if (avEl) avEl.textContent = formatCurrency(available);
             if (pctEl) pctEl.textContent = `${usedPct.toFixed(1)}% utilizado`;
             if (barEl) {
@@ -2828,7 +2828,7 @@
           }
 
           if (container) {
-            const usedPct = card.limit > 0 ? periodSpent / card.limit * 100 : 0;
+            const usedPct = card.limit > 0 ? committed / card.limit * 100 : 0;
             container.style.borderLeftColor = (usedPct > 90 || (card.limit === 0 && periodSpent > WARNING_THRESHOLD))
               ? '#ef4444'
               : hex;
