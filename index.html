@@ -27,6 +27,8 @@
   </script>
 
   <style>
+    /* Cards grid: auto-fill so no empty space */
+    #cardsGrid { display: grid; grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); gap: 0.75rem; }
     /* Tabelas auto para se ajustar ao conteúdo */
     table { table-layout: auto; width: 100%; }
     table th, table td { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
@@ -460,7 +462,7 @@
             <i class="fa-solid fa-credit-card text-indigo-500"></i>
             Faturas dos Cartões
           </h2>
-          <button id="btnManageCards" class="inline-flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium rounded-lg border border-indigo-200 text-indigo-600 bg-indigo-50 hover:bg-indigo-100 transition">
+          <button id="btnManageCards" class="inline-flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium rounded-lg border border-gray-200 text-gray-600 bg-gray-50 hover:bg-gray-100 transition">
             <i class="fa-solid fa-gear text-[11px]"></i>
             Gerenciar Cartões
           </button>
@@ -509,7 +511,7 @@
 
           <!-- Coluna direita: grid dinâmico de cartões -->
           <div class="lg:col-span-2">
-            <div id="cardsGrid" class="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-3">
+            <div id="cardsGrid" class="gap-3">
               <!-- Renderizado via JS -->
             </div>
           </div>
@@ -1345,16 +1347,24 @@
             <ul id="editParcelPreviewList" class="space-y-1.5 ml-1"></ul>
           </div>
           <p class="text-xs text-gray-600 mb-3 mt-3">
-            Este lançamento faz parte de uma compra parcelada. O que você deseja editar?
+            Este lançamento faz parte de uma série. O que você deseja editar?
           </p>
-          <div class="flex gap-2">
+          <div class="flex gap-2 flex-wrap">
             <button type="button" id="btnScopeSingle"
               class="px-4 py-2 rounded-lg text-xs font-medium bg-indigo-50 text-indigo-700 border border-indigo-200 hover:bg-indigo-100 transition">
-              Apenas esta parcela
+              Apenas este mês
+            </button>
+            <button type="button" id="btnScopePast"
+              class="px-4 py-2 rounded-lg text-xs font-medium bg-gray-100 text-gray-600 border border-gray-200 hover:bg-gray-200 transition">
+              Este e anteriores
+            </button>
+            <button type="button" id="btnScopeFuture"
+              class="px-4 py-2 rounded-lg text-xs font-medium bg-gray-100 text-gray-600 border border-gray-200 hover:bg-gray-200 transition">
+              Este e futuros
             </button>
             <button type="button" id="btnScopeAll"
               class="px-4 py-2 rounded-lg text-xs font-medium bg-gray-100 text-gray-600 border border-gray-200 hover:bg-gray-200 transition">
-              Todas as parcelas
+              Todos
             </button>
           </div>
         </div>
@@ -1399,16 +1409,24 @@
           <ul id="deleteParcelPreviewList" class="space-y-1.5 ml-1"></ul>
         </div>
         <p class="text-xs text-gray-600 mb-3 mt-3">
-          Este lançamento faz parte de uma compra parcelada. O que você deseja excluir?
+          Este lançamento faz parte de uma série. O que você deseja excluir?
         </p>
-        <div class="flex gap-2">
+        <div class="flex gap-2 flex-wrap">
           <button type="button" id="btnDeleteSingle"
             class="px-4 py-2 rounded-lg text-xs font-medium bg-indigo-50 text-indigo-700 border border-indigo-200 hover:bg-indigo-100 transition">
-            Apenas esta parcela
+            Apenas este mês
+          </button>
+          <button type="button" id="btnDeletePast"
+            class="px-4 py-2 rounded-lg text-xs font-medium bg-gray-100 text-gray-600 border border-gray-200 hover:bg-gray-200 transition">
+            Este e anteriores
+          </button>
+          <button type="button" id="btnDeleteFuture"
+            class="px-4 py-2 rounded-lg text-xs font-medium bg-gray-100 text-gray-600 border border-gray-200 hover:bg-gray-200 transition">
+            Este e futuros
           </button>
           <button type="button" id="btnDeleteAll"
             class="px-4 py-2 rounded-lg text-xs font-medium bg-red-50 text-red-700 border border-red-200 hover:bg-red-100 transition">
-            Todas as parcelas
+            Todos
           </button>
         </div>
       </div>
@@ -1478,10 +1496,12 @@
             </div>
             <div class="space-y-1">
               <label class="text-xs font-medium text-gray-700">Cor</label>
-              <div id="cardColorPicker" class="flex flex-wrap gap-2">
-                <!-- cores via JS -->
+              <div class="flex items-center gap-2">
+                <input type="color" id="cardColorInput" value="#0ea5e9"
+                  class="w-9 h-9 rounded-lg border border-gray-200 cursor-pointer p-0.5 bg-white" title="Escolha a cor" />
+                <span class="text-[11px] text-gray-500">Clique para abrir a paleta de cores</span>
               </div>
-              <input type="hidden" id="cardFormColor" value="sky" />
+              <input type="hidden" id="cardFormColor" value="#0ea5e9" />
             </div>
             <div class="flex gap-2 justify-end pt-1">
               <button type="button" id="btnCancelEditCard" class="hidden px-3 py-1.5 text-xs font-medium border border-gray-200 rounded-lg text-gray-600 hover:bg-gray-50">Cancelar edição</button>
@@ -1733,6 +1753,28 @@
               : '';
             return `<span class="flex items-center gap-2"><i class="fa-regular fa-calendar text-red-600"></i> ${labelDate} — ${formatCurrency(t.value)} <span class="font-semibold">${parcelaTxt}</span></span>`;
           });
+      }
+
+      // Resolves a card color (named key or hex) to a hex string
+      function resolveCardHex(color) {
+        const NAMED_HEX = {
+          sky: '#0ea5e9', orange: '#f97316', violet: '#7c3aed', slate: '#64748b',
+          emerald: '#10b981', rose: '#f43f5e', teal: '#14b8a6', indigo: '#6366f1',
+          amber: '#f59e0b', lime: '#84cc16'
+        };
+        return NAMED_HEX[color] || (typeof color === 'string' && color.startsWith('#') ? color : '#6366f1');
+      }
+      // Derives inline style objects from a hex color for card UI elements
+      function cardHexStyles(hex) {
+        const r = parseInt(hex.slice(1,3), 16) || 99;
+        const g = parseInt(hex.slice(3,5), 16) || 102;
+        const b = parseInt(hex.slice(5,7), 16) || 241;
+        return {
+          borderLeft: `border-left-color: ${hex}`,
+          icon:       `color: ${hex}`,
+          dot:        `background-color: ${hex}`,
+          badgeBg:    `background-color: rgba(${r},${g},${b},0.12); color: ${hex}; border: 1px solid rgba(${r},${g},${b},0.3)`
+        };
       }
 
       function formatCurrency(value) {
@@ -2599,16 +2641,18 @@
         if (!grid) return;
         grid.innerHTML = '';
         state.cards.forEach(card => {
-          const colors = CARD_COLOR_MAP[card.color] || CARD_COLOR_MAP.sky;
+          const hex = resolveCardHex(card.color);
+          const styles = cardHexStyles(hex);
           const div = document.createElement('div');
           div.id = `cardContainer-${card.id}`;
-          div.className = `bg-white rounded-xl shadow-sm border border-gray-100 p-3 flex flex-col gap-1 border-l-4 ${colors.border} cursor-pointer hover:shadow-md transition-shadow`;
+          div.className = `bg-white rounded-xl shadow-sm border border-gray-100 p-3 flex flex-col gap-1 border-l-4 cursor-pointer hover:shadow-md transition-shadow`;
+          div.style.borderLeftColor = hex;
           div.innerHTML = `
             <div class="flex items-center justify-between">
               <p class="text-xs text-gray-500 font-medium truncate">${card.label}</p>
               <div class="flex items-center gap-1 shrink-0">
-                <span class="text-[10px] ${colors.badge} px-1.5 py-0.5 rounded-full font-medium" id="cardCount-${card.id}">0</span>
-                <i class="fa-solid fa-credit-card ${colors.icon} text-sm"></i>
+                <span class="text-[10px] px-1.5 py-0.5 rounded-full font-medium" id="cardCount-${card.id}" style="${styles.badgeBg}">0</span>
+                <i class="fa-solid fa-credit-card text-sm" style="${styles.icon}"></i>
               </div>
             </div>
             <div class="flex items-center justify-between">
@@ -2735,7 +2779,7 @@
           const periodSpent = periodTotals[card.id] || 0;
           const committed = allCommitted[card.id] || 0;
           const count = counts[card.id] || 0;
-          const colors = CARD_COLOR_MAP[card.color] || CARD_COLOR_MAP.sky;
+          const hex = resolveCardHex(card.color);
 
           const valEl = document.getElementById(`cardValue-${card.id}`);
           const cntEl = document.getElementById(`cardCount-${card.id}`);
@@ -2762,15 +2806,10 @@
           }
 
           if (container) {
-            Object.values(CARD_COLOR_MAP).forEach(c => container.classList.remove(c.border));
-            container.classList.remove('border-l-red-500');
             const usedPct = card.limit > 0 ? (allCommitted[card.id] || 0) / card.limit * 100 : 0;
-            if (usedPct > 90 || (card.limit === 0 && periodSpent > WARNING_THRESHOLD)) {
-              container.classList.add('border-l-red-500');
-            } else {
-              container.classList.add(colors.border);
-            }
-          }
+            container.style.borderLeftColor = (usedPct > 90 || (card.limit === 0 && periodSpent > WARNING_THRESHOLD))
+              ? '#ef4444'
+              : hex;
 
           const key = keyInvoice(year, m, card.id);
           const paid = !!state.invoicesPaid[key];
@@ -3975,6 +4014,8 @@
 
         const scopeBlock = document.getElementById('editParcelScope');
         const btnSingle = document.getElementById('btnScopeSingle');
+        const btnFuture = document.getElementById('btnScopeFuture');
+        const btnPast   = document.getElementById('btnScopePast');
         const btnAll = document.getElementById('btnScopeAll');
 
         // Check if this is an installment transaction (credit card or boleto)
@@ -3988,13 +4029,13 @@
         });
         
         const isParceladoSerie =
-  tx.parcelas && tx.parcelas > 1 &&
   tx.groupId &&
-  (tx.isCreditCard || 
-   tx.paymentMethod === 'boleto' || 
-   tx.paymentMethod === 'Boleto' ||
-   tx.paymentMethod === 'cartao' ||
-   tx.category === 'fixa');  // Incluir despesas fixas com parcelas
+  (tx.category === 'fixa' ||
+   (tx.parcelas && tx.parcelas > 1 &&
+    (tx.isCreditCard ||
+     tx.paymentMethod === 'boleto' ||
+     tx.paymentMethod === 'Boleto' ||
+     tx.paymentMethod === 'cartao')));
    
         console.log('Edit Modal - isParceladoSerie:', isParceladoSerie);
 
@@ -4002,11 +4043,9 @@ if (isParceladoSerie) {
   scopeBlock.classList.remove('hidden');
   state.editingMode = 'single';
 
-  btnSingle.classList.add('bg-indigo-50','text-indigo-700','border-indigo-200');
+  [btnSingle, btnPast, btnFuture, btnAll].forEach(b => { if (b) { b.classList.add('bg-gray-100','text-gray-600','border-gray-200'); b.classList.remove('bg-indigo-50','text-indigo-700','border-indigo-200'); } });
   btnSingle.classList.remove('bg-gray-100','text-gray-600','border-gray-200');
-
-  btnAll.classList.add('bg-gray-100','text-gray-600','border-gray-200');
-  btnAll.classList.remove('bg-indigo-50','text-indigo-700','border-indigo-200');
+  btnSingle.classList.add('bg-indigo-50','text-indigo-700','border-indigo-200');
   
   // Set current parcelas number
   const editParcelasInput = document.getElementById('editParcelas');
@@ -4112,13 +4151,13 @@ if (previewBox) previewBox.classList.add('hidden');
         });
         
        const isParceladoSerie =
-  tx.parcelas && tx.parcelas > 1 &&
   tx.groupId &&
-  (tx.isCreditCard || 
-   tx.paymentMethod === 'boleto' || 
-   tx.paymentMethod === 'Boleto' || 
-   tx.paymentMethod === 'cartao' ||
-   tx.category === 'fixa');  // Incluir despesas fixas com parcelas
+  (tx.category === 'fixa' ||
+   (tx.parcelas && tx.parcelas > 1 &&
+    (tx.isCreditCard ||
+     tx.paymentMethod === 'boleto' ||
+     tx.paymentMethod === 'Boleto' ||
+     tx.paymentMethod === 'cartao')));
   
         console.log('Delete Modal - isParceladoSerie:', isParceladoSerie);
 
@@ -4141,17 +4180,15 @@ if (isParceladoSerie && previewBox && previewList) {
 
   scopeBlock.classList.remove('hidden');
   deleteSingleText.textContent =
-    'Você pode excluir apenas esta parcela ou todas as parcelas da compra parcelada.';
+    'Você pode excluir apenas este mês, este e os anteriores, este e os futuros, ou todos os lançamentos da série.';
 
-  document.getElementById('btnDeleteSingle')
-    .classList.add('bg-indigo-50','text-indigo-600','border-indigo-200');
-  document.getElementById('btnDeleteSingle')
-    .classList.remove('bg-gray-100','text-gray-600','border-gray-200');
-
-  document.getElementById('btnDeleteAll')
-    .classList.add('bg-gray-100','text-gray-600','border-gray-200');
-  document.getElementById('btnDeleteAll')
-    .classList.remove('bg-indigo-50','text-indigo-600','border-indigo-200');
+  // Reset all to gray, then activate "single" as default
+  ['btnDeleteSingle','btnDeletePast','btnDeleteFuture','btnDeleteAll'].forEach(id => {
+    const el = document.getElementById(id);
+    if (el) { el.classList.add('bg-gray-100','text-gray-600','border-gray-200'); el.classList.remove('bg-indigo-50','text-indigo-600','border-indigo-200'); }
+  });
+  document.getElementById('btnDeleteSingle').classList.remove('bg-gray-100','text-gray-600','border-gray-200');
+  document.getElementById('btnDeleteSingle').classList.add('bg-indigo-50','text-indigo-600','border-indigo-200');
 } else {
   scopeBlock.classList.add('hidden');
   deleteSingleText.textContent =
@@ -4174,7 +4211,38 @@ if (isParceladoSerie && previewBox && previewList) {
         try {
           if (state.deletingMode === 'all' && state.deletingGroupId) {
             await deleteTransactionsByGroup(state.deletingGroupId);
-            showToast('Todas as parcelas foram excluídas com sucesso', 'success');
+            showToast('Todos os lançamentos foram excluídos com sucesso', 'success');
+          } else if ((state.deletingMode === 'future' || state.deletingMode === 'past') && state.deletingGroupId) {
+            const anchor = state.transactions.find(t => t.id === state.deletingId);
+            const cutoff = anchor ? new Date(anchor.date) : new Date();
+            const isFuture = state.deletingMode === 'future';
+            const toDeleteIds = state.transactions
+              .filter(t => {
+                if (t.groupId !== state.deletingGroupId) return false;
+                const d = new Date(t.date);
+                return isFuture ? d >= cutoff : d <= cutoff;
+              })
+              .map(t => t.id);
+            const previous = [...state.transactions];
+            state.transactions = state.transactions.filter(t => !toDeleteIds.includes(t.id));
+            try {
+              await runWithRollback(
+                async () => {
+                  await Promise.all(toDeleteIds.map(id => deleteDoc(doc(db, "transactions", id))));
+                  const backupOk = updateLocalBackup();
+                  if (!backupOk) throw new Error("Falha ao atualizar backup local");
+                },
+                () => { state.transactions = previous; }
+              );
+              showToast(
+                `${toDeleteIds.length} lançamento(s) ${isFuture ? 'futuros' : 'anteriores'} excluído(s) com sucesso`,
+                'success'
+              );
+            } catch (e) {
+              state.transactions = previous;
+              showToast(`Erro ao excluir lançamentos ${isFuture ? 'futuros' : 'anteriores'}`, 'error');
+            }
+            renderDashboard(state.selectedMonth);
           } else {
             // single
             await deleteTransactionById(state.deletingId);
@@ -4433,7 +4501,7 @@ if (isParceladoSerie && previewBox && previewList) {
           document.getElementById('cardsModal').classList.remove('hidden');
           document.getElementById('cardsModal').classList.add('flex');
           renderCardsModalList();
-          renderCardColorPicker();
+          resetCardForm();
         }
         function closeCardsModal() {
           document.getElementById('cardsModal').classList.add('hidden');
@@ -4444,34 +4512,24 @@ if (isParceladoSerie && previewBox && previewList) {
         document.getElementById('btnCardsModalClose').addEventListener('click', closeCardsModal);
         document.getElementById('cardsModal').addEventListener('click', (e) => { if (e.target === e.currentTarget) closeCardsModal(); });
 
-        function renderCardColorPicker() {
-          const picker = document.getElementById('cardColorPicker');
-          if (!picker) return;
-          picker.innerHTML = '';
-          const selectedColor = document.getElementById('cardFormColor').value || 'sky';
-          Object.keys(CARD_COLOR_MAP).forEach(colorKey => {
-            const col = CARD_COLOR_MAP[colorKey];
-            const btn = document.createElement('button');
-            btn.type = 'button';
-            btn.dataset.color = colorKey;
-            btn.className = `w-6 h-6 rounded-full ${col.dot} border-2 transition ${selectedColor === colorKey ? 'border-gray-900 scale-110' : 'border-transparent'}`;
-            btn.title = colorKey;
-            btn.addEventListener('click', () => {
-              document.getElementById('cardFormColor').value = colorKey;
-              renderCardColorPicker();
-            });
-            picker.appendChild(btn);
-          });
-        }
+
+        // Wire color input → hidden field
+        (function() {
+          const colorInput = document.getElementById('cardColorInput');
+          const colorHidden = document.getElementById('cardFormColor');
+          if (colorInput && colorHidden) {
+            colorInput.addEventListener('input', () => { colorHidden.value = colorInput.value; });
+          }
+        })();
 
         function resetCardForm() {
           document.getElementById('formManageCard').reset();
           document.getElementById('editCardId').value = '';
-          document.getElementById('cardFormColor').value = 'sky';
+          document.getElementById('cardFormColor').value = '#0ea5e9';
+          document.getElementById('cardColorInput').value = '#0ea5e9';
           document.getElementById('cardsModalFormTitle').innerHTML = '<i class="fa-solid fa-plus text-indigo-400 mr-1"></i> Novo Cartão';
           document.getElementById('cardFormBtnText').textContent = 'Adicionar Cartão';
           document.getElementById('btnCancelEditCard').classList.add('hidden');
-          renderCardColorPicker();
         }
 
         function renderCardsModalList() {
@@ -4483,12 +4541,12 @@ if (isParceladoSerie && previewBox && previewList) {
             return;
           }
           state.cards.forEach(card => {
-            const colors = CARD_COLOR_MAP[card.color] || CARD_COLOR_MAP.sky;
+            const hex = resolveCardHex(card.color);
             const row = document.createElement('div');
             row.className = `flex items-center justify-between px-3 py-2 rounded-lg border border-gray-100 bg-gray-50`;
             row.innerHTML = `
               <div class="flex items-center gap-2">
-                <span class="w-3 h-3 rounded-full ${colors.dot} shrink-0"></span>
+                <span class="w-3 h-3 rounded-full shrink-0" style="background-color:${hex}"></span>
                 <div>
                   <p class="text-xs font-medium text-gray-800">${card.label}</p>
                   <p class="text-[10px] text-gray-500">${card.limit > 0 ? 'Limite: ' + formatCurrency(card.limit) : 'Sem limite definido'}</p>
@@ -4512,14 +4570,15 @@ if (isParceladoSerie && previewBox && previewList) {
         function startEditCard(cardId) {
           const card = state.cards.find(c => c.id === cardId);
           if (!card) return;
+          const hex = resolveCardHex(card.color);
           document.getElementById('editCardId').value = card.id;
           document.getElementById('cardFormName').value = card.label;
           document.getElementById('cardFormLimit').value = card.limit || '';
-          document.getElementById('cardFormColor').value = card.color || 'sky';
+          document.getElementById('cardFormColor').value = hex;
+          document.getElementById('cardColorInput').value = hex;
           document.getElementById('cardsModalFormTitle').innerHTML = '<i class="fa-solid fa-pen text-indigo-400 mr-1"></i> Editar Cartão';
           document.getElementById('cardFormBtnText').textContent = 'Salvar Alterações';
           document.getElementById('btnCancelEditCard').classList.remove('hidden');
-          renderCardColorPicker();
         }
 
         document.getElementById('btnCancelEditCard').addEventListener('click', resetCardForm);
@@ -4903,23 +4962,26 @@ if (forma === 'cartao' || forma === 'boleto') {
         document.getElementById('btnEditCancel').addEventListener('click', closeEditModal);
 
         const btnScopeSingle = document.getElementById('btnScopeSingle');
+        const btnScopePast   = document.getElementById('btnScopePast');
+        const btnScopeFuture = document.getElementById('btnScopeFuture');
         const btnScopeAll = document.getElementById('btnScopeAll');
 
-        btnScopeSingle.addEventListener('click', () => {
-          state.editingMode = 'single';
-          btnScopeSingle.classList.add('bg-indigo-50','text-indigo-600','border-indigo-200');
-          btnScopeSingle.classList.remove('bg-gray-100','text-gray-600','border-gray-200');
-          btnScopeAll.classList.add('bg-gray-100','text-gray-600','border-gray-200');
-          btnScopeAll.classList.remove('bg-indigo-50','text-indigo-600','border-indigo-200');
-        });
+        function setScopeActive(activeBtn) {
+          [btnScopeSingle, btnScopePast, btnScopeFuture, btnScopeAll].forEach(b => {
+            if (!b) return;
+            b.classList.remove('bg-indigo-50','text-indigo-700','text-indigo-600','border-indigo-200');
+            b.classList.add('bg-gray-100','text-gray-600','border-gray-200');
+          });
+          if (activeBtn) {
+            activeBtn.classList.remove('bg-gray-100','text-gray-600','border-gray-200');
+            activeBtn.classList.add('bg-indigo-50','text-indigo-700','border-indigo-200');
+          }
+        }
 
-        btnScopeAll.addEventListener('click', () => {
-          state.editingMode = 'all';
-          btnScopeAll.classList.add('bg-indigo-50','text-indigo-700','border-indigo-200');
-          btnScopeAll.classList.remove('bg-gray-100','text-gray-600','border-gray-200');
-          btnScopeSingle.classList.add('bg-gray-100','text-gray-600','border-gray-200');
-          btnScopeSingle.classList.remove('bg-indigo-50','text-indigo-700','border-indigo-200');
-        });
+        btnScopeSingle.addEventListener('click', () => { state.editingMode = 'single'; setScopeActive(btnScopeSingle); });
+        if (btnScopePast)   btnScopePast.addEventListener('click',   () => { state.editingMode = 'past';   setScopeActive(btnScopePast); });
+        if (btnScopeFuture) btnScopeFuture.addEventListener('click', () => { state.editingMode = 'future'; setScopeActive(btnScopeFuture); });
+        btnScopeAll.addEventListener('click', () => { state.editingMode = 'all'; setScopeActive(btnScopeAll); });
 
         // Event listener for parcelas input change
         const editParcelasInput = document.getElementById('editParcelas');
@@ -4957,11 +5019,14 @@ if (forma === 'cartao' || forma === 'boleto') {
           const isParceladoSerie = txClicked.groupId && txClicked.parcelas > 1;
           const parcelasChanged = isParceladoSerie && newParcelas !== txClicked.parcelas;
 
-          if (state.editingMode === 'all' && txClicked.groupId) {
+          if ((state.editingMode === 'all' || state.editingMode === 'future' || state.editingMode === 'past') && txClicked.groupId) {
             const groupId = txClicked.groupId;
+            const isFutureOnly = state.editingMode === 'future';
+            const isPastOnly   = state.editingMode === 'past';
+            const cutoffDate   = oldClickedDate; // used for both past and future filters
             
-            // If parcelas changed, delete old installments and create new ones
-            if (parcelasChanged) {
+            // Parcelas-count change only applies for 'all' mode on non-fixa series
+            if (parcelasChanged && state.editingMode === 'all') {
               // Delete all installments in the group
               state.transactions = state.transactions.filter((t) => t.groupId !== groupId);
               
@@ -4988,7 +5053,7 @@ if (forma === 'cartao' || forma === 'boleto') {
                   card: card,
                   parcelas: newParcelas,
                   parcelaIndex: i + 1,
-                  paymentMethod: txClicked.paymentMethod, // Preserve original payment method
+                  paymentMethod: txClicked.paymentMethod,
                   groupId: newGroupId,
                   paid: false,
                   aportado: mainCat === 'investimento' ? false : false,
@@ -4998,25 +5063,28 @@ if (forma === 'cartao' || forma === 'boleto') {
               
               showToast(`Parcelas atualizadas: ${txClicked.parcelas} → ${newParcelas}`, 'success');
             } else {
-              // Normal update for all installments
+              // Normal update for all (or future/past-only) installments
               state.transactions.forEach((t) => {
-                if (t.groupId === groupId) {
-                  const baseDesc = desc.replace(/\s*\(\d+\/\d+\)\s*$/, '');
-                  if (t.parcelas && t.parcelaIndex) t.description = `${baseDesc} (${t.parcelaIndex}/${t.parcelas})`;
-                  else t.description = baseDesc;
-                   t.category = mainCat; t.subCategory = subCat || null; t.isCreditCard = isCard; t.card = card;
-                  t.extraLazer = mainCat !== 'investimento' ? !!extraLazer : false;
-                  // Preserve paymentMethod if not changing to/from credit card
-                  if (isCard) {
-                    t.paymentMethod = 'cartao';
-                  } else if (txClicked.paymentMethod === 'cartao') {
-                    // Was credit card, now isn't - change to debito_pix
-                    t.paymentMethod = 'debito_pix';
-                  } else {
-                    // Keep existing paymentMethod (like 'boleto', 'debito_pix', etc)
-                    t.paymentMethod = txClicked.paymentMethod || 'debito_pix';
-                  }
-                  t.value = value;
+                if (t.groupId !== groupId) return;
+                const tDate = new Date(t.date);
+                // For 'future' mode: only update this tx and later ones
+                if (isFutureOnly && tDate < cutoffDate) return;
+                // For 'past' mode: only update this tx and earlier ones
+                if (isPastOnly  && tDate > cutoffDate) return;
+                const baseDesc = desc.replace(/\s*\(\d+\/\d+\)\s*$/, '');
+                if (t.parcelas && t.parcelaIndex) t.description = `${baseDesc} (${t.parcelaIndex}/${t.parcelas})`;
+                else t.description = baseDesc;
+                t.category = mainCat; t.subCategory = subCat || null; t.isCreditCard = isCard; t.card = card;
+                t.extraLazer = mainCat !== 'investimento' ? !!extraLazer : false;
+                if (isCard) {
+                  t.paymentMethod = 'cartao';
+                } else if (txClicked.paymentMethod === 'cartao') {
+                  t.paymentMethod = 'debito_pix';
+                } else {
+                  t.paymentMethod = txClicked.paymentMethod || 'debito_pix';
+                }
+                t.value = value;
+                if (state.editingMode === 'all') {
                   const oldDate = new Date(t.date);
                   if (!isNaN(oldDate.getTime())) {
                     const shifted = new Date(oldDate.getTime() + delta);
@@ -5025,7 +5093,10 @@ if (forma === 'cartao' || forma === 'boleto') {
                 }
               });
               
-              showToast('Todas as parcelas atualizadas com sucesso', 'success');
+              const toastMsg = isFutureOnly ? 'Lançamentos futuros atualizados com sucesso'
+                             : isPastOnly   ? 'Lançamentos anteriores atualizados com sucesso'
+                             : 'Todos os lançamentos atualizados com sucesso';
+              showToast(toastMsg, 'success');
             }
           } else {
             txClicked.description = desc; txClicked.value = value; txClicked.date = newDate.toISOString();
@@ -5055,24 +5126,27 @@ if (forma === 'cartao' || forma === 'boleto') {
         document.getElementById('btnDeleteCancel').addEventListener('click', closeDeleteModal);
 
         const btnDeleteSingle = document.getElementById('btnDeleteSingle');
+        const btnDeletePast   = document.getElementById('btnDeletePast');
+        const btnDeleteFuture = document.getElementById('btnDeleteFuture');
         const btnDeleteAll = document.getElementById('btnDeleteAll');
         const btnDeleteConfirm = document.getElementById('btnDeleteConfirm');
 
-        if (btnDeleteSingle) btnDeleteSingle.addEventListener('click', () => {
-          state.deletingMode = 'single';
-          btnDeleteSingle.classList.add('bg-indigo-50','text-indigo-600','border-indigo-200');
-          btnDeleteSingle.classList.remove('bg-gray-100','text-gray-600','border-gray-200');
-          btnDeleteAll.classList.add('bg-gray-100','text-gray-600','border-gray-200');
-          btnDeleteAll.classList.remove('bg-indigo-50','text-indigo-600','border-indigo-200');
-        });
+        function setDeleteModeActive(activeBtn) {
+          [btnDeleteSingle, btnDeletePast, btnDeleteFuture, btnDeleteAll].forEach(b => {
+            if (!b) return;
+            b.classList.remove('bg-indigo-50','text-indigo-600','border-indigo-200');
+            b.classList.add('bg-gray-100','text-gray-600','border-gray-200');
+          });
+          if (activeBtn) {
+            activeBtn.classList.remove('bg-gray-100','text-gray-600','border-gray-200');
+            activeBtn.classList.add('bg-indigo-50','text-indigo-600','border-indigo-200');
+          }
+        }
 
-        if (btnDeleteAll) btnDeleteAll.addEventListener('click', () => {
-          state.deletingMode = 'all';
-          btnDeleteAll.classList.add('bg-indigo-50','text-indigo-600','border-indigo-200');
-          btnDeleteAll.classList.remove('bg-gray-100','text-gray-600','border-gray-200');
-          btnDeleteSingle.classList.add('bg-gray-100','text-gray-600','border-gray-200');
-          btnDeleteSingle.classList.remove('bg-indigo-50','text-indigo-600','border-indigo-200');
-        });
+        if (btnDeleteSingle) btnDeleteSingle.addEventListener('click', () => { state.deletingMode = 'single'; setDeleteModeActive(btnDeleteSingle); });
+        if (btnDeletePast)   btnDeletePast.addEventListener('click',   () => { state.deletingMode = 'past';   setDeleteModeActive(btnDeletePast); });
+        if (btnDeleteFuture) btnDeleteFuture.addEventListener('click', () => { state.deletingMode = 'future'; setDeleteModeActive(btnDeleteFuture); });
+        if (btnDeleteAll) btnDeleteAll.addEventListener('click', () => { state.deletingMode = 'all'; setDeleteModeActive(btnDeleteAll); });
 
         if (btnDeleteConfirm) btnDeleteConfirm.addEventListener('click', performDelete);
 
