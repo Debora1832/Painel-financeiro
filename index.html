@@ -1347,20 +1347,24 @@
             <ul id="editParcelPreviewList" class="space-y-1.5 ml-1"></ul>
           </div>
           <p class="text-xs text-gray-600 mb-3 mt-3">
-            Este lançamento faz parte de uma compra parcelada. O que você deseja editar?
+            Este lançamento faz parte de uma série. O que você deseja editar?
           </p>
           <div class="flex gap-2 flex-wrap">
             <button type="button" id="btnScopeSingle"
               class="px-4 py-2 rounded-lg text-xs font-medium bg-indigo-50 text-indigo-700 border border-indigo-200 hover:bg-indigo-100 transition">
-              Apenas esta parcela
+              Apenas este mês
+            </button>
+            <button type="button" id="btnScopePast"
+              class="px-4 py-2 rounded-lg text-xs font-medium bg-gray-100 text-gray-600 border border-gray-200 hover:bg-gray-200 transition">
+              Este e anteriores
             </button>
             <button type="button" id="btnScopeFuture"
               class="px-4 py-2 rounded-lg text-xs font-medium bg-gray-100 text-gray-600 border border-gray-200 hover:bg-gray-200 transition">
-              Somente futuras
+              Este e futuros
             </button>
             <button type="button" id="btnScopeAll"
               class="px-4 py-2 rounded-lg text-xs font-medium bg-gray-100 text-gray-600 border border-gray-200 hover:bg-gray-200 transition">
-              Todas as parcelas
+              Todos
             </button>
           </div>
         </div>
@@ -1405,20 +1409,24 @@
           <ul id="deleteParcelPreviewList" class="space-y-1.5 ml-1"></ul>
         </div>
         <p class="text-xs text-gray-600 mb-3 mt-3">
-          Este lançamento faz parte de uma compra parcelada. O que você deseja excluir?
+          Este lançamento faz parte de uma série. O que você deseja excluir?
         </p>
         <div class="flex gap-2 flex-wrap">
           <button type="button" id="btnDeleteSingle"
             class="px-4 py-2 rounded-lg text-xs font-medium bg-indigo-50 text-indigo-700 border border-indigo-200 hover:bg-indigo-100 transition">
-            Apenas esta parcela
+            Apenas este mês
+          </button>
+          <button type="button" id="btnDeletePast"
+            class="px-4 py-2 rounded-lg text-xs font-medium bg-gray-100 text-gray-600 border border-gray-200 hover:bg-gray-200 transition">
+            Este e anteriores
           </button>
           <button type="button" id="btnDeleteFuture"
             class="px-4 py-2 rounded-lg text-xs font-medium bg-gray-100 text-gray-600 border border-gray-200 hover:bg-gray-200 transition">
-            Somente futuras
+            Este e futuros
           </button>
           <button type="button" id="btnDeleteAll"
             class="px-4 py-2 rounded-lg text-xs font-medium bg-red-50 text-red-700 border border-red-200 hover:bg-red-100 transition">
-            Todas as parcelas
+            Todos
           </button>
         </div>
       </div>
@@ -4007,6 +4015,7 @@
         const scopeBlock = document.getElementById('editParcelScope');
         const btnSingle = document.getElementById('btnScopeSingle');
         const btnFuture = document.getElementById('btnScopeFuture');
+        const btnPast   = document.getElementById('btnScopePast');
         const btnAll = document.getElementById('btnScopeAll');
 
         // Check if this is an installment transaction (credit card or boleto)
@@ -4020,13 +4029,13 @@
         });
         
         const isParceladoSerie =
-  tx.parcelas && tx.parcelas > 1 &&
   tx.groupId &&
-  (tx.isCreditCard || 
-   tx.paymentMethod === 'boleto' || 
-   tx.paymentMethod === 'Boleto' ||
-   tx.paymentMethod === 'cartao' ||
-   tx.category === 'fixa');  // Incluir despesas fixas com parcelas
+  (tx.category === 'fixa' ||
+   (tx.parcelas && tx.parcelas > 1 &&
+    (tx.isCreditCard ||
+     tx.paymentMethod === 'boleto' ||
+     tx.paymentMethod === 'Boleto' ||
+     tx.paymentMethod === 'cartao')));
    
         console.log('Edit Modal - isParceladoSerie:', isParceladoSerie);
 
@@ -4034,7 +4043,7 @@ if (isParceladoSerie) {
   scopeBlock.classList.remove('hidden');
   state.editingMode = 'single';
 
-  [btnSingle, btnFuture, btnAll].forEach(b => { if (b) { b.classList.add('bg-gray-100','text-gray-600','border-gray-200'); b.classList.remove('bg-indigo-50','text-indigo-700','border-indigo-200'); } });
+  [btnSingle, btnPast, btnFuture, btnAll].forEach(b => { if (b) { b.classList.add('bg-gray-100','text-gray-600','border-gray-200'); b.classList.remove('bg-indigo-50','text-indigo-700','border-indigo-200'); } });
   btnSingle.classList.remove('bg-gray-100','text-gray-600','border-gray-200');
   btnSingle.classList.add('bg-indigo-50','text-indigo-700','border-indigo-200');
   
@@ -4142,13 +4151,13 @@ if (previewBox) previewBox.classList.add('hidden');
         });
         
        const isParceladoSerie =
-  tx.parcelas && tx.parcelas > 1 &&
   tx.groupId &&
-  (tx.isCreditCard || 
-   tx.paymentMethod === 'boleto' || 
-   tx.paymentMethod === 'Boleto' || 
-   tx.paymentMethod === 'cartao' ||
-   tx.category === 'fixa');  // Incluir despesas fixas com parcelas
+  (tx.category === 'fixa' ||
+   (tx.parcelas && tx.parcelas > 1 &&
+    (tx.isCreditCard ||
+     tx.paymentMethod === 'boleto' ||
+     tx.paymentMethod === 'Boleto' ||
+     tx.paymentMethod === 'cartao')));
   
         console.log('Delete Modal - isParceladoSerie:', isParceladoSerie);
 
@@ -4171,10 +4180,10 @@ if (isParceladoSerie && previewBox && previewList) {
 
   scopeBlock.classList.remove('hidden');
   deleteSingleText.textContent =
-    'Você pode excluir apenas esta parcela, somente as futuras, ou todas as parcelas da compra parcelada.';
+    'Você pode excluir apenas este mês, este e os anteriores, este e os futuros, ou todos os lançamentos da série.';
 
   // Reset all to gray, then activate "single" as default
-  ['btnDeleteSingle','btnDeleteFuture','btnDeleteAll'].forEach(id => {
+  ['btnDeleteSingle','btnDeletePast','btnDeleteFuture','btnDeleteAll'].forEach(id => {
     const el = document.getElementById(id);
     if (el) { el.classList.add('bg-gray-100','text-gray-600','border-gray-200'); el.classList.remove('bg-indigo-50','text-indigo-600','border-indigo-200'); }
   });
@@ -4202,13 +4211,17 @@ if (isParceladoSerie && previewBox && previewList) {
         try {
           if (state.deletingMode === 'all' && state.deletingGroupId) {
             await deleteTransactionsByGroup(state.deletingGroupId);
-            showToast('Todas as parcelas foram excluídas com sucesso', 'success');
-          } else if (state.deletingMode === 'future' && state.deletingGroupId) {
-            // Delete clicked installment and all future ones in the same group
+            showToast('Todos os lançamentos foram excluídos com sucesso', 'success');
+          } else if ((state.deletingMode === 'future' || state.deletingMode === 'past') && state.deletingGroupId) {
             const anchor = state.transactions.find(t => t.id === state.deletingId);
             const cutoff = anchor ? new Date(anchor.date) : new Date();
+            const isFuture = state.deletingMode === 'future';
             const toDeleteIds = state.transactions
-              .filter(t => t.groupId === state.deletingGroupId && new Date(t.date) >= cutoff)
+              .filter(t => {
+                if (t.groupId !== state.deletingGroupId) return false;
+                const d = new Date(t.date);
+                return isFuture ? d >= cutoff : d <= cutoff;
+              })
               .map(t => t.id);
             const previous = [...state.transactions];
             state.transactions = state.transactions.filter(t => !toDeleteIds.includes(t.id));
@@ -4221,10 +4234,13 @@ if (isParceladoSerie && previewBox && previewList) {
                 },
                 () => { state.transactions = previous; }
               );
-              showToast(`${toDeleteIds.length} parcela(s) futura(s) excluída(s) com sucesso`, 'success');
+              showToast(
+                `${toDeleteIds.length} lançamento(s) ${isFuture ? 'futuros' : 'anteriores'} excluído(s) com sucesso`,
+                'success'
+              );
             } catch (e) {
               state.transactions = previous;
-              showToast('Erro ao excluir parcelas futuras', 'error');
+              showToast(`Erro ao excluir lançamentos ${isFuture ? 'futuros' : 'anteriores'}`, 'error');
             }
             renderDashboard(state.selectedMonth);
           } else {
@@ -4946,11 +4962,12 @@ if (forma === 'cartao' || forma === 'boleto') {
         document.getElementById('btnEditCancel').addEventListener('click', closeEditModal);
 
         const btnScopeSingle = document.getElementById('btnScopeSingle');
+        const btnScopePast   = document.getElementById('btnScopePast');
         const btnScopeFuture = document.getElementById('btnScopeFuture');
         const btnScopeAll = document.getElementById('btnScopeAll');
 
         function setScopeActive(activeBtn) {
-          [btnScopeSingle, btnScopeFuture, btnScopeAll].forEach(b => {
+          [btnScopeSingle, btnScopePast, btnScopeFuture, btnScopeAll].forEach(b => {
             if (!b) return;
             b.classList.remove('bg-indigo-50','text-indigo-700','text-indigo-600','border-indigo-200');
             b.classList.add('bg-gray-100','text-gray-600','border-gray-200');
@@ -4962,6 +4979,7 @@ if (forma === 'cartao' || forma === 'boleto') {
         }
 
         btnScopeSingle.addEventListener('click', () => { state.editingMode = 'single'; setScopeActive(btnScopeSingle); });
+        if (btnScopePast)   btnScopePast.addEventListener('click',   () => { state.editingMode = 'past';   setScopeActive(btnScopePast); });
         if (btnScopeFuture) btnScopeFuture.addEventListener('click', () => { state.editingMode = 'future'; setScopeActive(btnScopeFuture); });
         btnScopeAll.addEventListener('click', () => { state.editingMode = 'all'; setScopeActive(btnScopeAll); });
 
@@ -5001,13 +5019,14 @@ if (forma === 'cartao' || forma === 'boleto') {
           const isParceladoSerie = txClicked.groupId && txClicked.parcelas > 1;
           const parcelasChanged = isParceladoSerie && newParcelas !== txClicked.parcelas;
 
-          if ((state.editingMode === 'all' || state.editingMode === 'future') && txClicked.groupId) {
+          if ((state.editingMode === 'all' || state.editingMode === 'future' || state.editingMode === 'past') && txClicked.groupId) {
             const groupId = txClicked.groupId;
             const isFutureOnly = state.editingMode === 'future';
-            const cutoffDate = isFutureOnly ? oldClickedDate : null; // include clicked tx and later
+            const isPastOnly   = state.editingMode === 'past';
+            const cutoffDate   = oldClickedDate; // used for both past and future filters
             
-            // If parcelas changed, delete old installments and create new ones (only for 'all')
-            if (parcelasChanged && !isFutureOnly) {
+            // Parcelas-count change only applies for 'all' mode on non-fixa series
+            if (parcelasChanged && state.editingMode === 'all') {
               // Delete all installments in the group
               state.transactions = state.transactions.filter((t) => t.groupId !== groupId);
               
@@ -5044,11 +5063,14 @@ if (forma === 'cartao' || forma === 'boleto') {
               
               showToast(`Parcelas atualizadas: ${txClicked.parcelas} → ${newParcelas}`, 'success');
             } else {
-              // Normal update for all (or future-only) installments
+              // Normal update for all (or future/past-only) installments
               state.transactions.forEach((t) => {
                 if (t.groupId !== groupId) return;
+                const tDate = new Date(t.date);
                 // For 'future' mode: only update this tx and later ones
-                if (isFutureOnly && new Date(t.date) < cutoffDate) return;
+                if (isFutureOnly && tDate < cutoffDate) return;
+                // For 'past' mode: only update this tx and earlier ones
+                if (isPastOnly  && tDate > cutoffDate) return;
                 const baseDesc = desc.replace(/\s*\(\d+\/\d+\)\s*$/, '');
                 if (t.parcelas && t.parcelaIndex) t.description = `${baseDesc} (${t.parcelaIndex}/${t.parcelas})`;
                 else t.description = baseDesc;
@@ -5062,7 +5084,7 @@ if (forma === 'cartao' || forma === 'boleto') {
                   t.paymentMethod = txClicked.paymentMethod || 'debito_pix';
                 }
                 t.value = value;
-                if (!isFutureOnly) {
+                if (state.editingMode === 'all') {
                   const oldDate = new Date(t.date);
                   if (!isNaN(oldDate.getTime())) {
                     const shifted = new Date(oldDate.getTime() + delta);
@@ -5071,7 +5093,10 @@ if (forma === 'cartao' || forma === 'boleto') {
                 }
               });
               
-              showToast(isFutureOnly ? 'Parcelas futuras atualizadas com sucesso' : 'Todas as parcelas atualizadas com sucesso', 'success');
+              const toastMsg = isFutureOnly ? 'Lançamentos futuros atualizados com sucesso'
+                             : isPastOnly   ? 'Lançamentos anteriores atualizados com sucesso'
+                             : 'Todos os lançamentos atualizados com sucesso';
+              showToast(toastMsg, 'success');
             }
           } else {
             txClicked.description = desc; txClicked.value = value; txClicked.date = newDate.toISOString();
@@ -5101,12 +5126,13 @@ if (forma === 'cartao' || forma === 'boleto') {
         document.getElementById('btnDeleteCancel').addEventListener('click', closeDeleteModal);
 
         const btnDeleteSingle = document.getElementById('btnDeleteSingle');
+        const btnDeletePast   = document.getElementById('btnDeletePast');
         const btnDeleteFuture = document.getElementById('btnDeleteFuture');
         const btnDeleteAll = document.getElementById('btnDeleteAll');
         const btnDeleteConfirm = document.getElementById('btnDeleteConfirm');
 
         function setDeleteModeActive(activeBtn) {
-          [btnDeleteSingle, btnDeleteFuture, btnDeleteAll].forEach(b => {
+          [btnDeleteSingle, btnDeletePast, btnDeleteFuture, btnDeleteAll].forEach(b => {
             if (!b) return;
             b.classList.remove('bg-indigo-50','text-indigo-600','border-indigo-200');
             b.classList.add('bg-gray-100','text-gray-600','border-gray-200');
@@ -5118,6 +5144,7 @@ if (forma === 'cartao' || forma === 'boleto') {
         }
 
         if (btnDeleteSingle) btnDeleteSingle.addEventListener('click', () => { state.deletingMode = 'single'; setDeleteModeActive(btnDeleteSingle); });
+        if (btnDeletePast)   btnDeletePast.addEventListener('click',   () => { state.deletingMode = 'past';   setDeleteModeActive(btnDeletePast); });
         if (btnDeleteFuture) btnDeleteFuture.addEventListener('click', () => { state.deletingMode = 'future'; setDeleteModeActive(btnDeleteFuture); });
         if (btnDeleteAll) btnDeleteAll.addEventListener('click', () => { state.deletingMode = 'all'; setDeleteModeActive(btnDeleteAll); });
 
