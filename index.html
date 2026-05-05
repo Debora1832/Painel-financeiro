@@ -516,6 +516,64 @@
         </div>
       </section>
 
+      <!-- 4) BARRA DE PROGRESSO DE PAGAMENTOS -->
+      <section class="bg-white rounded-lg shadow-sm border border-gray-100 px-4 py-3">
+        <div class="flex items-center justify-between mb-2">
+          <div class="flex items-center gap-2">
+            <i class="fa-solid fa-clipboard-check text-emerald-500 text-sm"></i>
+            <h2 class="text-sm font-medium text-gray-700">Progresso de Pagamentos</h2>
+          </div>
+          <div class="flex items-center gap-3">
+            <p class="text-xs text-gray-500" id="paymentCount">0 de 0 pagos</p>
+            <p class="text-lg font-semibold text-gray-900" id="paymentPercentage">0%</p>
+          </div>
+        </div>
+        
+        <!-- Progress Bar -->
+        <div class="relative w-full h-2 bg-gray-200 rounded-full overflow-hidden">
+          <div id="paymentProgressBar" class="h-full bg-gradient-to-r from-emerald-400 to-emerald-600 rounded-full transition-all duration-300 ease-out" style="width: 0%">
+          </div>
+        </div>
+        
+        <!-- Status Message -->
+        <div id="paymentStatusMessage" class="mt-1.5">
+          <p class="text-xs text-gray-500 text-center">Marque seus lançamentos como pagos para ver o progresso</p>
+        </div>
+      </section>
+
+      <!-- 4.1) REGRA 50 / 30 / 20 -->
+      <section class="grid grid-cols-1 md:grid-cols-3 gap-4">
+        <div class="bg-white rounded-xl shadow-sm border border-indigo-100 p-4 border-l-4 border-l-slate-600">
+          <div class="flex items-center justify-between mb-1">
+            <p class="text-xs uppercase tracking-wide text-gray-500">50% Essenciais</p>
+            <span class="text-[10px] px-2 py-0.5 rounded-full bg-slate-100 text-slate-700">Fixas + Variáveis (sem lazer)</span>
+          </div>
+          <p id="ruleNeedsValue" class="text-lg font-semibold text-gray-900">R$ 0,00</p>
+          <p id="ruleNeedsMeta" class="text-xs text-gray-500 mt-1">Limite: R$ 0,00</p>
+          <p id="ruleNeedsStatus" class="text-xs font-medium text-slate-700 mt-2"></p>
+        </div>
+
+        <div class="bg-white rounded-xl shadow-sm border border-indigo-100 p-4 border-l-4 border-l-purple-600">
+          <div class="flex items-center justify-between mb-1">
+            <p class="text-xs uppercase tracking-wide text-gray-500">30% Lazer</p>
+            <span class="text-[10px] px-2 py-0.5 rounded-full bg-purple-100 text-purple-700">Subcategoria: Lazer</span>
+          </div>
+          <p id="ruleLeisureValue" class="text-lg font-semibold text-gray-900">R$ 0,00</p>
+          <p id="ruleLeisureMeta" class="text-xs text-gray-500 mt-1">Limite: R$ 0,00</p>
+          <p id="ruleLeisureStatus" class="text-xs font-medium text-purple-700 mt-2"></p>
+        </div>
+
+        <div class="bg-white rounded-xl shadow-sm border border-indigo-100 p-4 border-l-4 border-l-emerald-600">
+          <div class="flex items-center justify-between mb-1">
+            <p class="text-xs uppercase tracking-wide text-gray-500">20% Investimentos</p>
+            <span class="text-[10px] px-2 py-0.5 rounded-full bg-emerald-100 text-emerald-700">Aportes</span>
+          </div>
+          <p id="ruleInvestValue" class="text-lg font-semibold text-gray-900">R$ 0,00</p>
+          <p id="ruleInvestMeta" class="text-xs text-gray-500 mt-1">Limite: R$ 0,00</p>
+          <p id="ruleInvestStatus" class="text-xs font-medium text-emerald-700 mt-2"></p>
+        </div>
+      </section>
+
       <!-- 3) FORMULÁRIOS DE LANÇAMENTO -->
       <section class="grid grid-cols-1 lg:grid-cols-2 gap-4">
         <!-- Card Nova Receita -->
@@ -680,64 +738,6 @@
             </button>
           </div>
         </form>
-      </section>
-
-      <!-- 4) BARRA DE PROGRESSO DE PAGAMENTOS -->
-      <section class="bg-white rounded-lg shadow-sm border border-gray-100 px-4 py-3">
-        <div class="flex items-center justify-between mb-2">
-          <div class="flex items-center gap-2">
-            <i class="fa-solid fa-clipboard-check text-emerald-500 text-sm"></i>
-            <h2 class="text-sm font-medium text-gray-700">Progresso de Pagamentos</h2>
-          </div>
-          <div class="flex items-center gap-3">
-            <p class="text-xs text-gray-500" id="paymentCount">0 de 0 pagos</p>
-            <p class="text-lg font-semibold text-gray-900" id="paymentPercentage">0%</p>
-          </div>
-        </div>
-        
-        <!-- Progress Bar -->
-        <div class="relative w-full h-2 bg-gray-200 rounded-full overflow-hidden">
-          <div id="paymentProgressBar" class="h-full bg-gradient-to-r from-emerald-400 to-emerald-600 rounded-full transition-all duration-300 ease-out" style="width: 0%">
-          </div>
-        </div>
-        
-        <!-- Status Message -->
-        <div id="paymentStatusMessage" class="mt-1.5">
-          <p class="text-xs text-gray-500 text-center">Marque seus lançamentos como pagos para ver o progresso</p>
-        </div>
-      </section>
-
-      <!-- 4.1) REGRA 50 / 30 / 20 -->
-      <section class="grid grid-cols-1 md:grid-cols-3 gap-4">
-        <div class="bg-white rounded-xl shadow-sm border border-indigo-100 p-4 border-l-4 border-l-slate-600">
-          <div class="flex items-center justify-between mb-1">
-            <p class="text-xs uppercase tracking-wide text-gray-500">50% Essenciais</p>
-            <span class="text-[10px] px-2 py-0.5 rounded-full bg-slate-100 text-slate-700">Fixas + Variáveis (sem lazer)</span>
-          </div>
-          <p id="ruleNeedsValue" class="text-lg font-semibold text-gray-900">R$ 0,00</p>
-          <p id="ruleNeedsMeta" class="text-xs text-gray-500 mt-1">Limite: R$ 0,00</p>
-          <p id="ruleNeedsStatus" class="text-xs font-medium text-slate-700 mt-2"></p>
-        </div>
-
-        <div class="bg-white rounded-xl shadow-sm border border-indigo-100 p-4 border-l-4 border-l-purple-600">
-          <div class="flex items-center justify-between mb-1">
-            <p class="text-xs uppercase tracking-wide text-gray-500">30% Lazer</p>
-            <span class="text-[10px] px-2 py-0.5 rounded-full bg-purple-100 text-purple-700">Subcategoria: Lazer</span>
-          </div>
-          <p id="ruleLeisureValue" class="text-lg font-semibold text-gray-900">R$ 0,00</p>
-          <p id="ruleLeisureMeta" class="text-xs text-gray-500 mt-1">Limite: R$ 0,00</p>
-          <p id="ruleLeisureStatus" class="text-xs font-medium text-purple-700 mt-2"></p>
-        </div>
-
-        <div class="bg-white rounded-xl shadow-sm border border-indigo-100 p-4 border-l-4 border-l-emerald-600">
-          <div class="flex items-center justify-between mb-1">
-            <p class="text-xs uppercase tracking-wide text-gray-500">20% Investimentos</p>
-            <span class="text-[10px] px-2 py-0.5 rounded-full bg-emerald-100 text-emerald-700">Aportes</span>
-          </div>
-          <p id="ruleInvestValue" class="text-lg font-semibold text-gray-900">R$ 0,00</p>
-          <p id="ruleInvestMeta" class="text-xs text-gray-500 mt-1">Limite: R$ 0,00</p>
-          <p id="ruleInvestStatus" class="text-xs font-medium text-emerald-700 mt-2"></p>
-        </div>
       </section>
 
       <!-- Card/Category filter indicator -->
