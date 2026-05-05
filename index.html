@@ -555,7 +555,7 @@
             <div class="space-y-1">
               <div class="flex items-center justify-between">
                 <label for="recCategoria" class="font-medium text-gray-700">Categoria da Receita</label>
-                <button type="button" id="btnManageCategoriesRec" class="text-[10px] text-indigo-600 hover:text-indigo-800 flex items-center gap-0.5"><i class="fa-solid fa-plus-circle"></i> Gerenciar</button>
+                <button type="button" id="btnManageCategoriesRec" class="text-[10px] text-gray-400 hover:text-gray-600 flex items-center gap-0.5"><i class="fa-solid fa-plus-circle"></i> Gerenciar</button>
               </div>
               <select id="recCategoria" class="w-full rounded-lg border border-gray-200 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500">
                 <!-- opções via JS -->
@@ -609,7 +609,7 @@
             <div class="space-y-1">
               <div class="flex items-center justify-between">
                 <label for="despCategoria" class="font-medium text-gray-700">Tipo</label>
-                <button type="button" id="btnManageTypes" class="text-[10px] text-indigo-600 hover:text-indigo-800 flex items-center gap-0.5"><i class="fa-solid fa-plus-circle"></i> Gerenciar</button>
+                <button type="button" id="btnManageTypes" class="text-[10px] text-gray-400 hover:text-gray-600 flex items-center gap-0.5"><i class="fa-solid fa-plus-circle"></i> Gerenciar</button>
               </div>
               <select id="despCategoria" required
                 class="w-full rounded-lg border border-gray-200 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-orange-500">
@@ -621,7 +621,7 @@
             <div class="space-y-1">
               <div class="flex items-center justify-between">
                 <label for="despSubCategoria" class="font-medium text-gray-700">Categoria detalhada</label>
-                <button type="button" id="btnManageCategories" class="text-[10px] text-indigo-600 hover:text-indigo-800 flex items-center gap-0.5"><i class="fa-solid fa-plus-circle"></i> Gerenciar</button>
+                <button type="button" id="btnManageCategories" class="text-[10px] text-gray-400 hover:text-gray-600 flex items-center gap-0.5"><i class="fa-solid fa-plus-circle"></i> Gerenciar</button>
               </div>
               <select id="despSubCategoria" required
                 class="w-full rounded-lg border border-gray-200 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-orange-500">
@@ -760,7 +760,7 @@
               <h2 class="text-sm font-semibold text-emerald-700">Receitas</h2>
               <p class="text-xs text-gray-500">Entradas detalhadas no período.</p>
             </div>
-            <button class="clear-filters-btn px-3 py-1.5 text-xs font-medium text-indigo-600 bg-indigo-50 border border-indigo-200 rounded-lg hover:bg-indigo-100 transition-colors flex items-center gap-1" data-table="tableReceitas">
+            <button class="clear-filters-btn px-3 py-1.5 text-xs font-medium text-gray-500 bg-gray-50 border border-gray-200 rounded-lg hover:bg-gray-100 transition-colors flex items-center gap-1" data-table="tableReceitas">
               <i class="fa-solid fa-filter-circle-xmark text-xs"></i>
               <span class="btn-text">Limpar filtros</span>
             </button>
@@ -818,7 +818,7 @@
               <h2 class="text-sm font-semibold text-orange-700">Despesas Fixas</h2>
               <p class="text-xs text-gray-500">Contas recorrentes registradas para todos os meses.</p>
             </div>
-            <button class="clear-filters-btn px-3 py-1.5 text-xs font-medium text-indigo-600 bg-indigo-50 border border-indigo-200 rounded-lg hover:bg-indigo-100 transition-colors flex items-center gap-1" data-table="tableFixas">
+            <button class="clear-filters-btn px-3 py-1.5 text-xs font-medium text-gray-500 bg-gray-50 border border-gray-200 rounded-lg hover:bg-gray-100 transition-colors flex items-center gap-1" data-table="tableFixas">
               <i class="fa-solid fa-filter-circle-xmark text-xs"></i>
               <span class="btn-text">Limpar filtros</span>
             </button>
@@ -876,7 +876,7 @@
               <h2 class="text-sm font-semibold text-orange-700">Despesas Variáveis</h2>
               <p class="text-xs text-gray-500">Compras e gastos eventuais.</p>
             </div>
-            <button class="clear-filters-btn px-3 py-1.5 text-xs font-medium text-indigo-600 bg-indigo-50 border border-indigo-200 rounded-lg hover:bg-indigo-100 transition-colors flex items-center gap-1" data-table="tableVariaveis">
+            <button class="clear-filters-btn px-3 py-1.5 text-xs font-medium text-gray-500 bg-gray-50 border border-gray-200 rounded-lg hover:bg-gray-100 transition-colors flex items-center gap-1" data-table="tableVariaveis">
               <i class="fa-solid fa-filter-circle-xmark text-xs"></i>
               <span class="btn-text">Limpar filtros</span>
             </button>
@@ -935,7 +935,7 @@
               <h2 class="text-sm font-semibold text-blue-700">Investimentos</h2>
               <p class="text-xs text-gray-500">Aportes do período. Você pode marcar como aportado.</p>
             </div>
-            <button class="clear-filters-btn px-3 py-1.5 text-xs font-medium text-indigo-600 bg-indigo-50 border border-indigo-200 rounded-lg hover:bg-indigo-100 transition-colors flex items-center gap-1" data-table="tableInvestimentos">
+            <button class="clear-filters-btn px-3 py-1.5 text-xs font-medium text-gray-500 bg-gray-50 border border-gray-200 rounded-lg hover:bg-gray-100 transition-colors flex items-center gap-1" data-table="tableInvestimentos">
               <i class="fa-solid fa-filter-circle-xmark text-xs"></i>
               <span class="btn-text">Limpar filtros</span>
             </button>
@@ -4127,7 +4127,7 @@ if (previewBox) previewBox.classList.add('hidden');
           return;
         }
         
-        const totalValue = document.getElementById('editValor').value || 0;
+        const totalValue = parseFloat(document.getElementById('editValor').value) || 0;
         const baseDate = new Date(document.getElementById('editData').value);
         if (isNaN(baseDate.getTime())) return;
         
@@ -4136,25 +4136,37 @@ if (previewBox) previewBox.classList.add('hidden');
         
         if (!previewBox || !previewList) return;
         
-        // Calculate new distribution
-        const totalCents = Math.round(totalValue * 100);
-        const baseCents = Math.floor(totalCents / newParcelas);
-        const remainder = totalCents - baseCents * newParcelas;
-        
         previewList.innerHTML = '';
         
-        for (let i = 0; i < newParcelas; i++) {
-          const cents = baseCents + (i < remainder ? 1 : 0);
-          const d = new Date(baseDate);
-          d.setMonth(d.getMonth() + i);
+        // Fixa: repeat full value each month (no split)
+        if (tx.category === 'fixa') {
+          for (let i = 0; i < newParcelas; i++) {
+            const d = new Date(baseDate);
+            d.setMonth(d.getMonth() + i);
+            const monthLabel = `${MONTH_NAMES[d.getMonth()]}/${d.getFullYear()}`;
+            const valueLabel = formatCurrency(totalValue);
+            const li = document.createElement('li');
+            li.innerHTML = `<span class="flex items-center gap-2"><i class="fa-regular fa-calendar text-indigo-600"></i> ${monthLabel} — ${valueLabel} <span class="font-semibold">(${i + 1}/${newParcelas})</span></span>`;
+            li.className = 'text-indigo-800';
+            previewList.appendChild(li);
+          }
+        } else {
+          // Parcelado: split total across months
+          const totalCents = Math.round(totalValue * 100);
+          const baseCents = Math.floor(totalCents / newParcelas);
+          const remainder = totalCents - baseCents * newParcelas;
           
-          const monthLabel = `${MONTH_NAMES[d.getMonth()]}/${d.getFullYear()}`;
-          const valueLabel = formatCurrency(cents / 100);
-          
-          const li = document.createElement('li');
-          li.innerHTML = `<span class="flex items-center gap-2"><i class="fa-regular fa-calendar text-indigo-600"></i> ${monthLabel} — ${valueLabel} <span class="font-semibold">(${i + 1}/${newParcelas})</span></span>`;
-          li.className = 'text-indigo-800';
-          previewList.appendChild(li);
+          for (let i = 0; i < newParcelas; i++) {
+            const cents = baseCents + (i < remainder ? 1 : 0);
+            const d = new Date(baseDate);
+            d.setMonth(d.getMonth() + i);
+            const monthLabel = `${MONTH_NAMES[d.getMonth()]}/${d.getFullYear()}`;
+            const valueLabel = formatCurrency(cents / 100);
+            const li = document.createElement('li');
+            li.innerHTML = `<span class="flex items-center gap-2"><i class="fa-regular fa-calendar text-indigo-600"></i> ${monthLabel} — ${valueLabel} <span class="font-semibold">(${i + 1}/${newParcelas})</span></span>`;
+            li.className = 'text-indigo-800';
+            previewList.appendChild(li);
+          }
         }
         
         previewBox.classList.remove('hidden');
@@ -5075,35 +5087,61 @@ if (category === 'fixa') {
               // Delete all installments in the group
               state.transactions = state.transactions.filter((t) => t.groupId !== groupId);
               
-              // Create new installments with new distribution
-              const totalCents = Math.round(value * 100);
-              const baseCents = Math.floor(totalCents / newParcelas);
-              const remainder = totalCents - baseCents * newParcelas;
               const newGroupId = generateId();
               const baseDesc = desc.replace(/\s*\(\d+\/\d+\)\s*$/, '');
               
-              for (let i = 0; i < newParcelas; i++) {
-                const cents = baseCents + (i < remainder ? 1 : 0);
-                const d = new Date(newDate);
-                d.setMonth(d.getMonth() + i);
+              if (txClicked.category === 'fixa') {
+                // Fixa: repeat full value each month (no split)
+                for (let i = 0; i < newParcelas; i++) {
+                  const d = new Date(newDate);
+                  d.setMonth(d.getMonth() + i);
+                  state.transactions.push({
+                    id: generateId(),
+                    description: baseDesc,
+                    value: value,
+                    date: d.toISOString(),
+                    category: mainCat,
+                    subCategory: subCat || null,
+                    isCreditCard: isCard,
+                    card: card,
+                    parcelas: newParcelas,
+                    parcelaIndex: i + 1,
+                    paymentMethod: txClicked.paymentMethod,
+                    groupId: newGroupId,
+                    paid: false,
+                    aportado: false,
+                    extraLazer: mainCat !== 'investimento' ? !!extraLazer : false
+                  });
+                }
+              } else {
+                // Parcelado: split total across months
+                const totalCents = Math.round(value * 100);
+                const baseCents = Math.floor(totalCents / newParcelas);
+                const remainder = totalCents - baseCents * newParcelas;
                 
-                state.transactions.push({
-                  id: generateId(),
-                  description: `${baseDesc} (${i + 1}/${newParcelas})`,
-                  value: cents / 100,
-                  date: d.toISOString(),
-                  category: mainCat,
-                  subCategory: subCat || null,
-                  isCreditCard: isCard,
-                  card: card,
-                  parcelas: newParcelas,
-                  parcelaIndex: i + 1,
-                  paymentMethod: txClicked.paymentMethod,
-                  groupId: newGroupId,
-                  paid: false,
-                  aportado: mainCat === 'investimento' ? false : false,
-                  extraLazer: mainCat !== 'investimento' ? !!extraLazer : false
-                });
+                for (let i = 0; i < newParcelas; i++) {
+                  const cents = baseCents + (i < remainder ? 1 : 0);
+                  const d = new Date(newDate);
+                  d.setMonth(d.getMonth() + i);
+                  
+                  state.transactions.push({
+                    id: generateId(),
+                    description: `${baseDesc} (${i + 1}/${newParcelas})`,
+                    value: cents / 100,
+                    date: d.toISOString(),
+                    category: mainCat,
+                    subCategory: subCat || null,
+                    isCreditCard: isCard,
+                    card: card,
+                    parcelas: newParcelas,
+                    parcelaIndex: i + 1,
+                    paymentMethod: txClicked.paymentMethod,
+                    groupId: newGroupId,
+                    paid: false,
+                    aportado: mainCat === 'investimento' ? false : false,
+                    extraLazer: mainCat !== 'investimento' ? !!extraLazer : false
+                  });
+                }
               }
               
               showToast(`Parcelas atualizadas: ${txClicked.parcelas} → ${newParcelas}`, 'success');
