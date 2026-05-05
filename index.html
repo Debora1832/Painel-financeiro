@@ -2810,6 +2810,7 @@
             container.style.borderLeftColor = (usedPct > 90 || (card.limit === 0 && periodSpent > WARNING_THRESHOLD))
               ? '#ef4444'
               : hex;
+          }
 
           const key = keyInvoice(year, m, card.id);
           const paid = !!state.invoicesPaid[key];
