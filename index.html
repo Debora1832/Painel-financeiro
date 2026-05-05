@@ -453,106 +453,52 @@
         </div>
       </section>
 
-      <!-- 2) CARTÕES (mantido, com cores laterais) -->
+      <!-- 2) CARTÕES (dinâmico) -->
       <section class="space-y-3">
         <div class="flex items-center justify-between">
           <h2 class="text-lg font-semibold text-gray-900 flex items-center gap-2">
             <i class="fa-solid fa-credit-card text-indigo-500"></i>
             Faturas dos Cartões
           </h2>
+          <button id="btnManageCards" class="inline-flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium rounded-lg border border-indigo-200 text-indigo-600 bg-indigo-50 hover:bg-indigo-100 transition">
+            <i class="fa-solid fa-gear text-[11px]"></i>
+            Gerenciar Cartões
+          </button>
         </div>
 
         <div class="grid grid-cols-1 lg:grid-cols-3 gap-4">
-          <div class="lg:col-span-1 bg-white rounded-xl shadow-sm border border-gray-100 p-4 flex flex-col justify-between">
-            <div class="flex items-center justify-between mb-2">
-              <div>
-                <p class="text-xs uppercase tracking-wide text-gray-500">Total de Faturas</p>
-                <p class="text-lg font-semibold text-gray-900" id="totalFaturas">R$ 0,00</p>
+          <!-- Coluna esquerda: resumos -->
+          <div class="lg:col-span-1 flex flex-col gap-3">
+            <div class="bg-white rounded-xl shadow-sm border border-gray-100 p-4 flex flex-col justify-between">
+              <div class="flex items-center justify-between mb-2">
+                <div>
+                  <p class="text-xs uppercase tracking-wide text-gray-500">Total de Faturas</p>
+                  <p class="text-lg font-semibold text-gray-900" id="totalFaturas">R$ 0,00</p>
+                </div>
+                <div class="w-10 h-10 rounded-full bg-rose-50 flex items-center justify-center">
+                  <i class="fa-solid fa-file-invoice-dollar text-rose-500"></i>
+                </div>
               </div>
-              <div class="w-10 h-10 rounded-full bg-rose-50 flex items-center justify-center">
-                <i class="fa-solid fa-file-invoice-dollar text-rose-500"></i>
-              </div>
+              <p class="text-xs text-gray-500">Soma de todas as despesas no cartão no período selecionado.</p>
             </div>
-            <p class="text-xs text-gray-500">
-              Soma de todas as despesas no cartão no período selecionado.
-            </p>
+            <div class="bg-white rounded-xl shadow-sm border border-gray-100 p-4 flex flex-col justify-between border-l-4 border-l-emerald-400">
+              <div class="flex items-center justify-between mb-2">
+                <div>
+                  <p class="text-xs uppercase tracking-wide text-gray-500">Crédito Disponível Total</p>
+                  <p class="text-lg font-semibold text-emerald-700" id="totalCreditoDisponivel">R$ 0,00</p>
+                </div>
+                <div class="w-10 h-10 rounded-full bg-emerald-50 flex items-center justify-center">
+                  <i class="fa-solid fa-circle-dollar-to-slot text-emerald-500"></i>
+                </div>
+              </div>
+              <p class="text-xs text-gray-500">Soma dos limites disponíveis de todos os cartões de crédito.</p>
+            </div>
           </div>
 
-          <div class="lg:col-span-2 grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-5 gap-3">
-            <!-- Cartões mantidos: adicionei border-left colorido para cada cartão -->
-            <div class="bg-white rounded-xl shadow-sm border border-gray-100 p-3 flex flex-col gap-1 border-l-4 border-l-sky-500" id="cardContainer-caixa">
-              <div class="flex items-center justify-between">
-                <p class="text-xs text-gray-500">Caixa</p>
-                <div class="flex items-center gap-1">
-                  <span class="text-[10px] bg-sky-100 text-sky-700 px-1.5 py-0.5 rounded-full font-medium" id="cardCount-caixa">0</span>
-                  <i class="fa-solid fa-credit-card text-sky-600 text-sm"></i>
-                </div>
-              </div>
-              <p class="text-sm font-semibold text-gray-900" id="cardCaixa">R$ 0,00</p>
-              <button
-                class="card-status-btn mt-1 inline-flex items-center px-2.5 py-1 rounded-full border text-[10px] font-medium"
-                data-card="caixa"
-              ></button>
-            </div>
-
-            <div class="bg-white rounded-xl shadow-sm border border-gray-100 p-3 flex flex-col gap-1 border-l-4 border-l-orange-500" id="cardContainer-inter_debora">
-              <div class="flex items-center justify-between">
-                <p class="text-xs text-gray-500">Inter (Débora)</p>
-                <div class="flex items-center gap-1">
-                  <span class="text-[10px] bg-orange-100 text-orange-700 px-1.5 py-0.5 rounded-full font-medium" id="cardCount-inter_debora">0</span>
-                  <i class="fa-solid fa-credit-card text-orange-500 text-sm"></i>
-                </div>
-              </div>
-              <p class="text-sm font-semibold text-gray-900" id="cardInterD">R$ 0,00</p>
-              <button
-                class="card-status-btn mt-1 inline-flex items-center px-2.5 py-1 rounded-full border text-[10px] font-medium"
-                data-card="inter_debora"
-              ></button>
-            </div>
-
-            <div class="bg-white rounded-xl shadow-sm border border-gray-100 p-3 flex flex-col gap-1 border-l-4 border-l-orange-400" id="cardContainer-inter_cristiano">
-              <div class="flex items-center justify-between">
-                <p class="text-xs text-gray-500">Inter (Cristiano)</p>
-                <div class="flex items-center gap-1">
-                  <span class="text-[10px] bg-orange-100 text-orange-700 px-1.5 py-0.5 rounded-full font-medium" id="cardCount-inter_cristiano">0</span>
-                  <i class="fa-solid fa-credit-card text-orange-500 text-sm"></i>
-                </div>
-              </div>
-              <p class="text-sm font-semibold text-gray-900" id="cardInterC">R$ 0,00</p>
-              <button
-                class="card-status-btn mt-1 inline-flex items-center px-2.5 py-1 rounded-full border text-[10px] font-medium"
-                data-card="inter_cristiano"
-              ></button>
-            </div>
-
-            <div class="bg-white rounded-xl shadow-sm border border-gray-100 p-3 flex flex-col gap-1 border-l-4 border-l-violet-600" id="cardContainer-nubank">
-              <div class="flex items-center justify-between">
-                <p class="text-xs text-gray-500">Nubank</p>
-                <div class="flex items-center gap-1">
-                  <span class="text-[10px] bg-violet-100 text-violet-700 px-1.5 py-0.5 rounded-full font-medium" id="cardCount-nubank">0</span>
-                  <i class="fa-solid fa-credit-card text-purple-600 text-sm"></i>
-                </div>
-              </div>
-              <p class="text-sm font-semibold text-gray-900" id="cardNubank">R$ 0,00</p>
-              <button
-                class="card-status-btn mt-1 inline-flex items-center px-2.5 py-1 rounded-full border text-[10px] font-medium"
-                data-card="nubank"
-              ></button>
-            </div>
-
-            <div class="bg-white rounded-xl shadow-sm border border-gray-100 p-3 flex flex-col gap-1 border-l-4 border-l-slate-700" id="cardContainer-c6">
-              <div class="flex items-center justify-between">
-                <p class="text-xs text-gray-500">C6 Bank</p>
-                <div class="flex items-center gap-1">
-                  <span class="text-[10px] bg-slate-100 text-slate-700 px-1.5 py-0.5 rounded-full font-medium" id="cardCount-c6">0</span>
-                  <i class="fa-solid fa-credit-card text-gray-900 text-sm"></i>
-                </div>
-              </div>
-              <p class="text-sm font-semibold text-gray-900" id="cardC6">R$ 0,00</p>
-              <button
-                class="card-status-btn mt-1 inline-flex items-center px-2.5 py-1 rounded-full border text-[10px] font-medium"
-                data-card="c6"
-              ></button>
+          <!-- Coluna direita: grid dinâmico de cartões -->
+          <div class="lg:col-span-2">
+            <div id="cardsGrid" class="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-3">
+              <!-- Renderizado via JS -->
             </div>
           </div>
         </div>
@@ -595,16 +541,12 @@
               </div>
             </div>
             <div class="space-y-1">
-              <label for="recCategoria" class="font-medium text-gray-700">Categoria da Receita</label>
+              <div class="flex items-center justify-between">
+                <label for="recCategoria" class="font-medium text-gray-700">Categoria da Receita</label>
+                <button type="button" id="btnManageCategoriesRec" class="text-[10px] text-indigo-600 hover:text-indigo-800 flex items-center gap-0.5"><i class="fa-solid fa-plus-circle"></i> Gerenciar</button>
+              </div>
               <select id="recCategoria" class="w-full rounded-lg border border-gray-200 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500">
-                <!-- Opções expandidas -->
-                <option value="salario">Salário</option>
-                <option value="freelancer">Freelancer / Extra</option>
-                <option value="decimo">13º / Bônus</option>
-                <option value="reembolso">Reembolso</option>
-                <option value="aluguéis">Aluguéis</option>
-                <option value="juros_dividendos">Juros / Dividendos</option>
-                <option value="outros">Outros</option>
+                <!-- opções via JS -->
               </select>
             </div>
           </div>
@@ -653,7 +595,10 @@
               </div>
             </div>
             <div class="space-y-1">
-              <label for="despCategoria" class="font-medium text-gray-700">Tipo (Fixa / Variável / Investimento)</label>
+              <div class="flex items-center justify-between">
+                <label for="despCategoria" class="font-medium text-gray-700">Tipo</label>
+                <button type="button" id="btnManageTypes" class="text-[10px] text-indigo-600 hover:text-indigo-800 flex items-center gap-0.5"><i class="fa-solid fa-plus-circle"></i> Gerenciar</button>
+              </div>
               <select id="despCategoria" required
                 class="w-full rounded-lg border border-gray-200 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-orange-500">
                 <option value="fixa">Despesa Fixa</option>
@@ -662,7 +607,10 @@
               </select>
             </div>
             <div class="space-y-1">
-              <label for="despSubCategoria" class="font-medium text-gray-700">Categoria detalhada</label>
+              <div class="flex items-center justify-between">
+                <label for="despSubCategoria" class="font-medium text-gray-700">Categoria detalhada</label>
+                <button type="button" id="btnManageCategories" class="text-[10px] text-indigo-600 hover:text-indigo-800 flex items-center gap-0.5"><i class="fa-solid fa-plus-circle"></i> Gerenciar</button>
+              </div>
               <select id="despSubCategoria" required
                 class="w-full rounded-lg border border-gray-200 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-orange-500">
                 <!-- opções via JS -->
@@ -690,11 +638,7 @@
                 <label for="despCartao" class="font-medium text-gray-700">Cartão</label>
                 <select id="despCartao"
                   class="w-full rounded-lg border border-gray-200 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500">
-                  <option value="caixa">Caixa</option>
-                  <option value="inter_debora">Inter (Débora)</option>
-                  <option value="inter_cristiano">Inter (Cristiano)</option>
-                  <option value="nubank">Nubank</option>
-                  <option value="c6">C6 Bank</option>
+                  <!-- opções via JS -->
                 </select>
               </div>
             </div>
@@ -1362,11 +1306,7 @@
               <label for="editCartao" class="font-medium text-gray-700">Cartão</label>
               <select id="editCartao"
                 class="w-full rounded-lg border border-gray-200 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500">
-                <option value="caixa">Caixa</option>
-                <option value="inter_debora">Inter (Débora)</option>
-                <option value="inter_cristiano">Inter (Cristiano)</option>
-                <option value="nubank">Nubank</option>
-                <option value="c6">C6 Bank</option>
+                <!-- opções via JS -->
               </select>
             </div>
           </div>
@@ -1483,6 +1423,146 @@
     </div>
   </div>
 
+  <!-- MODAL: Gerenciar Cartões -->
+  <div id="cardsModal" class="fixed inset-0 z-50 hidden bg-black/40 items-center justify-center p-4">
+    <div class="bg-white rounded-xl shadow-lg w-full max-w-lg mx-4 flex flex-col max-h-[90vh]">
+      <div class="flex items-center justify-between px-5 py-4 border-b border-gray-100">
+        <div>
+          <h2 class="text-sm font-semibold text-gray-900 flex items-center gap-2">
+            <i class="fa-solid fa-credit-card text-indigo-500"></i>
+            Gerenciar Cartões
+          </h2>
+          <p class="text-xs text-gray-500">Cadastre, edite e remova cartões. Defina o limite de crédito de cada um.</p>
+        </div>
+        <button id="btnCardsModalClose" class="w-7 h-7 rounded-full flex items-center justify-center text-gray-400 hover:bg-gray-100">
+          <i class="fa-solid fa-xmark text-xs"></i>
+        </button>
+      </div>
+
+      <!-- Lista de cartões existentes -->
+      <div class="overflow-y-auto flex-1 px-5 py-3">
+        <div id="cardsModalList" class="space-y-2 mb-4">
+          <!-- renderizado via JS -->
+        </div>
+
+        <!-- Formulário para adicionar/editar cartão -->
+        <div class="border-t border-gray-100 pt-4">
+          <h3 id="cardsModalFormTitle" class="text-xs font-semibold text-gray-700 mb-3">
+            <i class="fa-solid fa-plus text-indigo-400 mr-1"></i> Novo Cartão
+          </h3>
+          <form id="formManageCard" class="space-y-3">
+            <input type="hidden" id="editCardId" value="" />
+            <div class="grid grid-cols-2 gap-3">
+              <div class="space-y-1">
+                <label for="cardFormName" class="text-xs font-medium text-gray-700">Nome do Cartão *</label>
+                <input id="cardFormName" type="text" required placeholder="Ex: Nubank, C6..."
+                  class="w-full rounded-lg border border-gray-200 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500" />
+              </div>
+              <div class="space-y-1">
+                <label for="cardFormLimit" class="text-xs font-medium text-gray-700">Limite de Crédito (R$)</label>
+                <input id="cardFormLimit" type="number" step="0.01" min="0" placeholder="0,00"
+                  class="w-full rounded-lg border border-gray-200 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500" />
+              </div>
+            </div>
+            <div class="space-y-1">
+              <label class="text-xs font-medium text-gray-700">Cor</label>
+              <div id="cardColorPicker" class="flex flex-wrap gap-2">
+                <!-- cores via JS -->
+              </div>
+              <input type="hidden" id="cardFormColor" value="sky" />
+            </div>
+            <div class="flex gap-2 justify-end pt-1">
+              <button type="button" id="btnCancelEditCard" class="hidden px-3 py-1.5 text-xs font-medium border border-gray-200 rounded-lg text-gray-600 hover:bg-gray-50">Cancelar edição</button>
+              <button type="submit" class="px-4 py-1.5 text-xs font-semibold rounded-lg bg-indigo-600 text-white hover:bg-indigo-700 flex items-center gap-1.5">
+                <i class="fa-solid fa-floppy-disk text-[10px]"></i>
+                <span id="cardFormBtnText">Adicionar Cartão</span>
+              </button>
+            </div>
+          </form>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- MODAL: Gerenciar Categorias e Tipos -->
+  <div id="settingsModal" class="fixed inset-0 z-50 hidden bg-black/40 items-center justify-center p-4">
+    <div class="bg-white rounded-xl shadow-lg w-full max-w-lg mx-4 flex flex-col max-h-[90vh]">
+      <div class="flex items-center justify-between px-5 py-4 border-b border-gray-100">
+        <div>
+          <h2 class="text-sm font-semibold text-gray-900 flex items-center gap-2">
+            <i class="fa-solid fa-sliders text-indigo-500"></i>
+            Gerenciar Categorias e Tipos
+          </h2>
+          <p class="text-xs text-gray-500">Adicione categorias personalizadas e novos tipos de lançamento.</p>
+        </div>
+        <button id="btnSettingsModalClose" class="w-7 h-7 rounded-full flex items-center justify-center text-gray-400 hover:bg-gray-100">
+          <i class="fa-solid fa-xmark text-xs"></i>
+        </button>
+      </div>
+
+      <!-- Abas -->
+      <div class="flex border-b border-gray-100 px-5">
+        <button class="settings-tab-btn py-2.5 px-3 text-xs font-medium border-b-2 border-indigo-500 text-indigo-600" data-tab="categories">Categorias</button>
+        <button class="settings-tab-btn py-2.5 px-3 text-xs font-medium border-b-2 border-transparent text-gray-500 hover:text-gray-700" data-tab="types">Tipos</button>
+      </div>
+
+      <div class="overflow-y-auto flex-1 px-5 py-3">
+        <!-- Aba Categorias -->
+        <div id="tabCategories" class="settings-tab-content space-y-4">
+          <div class="space-y-1">
+            <label for="settingsCatType" class="text-xs font-medium text-gray-700">Tipo de lançamento</label>
+            <select id="settingsCatType" class="w-full rounded-lg border border-gray-200 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500">
+              <option value="receita">Receita</option>
+              <option value="fixa">Despesa Fixa</option>
+              <option value="variavel">Despesa Variável</option>
+              <option value="investimento">Investimento</option>
+            </select>
+          </div>
+          <div id="settingsCatList" class="space-y-1.5">
+            <!-- lista via JS -->
+          </div>
+          <form id="formAddCategory" class="flex gap-2 pt-1 border-t border-gray-100">
+            <input id="newCatLabel" type="text" required placeholder="Nome da categoria"
+              class="flex-1 rounded-lg border border-gray-200 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500" />
+            <button type="submit" class="px-3 py-2 text-xs font-semibold rounded-lg bg-indigo-600 text-white hover:bg-indigo-700 flex items-center gap-1">
+              <i class="fa-solid fa-plus text-[10px]"></i> Adicionar
+            </button>
+          </form>
+        </div>
+
+        <!-- Aba Tipos -->
+        <div id="tabTypes" class="settings-tab-content hidden space-y-4">
+          <p class="text-xs text-gray-500">Crie tipos personalizados (ex: "Empréstimo", "Presente") associando-os a um tipo base para o cálculo do resumo.</p>
+          <div id="settingsTypesList" class="space-y-1.5">
+            <!-- lista via JS -->
+          </div>
+          <form id="formAddType" class="space-y-2 pt-1 border-t border-gray-100">
+            <div class="grid grid-cols-2 gap-2">
+              <div class="space-y-1">
+                <label for="newTypeLabel" class="text-xs font-medium text-gray-700">Nome do Tipo *</label>
+                <input id="newTypeLabel" type="text" required placeholder="Ex: Empréstimo"
+                  class="w-full rounded-lg border border-gray-200 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500" />
+              </div>
+              <div class="space-y-1">
+                <label for="newTypeBase" class="text-xs font-medium text-gray-700">Tipo Base *</label>
+                <select id="newTypeBase" class="w-full rounded-lg border border-gray-200 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500">
+                  <option value="fixa">Despesa Fixa</option>
+                  <option value="variavel">Despesa Variável</option>
+                  <option value="investimento">Investimento</option>
+                </select>
+              </div>
+            </div>
+            <div class="flex justify-end">
+              <button type="submit" class="px-3 py-2 text-xs font-semibold rounded-lg bg-indigo-600 text-white hover:bg-indigo-700 flex items-center gap-1">
+                <i class="fa-solid fa-plus text-[10px]"></i> Adicionar Tipo
+              </button>
+            </div>
+          </form>
+        </div>
+      </div>
+    </div>
+  </div>
+
   <!-- Toast notification container -->
   <div id="toastContainer"></div>
 
@@ -1520,6 +1600,8 @@
       // KEYs (mantive para compatibilidade se quiser fallback)
       const STORAGE_KEY = 'financeDashboard_transactions';
       const INVOICE_KEY = 'financeDashboard_invoicesPaid';
+      const CARDS_KEY = 'financeDashboard_cards';
+      const SETTINGS_KEY = 'financeDashboard_settings';
 
       // Constantes e mapeamentos (mantidos e expandidos)
       const CATEGORY_LABELS = { receita: 'Receita', investimento: 'Investimento', fixa: 'Despesa Fixa', variavel: 'Despesa Variável' };
@@ -1536,6 +1618,28 @@
         renda_fixa: 'Renda Fixa', renda_variavel: 'Renda Variável', tesouro: 'Tesouro Direto',
         fundos: 'Fundos de Investimento', previdencia: 'Previdência', cripto: 'Criptomoedas', imoveis: 'Imóveis', outros: 'Outros Investimentos'
       };
+
+      // Mapa de cores para cartões
+      const CARD_COLOR_MAP = {
+        sky:     { border: 'border-l-sky-500',     badge: 'bg-sky-100 text-sky-700',       icon: 'text-sky-600',     dot: 'bg-sky-400' },
+        orange:  { border: 'border-l-orange-500',  badge: 'bg-orange-100 text-orange-700', icon: 'text-orange-500',  dot: 'bg-orange-400' },
+        violet:  { border: 'border-l-violet-600',  badge: 'bg-violet-100 text-violet-700', icon: 'text-violet-600',  dot: 'bg-violet-500' },
+        slate:   { border: 'border-l-slate-700',   badge: 'bg-slate-100 text-slate-700',   icon: 'text-slate-700',   dot: 'bg-slate-500' },
+        emerald: { border: 'border-l-emerald-500', badge: 'bg-emerald-100 text-emerald-700', icon: 'text-emerald-600', dot: 'bg-emerald-400' },
+        rose:    { border: 'border-l-rose-500',    badge: 'bg-rose-100 text-rose-700',     icon: 'text-rose-600',    dot: 'bg-rose-400' },
+        teal:    { border: 'border-l-teal-500',    badge: 'bg-teal-100 text-teal-700',     icon: 'text-teal-600',    dot: 'bg-teal-400' },
+        indigo:  { border: 'border-l-indigo-500',  badge: 'bg-indigo-100 text-indigo-700', icon: 'text-indigo-600',  dot: 'bg-indigo-400' },
+        amber:   { border: 'border-l-amber-500',   badge: 'bg-amber-100 text-amber-700',   icon: 'text-amber-600',   dot: 'bg-amber-400' },
+        lime:    { border: 'border-l-lime-500',    badge: 'bg-lime-100 text-lime-700',     icon: 'text-lime-600',    dot: 'bg-lime-400' },
+      };
+
+      const DEFAULT_CARDS = [
+        { id: 'caixa',          label: 'Caixa',           limit: 0, color: 'sky' },
+        { id: 'inter_debora',   label: 'Inter (Débora)',   limit: 0, color: 'orange' },
+        { id: 'inter_cristiano',label: 'Inter (Cristiano)',limit: 0, color: 'violet' },
+        { id: 'nubank',         label: 'Nubank',           limit: 0, color: 'rose' },
+        { id: 'c6',             label: 'C6 Bank',          limit: 0, color: 'slate' },
+      ];
 
       const SUBCATEGORY_COLOR_CLASSES = {
         moradia: 'bg-emerald-50 text-emerald-700 border-emerald-200',
@@ -1563,13 +1667,12 @@
         vestimenta: 'bg-fuchsia-50 text-fuchsia-700 border-fuchsia-200'
       };
 
-      const CARD_LABELS = {
-        caixa: 'Caixa',
-        inter_debora: 'Inter (Débora)',
-        inter_cristiano: 'Inter (Cristiano)',
-        nubank: 'Nubank',
-        c6: 'C6 Bank'
-      };
+      // CARD_LABELS is now computed dynamically from state.cards
+      function getCardLabels() {
+        const map = {};
+        state.cards.forEach(c => { map[c.id] = c.label; });
+        return map;
+      }
 
       const MONTH_NAMES = [
         'Janeiro','Fevereiro','Março','Abril','Maio','Junho',
@@ -1580,6 +1683,9 @@
       const state = {
         transactions: [],
         invoicesPaid: {},
+        cards: [],           // [{id, label, limit, color}]
+        customSubCategories: { receita: [], fixa: [], variavel: [], investimento: [] }, // [{value, label}]
+        customTypes: [],     // [{value, label, baseType}]
         selectedMonth: new Date().getMonth(),
         selectedYear: 'all',
         editingId: null,
@@ -1589,8 +1695,8 @@
         deletingId: null,
         deletingGroupId: null,
         deletingMode: 'single', // 'single' | 'all'
-        selectedCard: null,     // filtro de cartão: 'caixa' | 'inter_debora' | 'inter_cristiano' | 'nubank' | 'c6' | null
-        selectedCategory: null  // filtro de categoria: 'receita' | 'fixa' | 'variavel' | 'investimento' | null
+        selectedCard: null,
+        selectedCategory: null
       };
 
       // Charts placeholders
@@ -1883,6 +1989,99 @@
         }
       }
 
+      // ---------- CARDS PERSISTENCE ----------
+      async function loadCards() {
+        try {
+          const colRef = collection(db, "cards");
+          const snap = await fetchCollectionPreferServer(colRef);
+          const result = [];
+          snap.forEach(docSnap => {
+            const d = docSnap.data();
+            result.push({ id: docSnap.id, label: d.label || docSnap.id, limit: Number(d.limit) || 0, color: d.color || 'sky' });
+          });
+          if (result.length > 0) {
+            state.cards = result;
+          } else {
+            // Seed with defaults
+            state.cards = DEFAULT_CARDS.map(c => ({ ...c }));
+            await saveCards();
+          }
+          try { localStorage.setItem(CARDS_KEY, JSON.stringify(state.cards)); } catch(e) {}
+        } catch (e) {
+          console.error("Erro ao carregar cards do Firestore", e);
+          try {
+            const raw = localStorage.getItem(CARDS_KEY);
+            if (raw) { state.cards = JSON.parse(raw); return; }
+          } catch(_) {}
+          state.cards = DEFAULT_CARDS.map(c => ({ ...c }));
+        }
+      }
+
+      async function saveCards() {
+        try {
+          await Promise.all(state.cards.map(c => setDoc(doc(db, "cards", c.id), { label: c.label, limit: c.limit, color: c.color })));
+          try { localStorage.setItem(CARDS_KEY, JSON.stringify(state.cards)); } catch(e) {}
+        } catch (e) {
+          console.error("Erro ao salvar cards no Firestore", e);
+          try { localStorage.setItem(CARDS_KEY, JSON.stringify(state.cards)); } catch(_) {}
+          throw e;
+        }
+      }
+
+      async function deleteCardFromFirestore(cardId) {
+        try {
+          await deleteDoc(doc(db, "cards", cardId));
+        } catch(e) {
+          console.error("Erro ao deletar card do Firestore", e);
+          throw e;
+        }
+      }
+
+      // ---------- SETTINGS PERSISTENCE (categories + types) ----------
+      async function loadSettings() {
+        try {
+          const settingsColRef = collection(db, "settings");
+          const snap = await fetchCollectionPreferServer(settingsColRef);
+          snap.forEach(docSnap => {
+            const d = docSnap.data();
+            if (docSnap.id === 'subcategories') {
+              state.customSubCategories = {
+                receita:     Array.isArray(d.receita)     ? d.receita     : [],
+                fixa:        Array.isArray(d.fixa)        ? d.fixa        : [],
+                variavel:    Array.isArray(d.variavel)    ? d.variavel    : [],
+                investimento:Array.isArray(d.investimento)? d.investimento: [],
+              };
+            }
+            if (docSnap.id === 'customTypes') {
+              state.customTypes = Array.isArray(d.types) ? d.types : [];
+            }
+          });
+          try { localStorage.setItem(SETTINGS_KEY, JSON.stringify({ customSubCategories: state.customSubCategories, customTypes: state.customTypes })); } catch(e) {}
+        } catch (e) {
+          console.error("Erro ao carregar settings do Firestore", e);
+          try {
+            const raw = localStorage.getItem(SETTINGS_KEY);
+            if (raw) {
+              const parsed = JSON.parse(raw);
+              if (parsed.customSubCategories) state.customSubCategories = parsed.customSubCategories;
+              if (parsed.customTypes) state.customTypes = parsed.customTypes;
+            }
+          } catch(_) {}
+        }
+      }
+
+      async function saveSettings() {
+        try {
+          await setDoc(doc(db, "settings", "subcategories"), state.customSubCategories);
+          await setDoc(doc(db, "settings", "customTypes"), { types: state.customTypes });
+          try { localStorage.setItem(SETTINGS_KEY, JSON.stringify({ customSubCategories: state.customSubCategories, customTypes: state.customTypes })); } catch(e) {}
+        } catch (e) {
+          console.error("Erro ao salvar settings no Firestore", e);
+          try { localStorage.setItem(SETTINGS_KEY, JSON.stringify({ customSubCategories: state.customSubCategories, customTypes: state.customTypes })); } catch(_) {}
+          throw e;
+        }
+      }
+
       // ---------- LÓGICA DE RENDER / CÁLCULOS ----------
       function getFilteredTransactions() {
         return state.transactions.filter((t) => {
@@ -1968,12 +2167,28 @@
         let map;
         if (tipo === 'investimento') map = INVEST_SUBCATEGORIES;
         else map = DESPESA_SUBCATEGORIES;
+        // Built-in subcategories
         Object.entries(map).forEach(([value,label]) => {
           const opt = document.createElement('option');
           opt.value = value;
           opt.textContent = label;
           select.appendChild(opt);
         });
+        // Custom subcategories for this type (mapped to base type)
+        const baseType = getBaseType(tipo);
+        const customs = state.customSubCategories[baseType] || [];
+        if (customs.length) {
+          const sep = document.createElement('option');
+          sep.disabled = true;
+          sep.textContent = '── Personalizadas ──';
+          select.appendChild(sep);
+          customs.forEach(c => {
+            const opt = document.createElement('option');
+            opt.value = c.value;
+            opt.textContent = c.label;
+            select.appendChild(opt);
+          });
+        }
 
         // Se for investimento: esconder campos de cartão e parcelas
         const formaSelect = document.getElementById('despFormaPagamento');
@@ -2024,6 +2239,103 @@
           if (value === selectedSub) opt.selected = true;
           select.appendChild(opt);
         });
+        // Custom subcategories for this category type
+        const customs = state.customSubCategories[mainCategory] || [];
+        if (customs.length) {
+          const sep = document.createElement('option');
+          sep.disabled = true;
+          sep.textContent = '── Personalizadas ──';
+          select.appendChild(sep);
+          customs.forEach(c => {
+            const opt = document.createElement('option');
+            opt.value = c.value;
+            opt.textContent = c.label;
+            if (c.value === selectedSub) opt.selected = true;
+            select.appendChild(opt);
+          });
+        }
+      }
+
+      function populateReceitaCategoria() {
+        const select = document.getElementById('recCategoria');
+        if (!select) return;
+        const current = select.value;
+        select.innerHTML = '';
+        Object.entries(RECEITA_SUBCATEGORIES).forEach(([value,label]) => {
+          const opt = document.createElement('option');
+          opt.value = value;
+          opt.textContent = label;
+          select.appendChild(opt);
+        });
+        const customs = state.customSubCategories['receita'] || [];
+        if (customs.length) {
+          const sep = document.createElement('option');
+          sep.disabled = true;
+          sep.textContent = '── Personalizadas ──';
+          select.appendChild(sep);
+          customs.forEach(c => {
+            const opt = document.createElement('option');
+            opt.value = c.value;
+            opt.textContent = c.label;
+            select.appendChild(opt);
+          });
+        }
+        if (current) select.value = current;
+      }
+
+      function populateCardSelects(preserveValue) {
+        const selects = ['despCartao', 'editCartao'];
+        selects.forEach(sid => {
+          const sel = document.getElementById(sid);
+          if (!sel) return;
+          const prev = preserveValue ? sel.value : null;
+          sel.innerHTML = '';
+          state.cards.forEach(card => {
+            const opt = document.createElement('option');
+            opt.value = card.id;
+            opt.textContent = card.label;
+            sel.appendChild(opt);
+          });
+          if (prev && [...sel.options].some(o => o.value === prev)) sel.value = prev;
+        });
+      }
+
+      function populateDespCategoria() {
+        const sel = document.getElementById('despCategoria');
+        if (!sel) return;
+        const prev = sel.value;
+        // Remove previously added custom options
+        [...sel.options].forEach(o => { if (o.dataset.custom) o.remove(); });
+        // Add custom types
+        if (state.customTypes.length) {
+          let sep = sel.querySelector('option.custom-sep');
+          if (!sep) {
+            sep = document.createElement('option');
+            sep.disabled = true;
+            sep.className = 'custom-sep';
+            sep.textContent = '── Personalizados ──';
+            sep.dataset.custom = '1';
+            sel.appendChild(sep);
+          }
+          state.customTypes.forEach(ct => {
+            if (!sel.querySelector(`option[value="${ct.value}"]`)) {
+              const opt = document.createElement('option');
+              opt.value = ct.value;
+              opt.textContent = ct.label;
+              opt.dataset.custom = '1';
+              opt.dataset.baseType = ct.baseType;
+              sel.appendChild(opt);
+            }
+          });
+        }
+        if (prev && [...sel.options].some(o => o.value === prev)) sel.value = prev;
+      }
+
+      // Returns the base type for a given type value (handles custom types)
+      function getBaseType(typeValue) {
+        const custom = state.customTypes.find(ct => ct.value === typeValue);
+        if (custom) return custom.baseType;
+        return typeValue; // already a base type
       }
 
       function refreshYearFilterOptions() {
@@ -2270,10 +2582,56 @@
         btn.innerHTML = `<i class="fa-solid ${iconClass} mr-1 text-[10px]"></i><span>${paid ? 'Fatura paga' : 'Fatura em aberto'}</span>`;
       }
 
+      function renderCardsGrid() {
+        const grid = document.getElementById('cardsGrid');
+        if (!grid) return;
+        grid.innerHTML = '';
+        state.cards.forEach(card => {
+          const colors = CARD_COLOR_MAP[card.color] || CARD_COLOR_MAP.sky;
+          const div = document.createElement('div');
+          div.id = `cardContainer-${card.id}`;
+          div.className = `bg-white rounded-xl shadow-sm border border-gray-100 p-3 flex flex-col gap-1 border-l-4 ${colors.border} cursor-pointer hover:shadow-md transition-shadow`;
+          div.innerHTML = `
+            <div class="flex items-center justify-between">
+              <p class="text-xs text-gray-500 font-medium truncate">${card.label}</p>
+              <div class="flex items-center gap-1 shrink-0">
+                <span class="text-[10px] ${colors.badge} px-1.5 py-0.5 rounded-full font-medium" id="cardCount-${card.id}">0</span>
+                <i class="fa-solid fa-credit-card ${colors.icon} text-sm"></i>
+              </div>
+            </div>
+            <p class="text-sm font-semibold text-gray-900" id="cardValue-${card.id}">R$ 0,00</p>
+            ${card.limit > 0 ? `
+            <div class="flex flex-col gap-0.5 mt-0.5">
+              <div class="flex items-center justify-between text-[10px] text-gray-400">
+                <span>Disponível</span>
+                <span id="cardAvailable-${card.id}" class="font-medium text-emerald-600">R$ 0,00</span>
+              </div>
+              <div class="w-full h-1 bg-gray-100 rounded-full overflow-hidden">
+                <div id="cardUsageBar-${card.id}" class="h-full bg-rose-400 rounded-full transition-all" style="width:0%"></div>
+              </div>
+            </div>` : ''}
+            <button
+              class="card-status-btn mt-1 inline-flex items-center px-2.5 py-1 rounded-full border text-[10px] font-medium"
+              data-card="${card.id}"
+            ></button>
+          `;
+          div.addEventListener('click', (e) => {
+            if (e.target.closest('.card-status-btn')) return;
+            state.selectedCategory = null;
+            state.selectedCard = (state.selectedCard === card.id) ? null : card.id;
+            if (window._applyPageFilter) window._applyPageFilter();
+          });
+          const btn = div.querySelector('.card-status-btn');
+          btn.addEventListener('click', () => toggleInvoiceStatusForSelectedMonth(card.id));
+          grid.appendChild(div);
+        });
+      }
+
       function renderCardsFaturas() {
         const txs = getFilteredTransactions().filter((t) => t.isCreditCard);
-        const totals = { caixa: 0, inter_debora: 0, inter_cristiano: 0, nubank: 0, c6: 0 };
-        const counts = { caixa: 0, inter_debora: 0, inter_cristiano: 0, nubank: 0, c6: 0 };
+        const totals = {};
+        const counts = {};
+        state.cards.forEach(c => { totals[c.id] = 0; counts[c.id] = 0; });
         let totalFaturas = 0;
 
         txs.forEach((t) => {
@@ -2286,52 +2644,66 @@
         });
 
         document.getElementById('totalFaturas').textContent = formatCurrency(totalFaturas);
-        document.getElementById('cardCaixa').textContent = formatCurrency(totals.caixa);
-        document.getElementById('cardInterD').textContent = formatCurrency(totals.inter_debora);
-        document.getElementById('cardInterC').textContent = formatCurrency(totals.inter_cristiano);
-        document.getElementById('cardNubank').textContent = formatCurrency(totals.nubank);
-        document.getElementById('cardC6').textContent = formatCurrency(totals.c6);
 
-        // Update item counts
-        document.getElementById('cardCount-caixa').textContent = counts.caixa;
-        document.getElementById('cardCount-inter_debora').textContent = counts.inter_debora;
-        document.getElementById('cardCount-inter_cristiano').textContent = counts.inter_cristiano;
-        document.getElementById('cardCount-nubank').textContent = counts.nubank;
-        document.getElementById('cardCount-c6').textContent = counts.c6;
-
-        // Add warning for invoices > R$ 2500
-        const WARNING_THRESHOLD = 2500;
-        ['caixa','inter_debora','inter_cristiano','nubank','c6'].forEach(card => {
-          const cardContainer = document.getElementById(`cardContainer-${card}`);
-          const cardTotal = totals[card];
-          
-          // Remove existing warning classes first
-          cardContainer.classList.remove('border-l-red-500', 'border-l-yellow-500');
-          
-          // Add warning if threshold exceeded
-          if (cardTotal > WARNING_THRESHOLD) {
-            cardContainer.classList.add('border-l-red-500');
-            cardContainer.classList.remove('border-l-sky-500', 'border-l-orange-500', 'border-l-orange-400', 'border-l-violet-600', 'border-l-slate-700');
-          }
+        // Compute total available credit
+        let totalDisponivel = 0;
+        state.cards.forEach(card => {
+          if (card.limit > 0) totalDisponivel += Math.max(0, card.limit - (totals[card.id] || 0));
         });
+        const totalDispEl = document.getElementById('totalCreditoDisponivel');
+        if (totalDispEl) totalDispEl.textContent = formatCurrency(totalDisponivel);
 
+        const WARNING_THRESHOLD = 2500;
         const year = getYearForSelectedMonth();
         const m = state.selectedMonth;
-        ['caixa','inter_debora','inter_cristiano','nubank','c6'].forEach(card => {
-          const key = keyInvoice(year, m, card);
+
+        state.cards.forEach(card => {
+          const spent = totals[card.id] || 0;
+          const count = counts[card.id] || 0;
+          const colors = CARD_COLOR_MAP[card.color] || CARD_COLOR_MAP.sky;
+
+          const valEl = document.getElementById(`cardValue-${card.id}`);
+          const cntEl = document.getElementById(`cardCount-${card.id}`);
+          const container = document.getElementById(`cardContainer-${card.id}`);
+          if (valEl) valEl.textContent = formatCurrency(spent);
+          if (cntEl) cntEl.textContent = count;
+
+          if (card.limit > 0) {
+            const available = Math.max(0, card.limit - spent);
+            const usedPct = Math.min(100, (spent / card.limit) * 100);
+            const avEl = document.getElementById(`cardAvailable-${card.id}`);
+            const barEl = document.getElementById(`cardUsageBar-${card.id}`);
+            if (avEl) avEl.textContent = formatCurrency(available);
+            if (barEl) {
+              barEl.style.width = `${usedPct}%`;
+              barEl.className = `h-full rounded-full transition-all ${usedPct > 90 ? 'bg-red-500' : usedPct > 70 ? 'bg-amber-400' : 'bg-emerald-400'}`;
+            }
+          }
+
+          if (container) {
+            // Reset border color
+            Object.values(CARD_COLOR_MAP).forEach(c => container.classList.remove(c.border));
+            container.classList.remove('border-l-red-500');
+            if (spent > WARNING_THRESHOLD && (card.limit === 0 || spent > card.limit * 0.9)) {
+              container.classList.add('border-l-red-500');
+            } else {
+              container.classList.add(colors.border);
+            }
+          }
+
+          const key = keyInvoice(year, m, card.id);
           const paid = !!state.invoicesPaid[key];
-          const btn = document.querySelector(`.card-status-btn[data-card="${card}"]`);
+          const btn = document.querySelector(`.card-status-btn[data-card="${card.id}"]`);
           updateCardStatusButton(btn, paid);
         });
       }
 
       function updateCardFilterVisual() {
-        // Credit card container ring highlight
-        const CARD_KEYS = ['caixa', 'inter_debora', 'inter_cristiano', 'nubank', 'c6'];
-        CARD_KEYS.forEach(card => {
-          const container = document.getElementById(`cardContainer-${card}`);
+        // Credit card container ring highlight (dynamic)
+        state.cards.forEach(card => {
+          const container = document.getElementById(`cardContainer-${card.id}`);
           if (!container) return;
-          if (state.selectedCard === card) {
+          if (state.selectedCard === card.id) {
             container.classList.add('ring-2', 'ring-indigo-500', 'ring-offset-2');
           } else {
             container.classList.remove('ring-2', 'ring-indigo-500', 'ring-offset-2');
@@ -2358,6 +2730,7 @@
           indicator.classList.remove('hidden');
           const iconEl = document.getElementById('filterIndicatorIcon');
           const textEl = document.getElementById('filterIndicatorText');
+          const CARD_LABELS = getCardLabels();
           if (state.selectedCard) {
             if (iconEl) { iconEl.className = 'fa-solid fa-credit-card text-indigo-500'; }
             if (textEl) {
@@ -2435,7 +2808,9 @@
             if (t.category === 'receita') map = RECEITA_SUBCATEGORIES;
             else if (t.category === 'investimento') map = INVEST_SUBCATEGORIES;
             else map = DESPESA_SUBCATEGORIES;
-            const subLabel = map[t.subCategory] || map[sub];
+            const customSubsLookup = state.customSubCategories[t.category] || [];
+            const customMatchLookup = customSubsLookup.find(c => c.value === t.subCategory || c.value === sub);
+            const subLabel = map[t.subCategory] || map[sub] || (customMatchLookup && customMatchLookup.label);
             if (subLabel) {
               const colorClasses = SUBCATEGORY_COLOR_CLASSES[t.subCategory] || SUBCATEGORY_COLOR_CLASSES[sub] || 'bg-gray-50 text-gray-700 border-gray-200';
               badgesHTML += `<span class="inline-flex items-center px-2 py-0.5 rounded-full border text-[10px] font-medium ${colorClasses}">${subLabel}</span>`;
@@ -2447,7 +2822,7 @@
           }
 
           let pagamentoTexto = '-';
-          if (t.isCreditCard && t.card) pagamentoTexto = CARD_LABELS[t.card] || '-';
+          if (t.isCreditCard && t.card) pagamentoTexto = getCardLabels()[t.card] || t.card || '-';
           else if (t.paymentMethod === 'debito_pix') pagamentoTexto = 'Débito/Pix';
           else if (t.paymentMethod === 'boleto') pagamentoTexto = 'Boleto';
 
@@ -2497,7 +2872,9 @@
           const zebra = index % 2 === 0 ? 'bg-white' : 'bg-gray-50/50';
           tr.className = zebra;
 
-          const subLabel = t.subCategory ? (INVEST_SUBCATEGORIES[t.subCategory] || t.subCategory) : '-';
+          const customSubsInv = state.customSubCategories['investimento'] || [];
+          const customMatchInv = t.subCategory ? customSubsInv.find(c => c.value === t.subCategory) : null;
+          const subLabel = t.subCategory ? (INVEST_SUBCATEGORIES[t.subCategory] || (customMatchInv && customMatchInv.label) || t.subCategory) : '-';
 
           const aportado = !!t.aportado;
           const btnClass = aportado ? 'bg-blue-50 text-blue-700 border-blue-200' : 'bg-gray-50 text-gray-600 border-gray-200';
@@ -2544,7 +2921,9 @@
             if (t.category === 'receita') map = RECEITA_SUBCATEGORIES;
             else if (t.category === 'investimento') map = INVEST_SUBCATEGORIES;
             else map = DESPESA_SUBCATEGORIES;
-            const subLabel = map[t.subCategory] || map[sub];
+            const customSubsLookup = state.customSubCategories[t.category] || [];
+            const customMatchLookup = customSubsLookup.find(c => c.value === t.subCategory || c.value === sub);
+            const subLabel = map[t.subCategory] || map[sub] || (customMatchLookup && customMatchLookup.label);
             if (subLabel) {
               const colorClasses = SUBCATEGORY_COLOR_CLASSES[t.subCategory] || SUBCATEGORY_COLOR_CLASSES[sub] || 'bg-gray-50 text-gray-700 border-gray-200';
               badgesHTML += `<span class="inline-flex items-center px-2 py-0.5 rounded-full border text-[10px] font-medium ${colorClasses}">${subLabel}</span>`;
@@ -2556,7 +2935,7 @@
           }
 
           let pagamentoTexto = '-';
-          if (t.isCreditCard && t.card) pagamentoTexto = CARD_LABELS[t.card] || '-';
+          if (t.isCreditCard && t.card) pagamentoTexto = getCardLabels()[t.card] || t.card || '-';
           else if (t.paymentMethod === 'debito_pix') pagamentoTexto = 'Débito/Pix';
           else if (t.paymentMethod === 'boleto') pagamentoTexto = 'Boleto';
 
@@ -2625,10 +3004,12 @@
           let badgesHTML = `<span class="inline-flex items-center px-2 py-0.5 rounded-full border text-[10px] font-medium text-gray-600 bg-gray-50 border-gray-200 mr-1">${categoriaBaseLabel}</span>`;
 
           if (t.subCategory) {
-            const subLabel = INVEST_SUBCATEGORIES[t.subCategory];
-            if (subLabel) {
+            const customSubsInv2 = state.customSubCategories['investimento'] || [];
+            const customMatchInv2 = customSubsInv2.find(c => c.value === t.subCategory);
+            const subLabel2 = INVEST_SUBCATEGORIES[t.subCategory] || (customMatchInv2 && customMatchInv2.label);
+            if (subLabel2) {
               const colorClasses = SUBCATEGORY_COLOR_CLASSES[t.subCategory] || 'bg-gray-50 text-gray-700 border-gray-200';
-              badgesHTML += `<span class="inline-flex items-center px-2 py-0.5 rounded-full border text-[10px] font-medium ${colorClasses}">${subLabel}</span>`;
+              badgesHTML += `<span class="inline-flex items-center px-2 py-0.5 rounded-full border text-[10px] font-medium ${colorClasses}">${subLabel2}</span>`;
             }
           }
 
@@ -3210,6 +3591,7 @@
           monthlyView.classList.remove('hidden');
           renderSummaryCards();
           renderBudgetRuleCards();
+          renderCardsGrid();
           renderCardsFaturas();
           updateCardFilterVisual();
           renderTables();
@@ -3504,7 +3886,7 @@
           // Check if it's a credit card transaction (both isCreditCard flag and paymentMethod)
           const isCard = (tx.isCreditCard || tx.paymentMethod === 'cartao');
           editIsCartao.checked = isCard;
-          if (isCard) { editCartaoFields.classList.remove('hidden'); editCartao.value = tx.card || 'caixa'; }
+          if (isCard) { editCartaoFields.classList.remove('hidden'); editCartao.value = tx.card || (state.cards[0]?.id || ''); }
           else editCartaoFields.classList.add('hidden');
         }
 
@@ -3964,7 +4346,302 @@ if (isParceladoSerie && previewBox && previewList) {
             sidebarToggle.classList.toggle('collapsed');
           });
         }
-        
+
+        // ---------- CARDS MODAL ----------
+        function openCardsModal() {
+          document.getElementById('cardsModal').classList.remove('hidden');
+          document.getElementById('cardsModal').classList.add('flex');
+          renderCardsModalList();
+          renderCardColorPicker();
+        }
+        function closeCardsModal() {
+          document.getElementById('cardsModal').classList.add('hidden');
+          document.getElementById('cardsModal').classList.remove('flex');
+          resetCardForm();
+        }
+        document.getElementById('btnManageCards').addEventListener('click', openCardsModal);
+        document.getElementById('btnCardsModalClose').addEventListener('click', closeCardsModal);
+        document.getElementById('cardsModal').addEventListener('click', (e) => { if (e.target === e.currentTarget) closeCardsModal(); });
+
+        function renderCardColorPicker() {
+          const picker = document.getElementById('cardColorPicker');
+          if (!picker) return;
+          picker.innerHTML = '';
+          const selectedColor = document.getElementById('cardFormColor').value || 'sky';
+          Object.keys(CARD_COLOR_MAP).forEach(colorKey => {
+            const col = CARD_COLOR_MAP[colorKey];
+            const btn = document.createElement('button');
+            btn.type = 'button';
+            btn.dataset.color = colorKey;
+            btn.className = `w-6 h-6 rounded-full ${col.dot} border-2 transition ${selectedColor === colorKey ? 'border-gray-900 scale-110' : 'border-transparent'}`;
+            btn.title = colorKey;
+            btn.addEventListener('click', () => {
+              document.getElementById('cardFormColor').value = colorKey;
+              renderCardColorPicker();
+            });
+            picker.appendChild(btn);
+          });
+        }
+
+        function resetCardForm() {
+          document.getElementById('formManageCard').reset();
+          document.getElementById('editCardId').value = '';
+          document.getElementById('cardFormColor').value = 'sky';
+          document.getElementById('cardsModalFormTitle').innerHTML = '<i class="fa-solid fa-plus text-indigo-400 mr-1"></i> Novo Cartão';
+          document.getElementById('cardFormBtnText').textContent = 'Adicionar Cartão';
+          document.getElementById('btnCancelEditCard').classList.add('hidden');
+          renderCardColorPicker();
+        }
+
+        function renderCardsModalList() {
+          const list = document.getElementById('cardsModalList');
+          if (!list) return;
+          list.innerHTML = '';
+          if (state.cards.length === 0) {
+            list.innerHTML = '<p class="text-xs text-gray-400 text-center py-2">Nenhum cartão cadastrado.</p>';
+            return;
+          }
+          state.cards.forEach(card => {
+            const colors = CARD_COLOR_MAP[card.color] || CARD_COLOR_MAP.sky;
+            const row = document.createElement('div');
+            row.className = `flex items-center justify-between px-3 py-2 rounded-lg border border-gray-100 bg-gray-50`;
+            row.innerHTML = `
+              <div class="flex items-center gap-2">
+                <span class="w-3 h-3 rounded-full ${colors.dot} shrink-0"></span>
+                <div>
+                  <p class="text-xs font-medium text-gray-800">${card.label}</p>
+                  <p class="text-[10px] text-gray-500">${card.limit > 0 ? 'Limite: ' + formatCurrency(card.limit) : 'Sem limite definido'}</p>
+                </div>
+              </div>
+              <div class="flex items-center gap-1">
+                <button class="btn-edit-card w-7 h-7 rounded-lg text-indigo-600 hover:bg-indigo-50 flex items-center justify-center" data-id="${card.id}" title="Editar">
+                  <i class="fa-solid fa-pen text-[10px]"></i>
+                </button>
+                <button class="btn-delete-card w-7 h-7 rounded-lg text-red-500 hover:bg-red-50 flex items-center justify-center" data-id="${card.id}" title="Excluir">
+                  <i class="fa-solid fa-trash text-[10px]"></i>
+                </button>
+              </div>
+            `;
+            row.querySelector('.btn-edit-card').addEventListener('click', () => startEditCard(card.id));
+            row.querySelector('.btn-delete-card').addEventListener('click', () => deleteCard(card.id));
+            list.appendChild(row);
+          });
+        }
+
+        function startEditCard(cardId) {
+          const card = state.cards.find(c => c.id === cardId);
+          if (!card) return;
+          document.getElementById('editCardId').value = card.id;
+          document.getElementById('cardFormName').value = card.label;
+          document.getElementById('cardFormLimit').value = card.limit || '';
+          document.getElementById('cardFormColor').value = card.color || 'sky';
+          document.getElementById('cardsModalFormTitle').innerHTML = '<i class="fa-solid fa-pen text-indigo-400 mr-1"></i> Editar Cartão';
+          document.getElementById('cardFormBtnText').textContent = 'Salvar Alterações';
+          document.getElementById('btnCancelEditCard').classList.remove('hidden');
+          renderCardColorPicker();
+        }
+
+        document.getElementById('btnCancelEditCard').addEventListener('click', resetCardForm);
+
+        document.getElementById('formManageCard').addEventListener('submit', async (e) => {
+          e.preventDefault();
+          const editId = document.getElementById('editCardId').value;
+          const label = document.getElementById('cardFormName').value.trim();
+          const limit = parseFloat(document.getElementById('cardFormLimit').value || '0') || 0;
+          const color = document.getElementById('cardFormColor').value || 'sky';
+          if (!label) return;
+
+          if (editId) {
+            // Edit existing
+            const card = state.cards.find(c => c.id === editId);
+            if (card) { card.label = label; card.limit = limit; card.color = color; }
+          } else {
+            // Add new
+            const newId = label.toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g,'').replace(/\s+/g,'_').replace(/[^a-z0-9_]/g,'') + '_' + Date.now().toString(36);
+            state.cards.push({ id: newId, label, limit, color });
+          }
+
+          try {
+            await saveCards();
+            populateCardSelects(true);
+            renderCardsGrid();
+            renderCardsFaturas();
+            renderCardsModalList();
+            resetCardForm();
+            showToast(editId ? 'Cartão atualizado!' : 'Cartão adicionado!', 'success');
+          } catch(err) {
+            showToast('Erro ao salvar cartão.', 'error');
+          }
+        });
+
+        async function deleteCard(cardId) {
+          if (!confirm('Excluir este cartão? As transações existentes não serão apagadas.')) return;
+          state.cards = state.cards.filter(c => c.id !== cardId);
+          try {
+            await deleteCardFromFirestore(cardId);
+            await saveCards();
+          } catch(e) {}
+          try { localStorage.setItem(CARDS_KEY, JSON.stringify(state.cards)); } catch(_) {}
+          populateCardSelects(true);
+          renderCardsGrid();
+          renderCardsFaturas();
+          renderCardsModalList();
+          showToast('Cartão removido.', 'success');
+        }
+
+        // ---------- SETTINGS MODAL ----------
+        function openSettingsModal() {
+          document.getElementById('settingsModal').classList.remove('hidden');
+          document.getElementById('settingsModal').classList.add('flex');
+          switchSettingsTab('categories');
+        }
+        function closeSettingsModal() {
+          document.getElementById('settingsModal').classList.add('hidden');
+          document.getElementById('settingsModal').classList.remove('flex');
+        }
+
+        ['btnManageTypes','btnManageCategories','btnManageCategoriesRec'].forEach(id => {
+          const btn = document.getElementById(id);
+          if (btn) btn.addEventListener('click', () => {
+            openSettingsModal();
+            if (id === 'btnManageTypes') switchSettingsTab('types');
+            else switchSettingsTab('categories');
+          });
+        });
+        document.getElementById('btnSettingsModalClose').addEventListener('click', closeSettingsModal);
+        document.getElementById('settingsModal').addEventListener('click', (e) => { if (e.target === e.currentTarget) closeSettingsModal(); });
+
+        // Tab switching
+        document.querySelectorAll('.settings-tab-btn').forEach(btn => {
+          btn.addEventListener('click', () => switchSettingsTab(btn.dataset.tab));
+        });
+
+        function switchSettingsTab(tab) {
+          document.querySelectorAll('.settings-tab-btn').forEach(b => {
+            if (b.dataset.tab === tab) {
+              b.classList.add('border-indigo-500','text-indigo-600');
+              b.classList.remove('border-transparent','text-gray-500');
+            } else {
+              b.classList.remove('border-indigo-500','text-indigo-600');
+              b.classList.add('border-transparent','text-gray-500');
+            }
+          });
+          document.querySelectorAll('.settings-tab-content').forEach(c => c.classList.add('hidden'));
+          const tabEl = document.getElementById(`tab${tab.charAt(0).toUpperCase() + tab.slice(1)}`);
+          if (tabEl) tabEl.classList.remove('hidden');
+          if (tab === 'categories') renderSettingsCatList();
+          if (tab === 'types') renderSettingsTypesList();
+        }
+
+        const settingsCatType = document.getElementById('settingsCatType');
+        settingsCatType.addEventListener('change', renderSettingsCatList);
+
+        function renderSettingsCatList() {
+          const type = settingsCatType.value;
+          const list = document.getElementById('settingsCatList');
+          if (!list) return;
+          list.innerHTML = '';
+          const customs = state.customSubCategories[type] || [];
+          if (customs.length === 0) {
+            list.innerHTML = '<p class="text-[10px] text-gray-400">Nenhuma categoria personalizada ainda.</p>';
+            return;
+          }
+          customs.forEach((cat, idx) => {
+            const row = document.createElement('div');
+            row.className = 'flex items-center justify-between px-2 py-1.5 rounded-lg bg-gray-50 border border-gray-100';
+            row.innerHTML = `<span class="text-xs text-gray-700">${cat.label}</span>
+              <button class="w-6 h-6 rounded text-red-400 hover:bg-red-50 flex items-center justify-center btn-del-cat" data-type="${type}" data-idx="${idx}">
+                <i class="fa-solid fa-xmark text-[10px]"></i>
+              </button>`;
+            row.querySelector('.btn-del-cat').addEventListener('click', async (e) => {
+              const t = e.currentTarget.dataset.type;
+              const i = parseInt(e.currentTarget.dataset.idx);
+              state.customSubCategories[t].splice(i, 1);
+              await saveSettings();
+              populateDespesaSubcategorias();
+              populateReceitaCategoria();
+              renderSettingsCatList();
+              showToast('Categoria removida.', 'success');
+            });
+            list.appendChild(row);
+          });
+        }
+
+        document.getElementById('formAddCategory').addEventListener('submit', async (e) => {
+          e.preventDefault();
+          const type = settingsCatType.value;
+          const labelVal = document.getElementById('newCatLabel').value.trim();
+          if (!labelVal) return;
+          const valueKey = labelVal.toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g,'').replace(/\s+/g,'_').replace(/[^a-z0-9_]/g,'');
+          if (!state.customSubCategories[type]) state.customSubCategories[type] = [];
+          if (state.customSubCategories[type].some(c => c.value === valueKey)) {
+            showToast('Esta categoria já existe.', 'warning'); return;
+          }
+          state.customSubCategories[type].push({ value: valueKey, label: labelVal });
+          try {
+            await saveSettings();
+            document.getElementById('newCatLabel').value = '';
+            populateDespesaSubcategorias();
+            populateReceitaCategoria();
+            renderSettingsCatList();
+            showToast('Categoria adicionada!', 'success');
+          } catch(err) {
+            showToast('Erro ao salvar categoria.', 'error');
+          }
+        });
+
+        function renderSettingsTypesList() {
+          const list = document.getElementById('settingsTypesList');
+          if (!list) return;
+          list.innerHTML = '';
+          if (state.customTypes.length === 0) {
+            list.innerHTML = '<p class="text-[10px] text-gray-400">Nenhum tipo personalizado ainda.</p>';
+            return;
+          }
+          state.customTypes.forEach((ct, idx) => {
+            const baseName = CATEGORY_LABELS[ct.baseType] || ct.baseType;
+            const row = document.createElement('div');
+            row.className = 'flex items-center justify-between px-2 py-1.5 rounded-lg bg-gray-50 border border-gray-100';
+            row.innerHTML = `<div>
+              <span class="text-xs text-gray-700 font-medium">${ct.label}</span>
+              <span class="text-[10px] text-gray-400 ml-1">(base: ${baseName})</span>
+            </div>
+            <button class="w-6 h-6 rounded text-red-400 hover:bg-red-50 flex items-center justify-center btn-del-type" data-idx="${idx}">
+              <i class="fa-solid fa-xmark text-[10px]"></i>
+            </button>`;
+            row.querySelector('.btn-del-type').addEventListener('click', async (e) => {
+              const i = parseInt(e.currentTarget.dataset.idx);
+              state.customTypes.splice(i, 1);
+              await saveSettings();
+              populateDespCategoria();
+              renderSettingsTypesList();
+              showToast('Tipo removido.', 'success');
+            });
+            list.appendChild(row);
+          });
+        }
+
+        document.getElementById('formAddType').addEventListener('submit', async (e) => {
+          e.preventDefault();
+          const labelVal = document.getElementById('newTypeLabel').value.trim();
+          const baseType = document.getElementById('newTypeBase').value;
+          if (!labelVal) return;
+          const valueKey = labelVal.toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g,'').replace(/\s+/g,'_').replace(/[^a-z0-9_]/g,'') + '_custom';
+          if (state.customTypes.some(ct => ct.value === valueKey)) {
+            showToast('Este tipo já existe.', 'warning'); return;
+          }
+          state.customTypes.push({ value: valueKey, label: labelVal, baseType });
+          try {
+            await saveSettings();
+            document.getElementById('newTypeLabel').value = '';
+            populateDespCategoria();
+            renderSettingsTypesList();
+            showToast('Tipo adicionado!', 'success');
+          } catch(err) {
+            showToast('Erro ao salvar tipo.', 'error');
+          }
+        });
+
         document.querySelectorAll('.month-btn').forEach((btn) => {
           btn.addEventListener('click', () => renderDashboard(parseInt(btn.getAttribute('data-month-index'), 10)));
         });
@@ -4042,12 +4719,15 @@ if (forma === 'cartao' || forma === 'boleto') {
 
           if (!description || !date || isNaN(value)) return;
 
+          // Resolve base type for custom types
+          const baseCategory = getBaseType(category);
+
           try {
             await addTransaction({
               description,
               value,
               date,
-              category,
+              category: baseCategory,
               subCategory,
               isCreditCard,
               card,
@@ -4062,7 +4742,7 @@ if (forma === 'cartao' || forma === 'boleto') {
               'variavel': 'Despesa variável',
               'investimento': 'Investimento'
             };
-            showToast(`${categoryLabels[category] || 'Lançamento'} adicionado com sucesso`, 'success');
+            showToast(`${categoryLabels[baseCategory] || 'Lançamento'} adicionado com sucesso`, 'success');
             
             formDespesa.reset();
             // esconder subseções pós-reset
@@ -4083,12 +4763,8 @@ if (forma === 'cartao' || forma === 'boleto') {
           updateParcelVisibilityAndCard();
         });
 
-        document.querySelectorAll('.card-status-btn').forEach(btn => {
-          btn.addEventListener('click', () => {
-            const card = btn.getAttribute('data-card');
-            toggleInvoiceStatusForSelectedMonth(card);
-          });
-        });
+        // Note: card-status-btn listeners are attached dynamically in renderCardsGrid()
+        // and card container click listeners are also attached in renderCardsGrid()
 
         // Helper: aplica filtro e re-renderiza toda a página
         function applyPageFilter() {
@@ -4104,19 +4780,8 @@ if (forma === 'cartao' || forma === 'boleto') {
           }
         }
 
-        // Clique nos cartões de crédito para filtrar transações
-        ['caixa', 'inter_debora', 'inter_cristiano', 'nubank', 'c6'].forEach(card => {
-          const container = document.getElementById(`cardContainer-${card}`);
-          if (container) {
-            container.addEventListener('click', (e) => {
-              // Não aciona se clicou no botão de status da fatura
-              if (e.target.closest('.card-status-btn')) return;
-              state.selectedCategory = null;
-              state.selectedCard = (state.selectedCard === card) ? null : card;
-              applyPageFilter();
-            });
-          }
-        });
+        // applyPageFilter is defined here; expose for use in renderCardsGrid closures
+        window._applyPageFilter = applyPageFilter;
 
         // Clique nos cartões de resumo (Receitas, Investimentos, etc.) para filtrar por categoria
         ['receita', 'investimento', 'fixa', 'variavel'].forEach(cat => {
@@ -4384,9 +5049,18 @@ if (forma === 'cartao' || forma === 'boleto') {
         if (_authError) {
           showToast('Falha na autenticação Firebase. Dados serão salvos somente localmente.', 'warning');
         }
-        
+
+        await loadCards();
+        await loadSettings();
         await loadTransactions();
         await loadInvoices();
+
+        // Populate dynamic selects after data is loaded
+        populateCardSelects(false);
+        populateDespesaSubcategorias();
+        populateReceitaCategoria();
+        populateDespCategoria();
+
         refreshYearFilterOptions();
         setupEvents();
         renderDashboard(state.selectedMonth);
