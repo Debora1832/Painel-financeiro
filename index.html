@@ -487,11 +487,23 @@
                   <p class="text-xs uppercase tracking-wide text-gray-500">Crédito Disponível Total</p>
                   <p class="text-lg font-semibold text-emerald-700" id="totalCreditoDisponivel">R$ 0,00</p>
                 </div>
-                <div class="w-10 h-10 rounded-full bg-emerald-50 flex items-center justify-center">
+                <div class="w-10 h-10 rounded-full bg-emerald-50 flex items-center justify-center shrink-0">
                   <i class="fa-solid fa-circle-dollar-to-slot text-emerald-500"></i>
                 </div>
               </div>
-              <p class="text-xs text-gray-500">Soma dos limites disponíveis de todos os cartões de crédito.</p>
+              <div class="space-y-1.5">
+                <div class="flex items-center justify-between text-[11px]">
+                  <span class="text-gray-500">Utilizado (parcelas pendentes)</span>
+                  <span id="totalCreditoUtilizado" class="font-semibold text-rose-600">R$ 0,00</span>
+                </div>
+                <div class="w-full h-1.5 bg-gray-100 rounded-full overflow-hidden">
+                  <div id="totalCreditoBar" class="h-full bg-emerald-400 rounded-full transition-all" style="width:0%"></div>
+                </div>
+                <div class="flex items-center justify-between text-[10px] text-gray-400">
+                  <span id="totalCreditoPct">0% utilizado do limite total</span>
+                  <span id="totalCreditoLimite">Limite: R$ 0,00</span>
+                </div>
+              </div>
             </div>
           </div>
 
@@ -2599,15 +2611,25 @@
                 <i class="fa-solid fa-credit-card ${colors.icon} text-sm"></i>
               </div>
             </div>
-            <p class="text-sm font-semibold text-gray-900" id="cardValue-${card.id}">R$ 0,00</p>
+            <div class="flex items-center justify-between">
+              <span class="text-[10px] text-gray-400">Fatura do período</span>
+              <p class="text-sm font-semibold text-gray-900" id="cardValue-${card.id}">R$ 0,00</p>
+            </div>
             ${card.limit > 0 ? `
-            <div class="flex flex-col gap-0.5 mt-0.5">
-              <div class="flex items-center justify-between text-[10px] text-gray-400">
-                <span>Disponível</span>
-                <span id="cardAvailable-${card.id}" class="font-medium text-emerald-600">R$ 0,00</span>
+            <div class="flex flex-col gap-1 mt-1 pt-1 border-t border-gray-100">
+              <div class="flex items-center justify-between text-[10px]">
+                <span class="text-gray-400">Utilizado (total)</span>
+                <span id="cardCommitted-${card.id}" class="font-semibold text-rose-600">R$ 0,00</span>
               </div>
-              <div class="w-full h-1 bg-gray-100 rounded-full overflow-hidden">
+              <div class="flex items-center justify-between text-[10px]">
+                <span class="text-gray-400">Disponível</span>
+                <span id="cardAvailable-${card.id}" class="font-semibold text-emerald-600">R$ 0,00</span>
+              </div>
+              <div class="w-full h-1.5 bg-gray-100 rounded-full overflow-hidden mt-0.5">
                 <div id="cardUsageBar-${card.id}" class="h-full bg-rose-400 rounded-full transition-all" style="width:0%"></div>
+              </div>
+              <div class="flex items-center justify-end">
+                <span id="cardPct-${card.id}" class="text-[10px] font-medium text-gray-500">0% utilizado</span>
               </div>
             </div>` : ''}
             <button
@@ -2628,52 +2650,97 @@
       }
 
       function renderCardsFaturas() {
+        // --- FILTERED (current period): used for "fatura do período" display ---
         const txs = getFilteredTransactions().filter((t) => t.isCreditCard);
-        const totals = {};
+        const periodTotals = {};
         const counts = {};
-        state.cards.forEach(c => { totals[c.id] = 0; counts[c.id] = 0; });
+        state.cards.forEach(c => { periodTotals[c.id] = 0; counts[c.id] = 0; });
         let totalFaturas = 0;
 
         txs.forEach((t) => {
           const v = Number(t.value) || 0;
           totalFaturas += v;
-          if (t.card && totals.hasOwnProperty(t.card)) {
-            totals[t.card] += v;
+          if (t.card && periodTotals.hasOwnProperty(t.card)) {
+            periodTotals[t.card] += v;
             counts[t.card]++;
           }
         });
 
         document.getElementById('totalFaturas').textContent = formatCurrency(totalFaturas);
 
-        // Compute total available credit
-        let totalDisponivel = 0;
-        state.cards.forEach(card => {
-          if (card.limit > 0) totalDisponivel += Math.max(0, card.limit - (totals[card.id] || 0));
-        });
-        const totalDispEl = document.getElementById('totalCreditoDisponivel');
-        if (totalDispEl) totalDispEl.textContent = formatCurrency(totalDisponivel);
+        // --- ALL MONTHS: total committed = all unpaid credit card transactions ---
+        // This reflects real credit limit usage (current + future installments not yet paid)
+        const allCommitted = {};
+        state.cards.forEach(c => { allCommitted[c.id] = 0; });
 
+        state.transactions.forEach(t => {
+          if (!t.isCreditCard || !t.card) return;
+          if (!allCommitted.hasOwnProperty(t.card)) return;
+          if (!t.paid) {
+            allCommitted[t.card] += Number(t.value) || 0;
+          }
+        });
+
+        // --- TOTAL CREDIT BALLOON ---
+        let totalDisponivel = 0;
+        let totalUtilizado = 0;
+        let totalLimite = 0;
+
+        state.cards.forEach(card => {
+          if (card.limit > 0) {
+            const committed = allCommitted[card.id] || 0;
+            totalLimite += card.limit;
+            totalUtilizado += Math.min(committed, card.limit);
+            totalDisponivel += Math.max(0, card.limit - committed);
+          }
+        });
+
+        const totalDispEl = document.getElementById('totalCreditoDisponivel');
+        const totalUtilEl = document.getElementById('totalCreditoUtilizado');
+        const totalBarEl = document.getElementById('totalCreditoBar');
+        const totalPctEl = document.getElementById('totalCreditoPct');
+        const totalLimEl = document.getElementById('totalCreditoLimite');
+
+        if (totalDispEl) totalDispEl.textContent = formatCurrency(totalDisponivel);
+        if (totalUtilEl) totalUtilEl.textContent = formatCurrency(totalUtilizado);
+        if (totalLimEl) totalLimEl.textContent = `Limite: ${formatCurrency(totalLimite)}`;
+
+        const totalPct = totalLimite > 0 ? Math.min(100, (totalUtilizado / totalLimite) * 100) : 0;
+        if (totalPctEl) totalPctEl.textContent = `${totalPct.toFixed(1)}% utilizado do limite total`;
+        if (totalBarEl) {
+          totalBarEl.style.width = `${totalPct}%`;
+          totalBarEl.className = `h-full rounded-full transition-all ${totalPct > 90 ? 'bg-red-500' : totalPct > 70 ? 'bg-amber-400' : 'bg-emerald-400'}`;
+        }
+
+        // --- INDIVIDUAL CARDS ---
         const WARNING_THRESHOLD = 2500;
         const year = getYearForSelectedMonth();
         const m = state.selectedMonth;
 
         state.cards.forEach(card => {
-          const spent = totals[card.id] || 0;
+          const periodSpent = periodTotals[card.id] || 0;
+          const committed = allCommitted[card.id] || 0;
           const count = counts[card.id] || 0;
           const colors = CARD_COLOR_MAP[card.color] || CARD_COLOR_MAP.sky;
 
           const valEl = document.getElementById(`cardValue-${card.id}`);
           const cntEl = document.getElementById(`cardCount-${card.id}`);
           const container = document.getElementById(`cardContainer-${card.id}`);
-          if (valEl) valEl.textContent = formatCurrency(spent);
+          if (valEl) valEl.textContent = formatCurrency(periodSpent);
           if (cntEl) cntEl.textContent = count;
 
           if (card.limit > 0) {
-            const available = Math.max(0, card.limit - spent);
-            const usedPct = Math.min(100, (spent / card.limit) * 100);
+            const available = Math.max(0, card.limit - committed);
+            const usedPct = Math.min(100, (committed / card.limit) * 100);
+
+            const committedEl = document.getElementById(`cardCommitted-${card.id}`);
             const avEl = document.getElementById(`cardAvailable-${card.id}`);
             const barEl = document.getElementById(`cardUsageBar-${card.id}`);
+            const pctEl = document.getElementById(`cardPct-${card.id}`);
+
+            if (committedEl) committedEl.textContent = formatCurrency(committed);
             if (avEl) avEl.textContent = formatCurrency(available);
+            if (pctEl) pctEl.textContent = `${usedPct.toFixed(1)}% utilizado`;
             if (barEl) {
               barEl.style.width = `${usedPct}%`;
               barEl.className = `h-full rounded-full transition-all ${usedPct > 90 ? 'bg-red-500' : usedPct > 70 ? 'bg-amber-400' : 'bg-emerald-400'}`;
@@ -2681,10 +2748,10 @@
           }
 
           if (container) {
-            // Reset border color
             Object.values(CARD_COLOR_MAP).forEach(c => container.classList.remove(c.border));
             container.classList.remove('border-l-red-500');
-            if (spent > WARNING_THRESHOLD && (card.limit === 0 || spent > card.limit * 0.9)) {
+            const usedPct = card.limit > 0 ? (allCommitted[card.id] || 0) / card.limit * 100 : 0;
+            if (usedPct > 90 || (card.limit === 0 && periodSpent > WARNING_THRESHOLD)) {
               container.classList.add('border-l-red-500');
             } else {
               container.classList.add(colors.border);
