@@ -468,9 +468,9 @@
           </button>
         </div>
 
-        <div class="grid grid-cols-1 lg:grid-cols-3 gap-4">
-          <!-- Coluna esquerda: resumos -->
-          <div class="lg:col-span-1 flex flex-col gap-3">
+        <div class="flex flex-col gap-4">
+          <!-- Linha superior: dois cards de resumo lado a lado -->
+          <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
             <div class="bg-white rounded-xl shadow-sm border border-gray-100 p-4 flex flex-col justify-between">
               <div class="flex items-center justify-between mb-2">
                 <div>
@@ -509,11 +509,9 @@
             </div>
           </div>
 
-          <!-- Coluna direita: grid dinâmico de cartões -->
-          <div class="lg:col-span-2">
-            <div id="cardsGrid" class="gap-3">
-              <!-- Renderizado via JS -->
-            </div>
+          <!-- Grid dinâmico de cartões — ocupa toda a largura -->
+          <div id="cardsGrid" class="gap-3">
+            <!-- Renderizado via JS -->
           </div>
         </div>
       </section>
@@ -662,6 +660,13 @@
               <input id="despParcelas" type="number" min="1" max="48" value="1"
                 class="w-full rounded-lg border border-gray-200 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500" />
               <p class="text-[11px] text-gray-400">Compras parceladas serão distribuídas automaticamente pelos meses futuros.</p>
+            </div>
+
+            <div id="despRepeticoesWrapper" class="space-y-1 hidden">
+              <label for="despRepeticoes" class="font-medium text-gray-700">Repetições (meses)</label>
+              <input id="despRepeticoes" type="number" min="1" max="120" value="12"
+                class="w-full rounded-lg border border-gray-200 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-orange-500" />
+              <p class="text-[11px] text-gray-400">Quantos meses este lançamento fixo será repetido a partir da data selecionada.</p>
             </div>
 
             <!-- Observação: checkbox 'Já aportado?' removido do formulário conforme solicitado -->
@@ -1328,15 +1333,15 @@
 
         <div id="editParcelScope" class="hidden border-t border-gray-100 pt-2 mt-2">
           <div id="editParcelNumField" class="space-y-1 mb-3">
-            <label for="editParcelas" class="font-medium text-gray-700 flex items-center gap-2">
+            <label for="editParcelas" id="editParcelasLabel" class="font-medium text-gray-700 flex items-center gap-2">
               <i class="fa-solid fa-calculator text-indigo-600"></i>
-              Número de Parcelas
+              Número de Repetições
             </label>
-            <input id="editParcelas" type="number" min="1" max="60" step="1" value="1"
+            <input id="editParcelas" type="number" min="1" max="120" step="1" value="1"
               class="w-full rounded-lg border border-gray-200 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500" />
-            <p class="text-xs text-gray-500 mt-1">
+            <p class="text-xs text-gray-500 mt-1" id="editParcelasHint">
               <i class="fa-solid fa-info-circle"></i>
-              Altere o número de parcelas para redistribuir o valor automaticamente
+              Altere o número de repetições para redistribuir o valor automaticamente
             </p>
           </div>
           <div id="editParcelPreview" class="hidden mt-2 border-2 border-indigo-200 rounded-lg bg-indigo-50 p-3 text-xs">
@@ -2259,14 +2264,30 @@
         const forma = document.getElementById('despFormaPagamento').value;
         const cartaoWrapper = document.getElementById('despCartaoFields');
         const parcelasWrapper = document.getElementById('despParcelasWrapper');
+        const repeticoesWrapper = document.getElementById('despRepeticoesWrapper');
 
-        // Se for investimento -> esconder ambos sempre
+        // Se for investimento -> esconder todos sempre
         if (tipo === 'investimento') {
           cartaoWrapper.classList.add('hidden');
           parcelasWrapper.classList.add('hidden');
+          repeticoesWrapper.classList.add('hidden');
           return;
         }
 
+        // Para despesa fixa: mostrar repetições (não parcelas)
+        if (tipo === 'fixa') {
+          if (forma === 'cartao') {
+            cartaoWrapper.classList.remove('hidden');
+          } else {
+            cartaoWrapper.classList.add('hidden');
+          }
+          parcelasWrapper.classList.add('hidden');
+          repeticoesWrapper.classList.remove('hidden');
+          return;
+        }
+
+        // Despesa variável e outros
+        repeticoesWrapper.classList.add('hidden');
         if (forma === 'cartao') {
           cartaoWrapper.classList.remove('hidden');
           parcelasWrapper.classList.remove('hidden');
@@ -2662,11 +2683,11 @@
             ${card.limit > 0 ? `
             <div class="flex flex-col gap-1 mt-1 pt-1 border-t border-gray-100">
               <div class="flex items-center justify-between text-[10px]">
-                <span class="text-gray-400">Utilizado (total)</span>
+                <span class="text-gray-400">Utilizado no período</span>
                 <span id="cardCommitted-${card.id}" class="font-semibold text-rose-600">R$ 0,00</span>
               </div>
               <div class="flex items-center justify-between text-[10px]">
-                <span class="text-gray-400">Disponível</span>
+                <span class="text-gray-400">Disponível no período</span>
                 <span id="cardAvailable-${card.id}" class="font-semibold text-emerald-600">R$ 0,00</span>
               </div>
               <div class="w-full h-1.5 bg-gray-100 rounded-full overflow-hidden mt-0.5">
@@ -2788,15 +2809,16 @@
           if (cntEl) cntEl.textContent = count;
 
           if (card.limit > 0) {
-            const available = Math.max(0, card.limit - committed);
-            const usedPct = Math.min(100, (committed / card.limit) * 100);
+            // Use period-specific spend so the card shows how much of the limit is consumed THIS month
+            const available = Math.max(0, card.limit - periodSpent);
+            const usedPct = Math.min(100, (periodSpent / card.limit) * 100);
 
             const committedEl = document.getElementById(`cardCommitted-${card.id}`);
             const avEl = document.getElementById(`cardAvailable-${card.id}`);
             const barEl = document.getElementById(`cardUsageBar-${card.id}`);
             const pctEl = document.getElementById(`cardPct-${card.id}`);
 
-            if (committedEl) committedEl.textContent = formatCurrency(committed);
+            if (committedEl) committedEl.textContent = formatCurrency(periodSpent);
             if (avEl) avEl.textContent = formatCurrency(available);
             if (pctEl) pctEl.textContent = `${usedPct.toFixed(1)}% utilizado`;
             if (barEl) {
@@ -2806,7 +2828,7 @@
           }
 
           if (container) {
-            const usedPct = card.limit > 0 ? (allCommitted[card.id] || 0) / card.limit * 100 : 0;
+            const usedPct = card.limit > 0 ? periodSpent / card.limit * 100 : 0;
             container.style.borderLeftColor = (usedPct > 90 || (card.limit === 0 && periodSpent > WARNING_THRESHOLD))
               ? '#ef4444'
               : hex;
@@ -3857,6 +3879,7 @@
   isCreditCard,
   card,
   parcelas,
+  repeticoes,
   paymentMethod,
   aportado,
   extraLazer
@@ -3877,10 +3900,11 @@
   // DESPESA FIXA (mensal)
   // =========================
   if (category === 'fixa') {
-    // Despesas fixas continuam para anos futuros (próximos 12 meses)
+    // Usa o número de repetições informado pelo usuário (padrão: 12 meses)
+    const nRepeticoes = Math.max(1, Math.floor(repeticoes || 12));
     const groupId = generateId();
     
-    for (let i = 0; i < 12; i++) {
+    for (let i = 0; i < nRepeticoes; i++) {
       const d = new Date(baseDate);
       d.setMonth(d.getMonth() + i);
 
@@ -3893,7 +3917,7 @@
         subCategory,
         isCreditCard,
         card: isCreditCard ? card : null,
-          parcelas: 12,
+          parcelas: nRepeticoes,
           parcelaIndex: i + 1,
           paymentMethod,
           groupId: groupId,
@@ -4048,10 +4072,22 @@ if (isParceladoSerie) {
   btnSingle.classList.remove('bg-gray-100','text-gray-600','border-gray-200');
   btnSingle.classList.add('bg-indigo-50','text-indigo-700','border-indigo-200');
   
-  // Set current parcelas number
+  // Set current parcelas / repetições number and update label contextually
   const editParcelasInput = document.getElementById('editParcelas');
+  const editParcelasLabel = document.getElementById('editParcelasLabel');
+  const editParcelasHint = document.getElementById('editParcelasHint');
   if (editParcelasInput) {
     editParcelasInput.value = tx.parcelas || 1;
+  }
+  if (editParcelasLabel) {
+    editParcelasLabel.innerHTML = tx.category === 'fixa'
+      ? '<i class="fa-solid fa-rotate text-indigo-600"></i> Número de Repetições'
+      : '<i class="fa-solid fa-calculator text-indigo-600"></i> Número de Parcelas';
+  }
+  if (editParcelasHint) {
+    editParcelasHint.innerHTML = tx.category === 'fixa'
+      ? '<i class="fa-solid fa-info-circle"></i> Altere quantos meses este lançamento fixo se repete'
+      : '<i class="fa-solid fa-info-circle"></i> Altere o número de parcelas para redistribuir o valor automaticamente';
   }
   
   const previewBox = document.getElementById('editParcelPreview');
@@ -4852,10 +4888,16 @@ if (isParceladoSerie && previewBox && previewList) {
           const isCreditCard = forma === 'cartao';
 const card = isCreditCard ? document.getElementById('despCartao').value : null;
 
-// ✅ Parcelas valem para CARTÃO e BOLETO
+// ✅ Parcelas valem para CARTÃO e BOLETO (apenas para despesas não-fixas)
 let parcelas = 1;
-if (forma === 'cartao' || forma === 'boleto') {
+if ((forma === 'cartao' || forma === 'boleto') && category !== 'fixa') {
   parcelas = parseInt(document.getElementById('despParcelas').value || '1', 10);
+}
+
+// Repetições para despesa fixa
+let repeticoes = 12;
+if (category === 'fixa') {
+  repeticoes = parseInt(document.getElementById('despRepeticoes').value || '12', 10);
 }
 
           if (!description || !date || isNaN(value)) return;
@@ -4873,6 +4915,7 @@ if (forma === 'cartao' || forma === 'boleto') {
               isCreditCard,
               card,
               parcelas,
+              repeticoes,
               paymentMethod: isCreditCard ? 'cartao' : forma, // 'boleto' or 'debito_pix' or 'dinheiro'
               aportado: false, // sempre false vindo do formulário; o status pode ser alterado via tabela
               extraLazer
@@ -4889,6 +4932,7 @@ if (forma === 'cartao' || forma === 'boleto') {
             // esconder subseções pós-reset
             document.getElementById('despCartaoFields').classList.add('hidden');
             document.getElementById('despParcelasWrapper').classList.add('hidden');
+            document.getElementById('despRepeticoesWrapper').classList.add('hidden');
 
             // repor datas para hoje caso precise
             const today = new Date().toISOString().slice(0, 10);
