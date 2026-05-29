@@ -260,6 +260,18 @@
       outline: 2px solid rgb(99, 102, 241);
       outline-offset: 2px;
     }
+
+    /* Wishes category button active */
+    .wish-cat-btn.active {
+      outline: 2px solid #f59e0b;
+      outline-offset: 2px;
+      font-weight: 700;
+    }
+
+    /* Wish card progress bar */
+    .wish-progress-bar {
+      transition: width 0.5s ease;
+    }
   </style>
 </head>
 <body class="min-h-screen bg-gray-50 flex text-gray-900">
@@ -281,7 +293,7 @@
       </button>
     </div>
 
-    <div class="px-4 pt-4 pb-2">
+    <div class="px-4 pt-4 pb-2 space-y-2">
       <button
         id="btnAnnual"
         class="w-full flex items-center justify-between text-sm px-3 py-2 rounded-lg border border-gray-700 bg-gray-800 hover:bg-gray-700 transition"
@@ -289,6 +301,16 @@
         <span class="flex items-center gap-2">
           <i class="fa-solid fa-chart-pie text-indigo-400 sidebar-icon"></i>
           <span class="sidebar-text">Visão Anual</span>
+        </span>
+        <i class="fa-solid fa-chevron-right text-xs text-gray-400 sidebar-text"></i>
+      </button>
+      <button
+        id="btnDesejos"
+        class="w-full flex items-center justify-between text-sm px-3 py-2 rounded-lg border border-gray-700 bg-gray-800 hover:bg-gray-700 transition"
+      >
+        <span class="flex items-center gap-2">
+          <i class="fa-solid fa-star text-yellow-400 sidebar-icon"></i>
+          <span class="sidebar-text">Desejos</span>
         </span>
         <i class="fa-solid fa-chevron-right text-xs text-gray-400 sidebar-text"></i>
       </button>
@@ -494,14 +516,14 @@
                 </div>
               </div>
               <div class="space-y-1.5">
-                <div class="flex items-center justify-between text-[15px]">
+                <div class="flex items-center justify-between text-[11px]">
                   <span class="text-gray-500">Utilizado (pendente de pagamento)</span>
                   <span id="totalCreditoUtilizado" class="font-semibold text-rose-600">R$ 0,00</span>
                 </div>
                 <div class="w-full h-1.5 bg-gray-100 rounded-full overflow-hidden">
                   <div id="totalCreditoBar" class="h-full bg-emerald-400 rounded-full transition-all" style="width:0%"></div>
                 </div>
-                <div class="flex items-center justify-between text-[15px] text-gray-400">
+                <div class="flex items-center justify-between text-[10px] text-gray-400">
                   <span id="totalCreditoPct">0% utilizado do limite total</span>
                   <span id="totalCreditoLimite">Limite: R$ 0,00</span>
                 </div>
@@ -1252,7 +1274,140 @@
         </div>
       </section>
     </div>
+
+    <!-- VISÃO DESEJOS -->
+    <div id="wishesView" class="space-y-4 hidden">
+      <!-- Header da seção -->
+      <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
+        <div>
+          <h2 class="text-lg font-semibold text-gray-900 flex items-center gap-2">
+            <i class="fa-solid fa-star text-yellow-400"></i>
+            Meus Desejos
+          </h2>
+          <p class="text-xs text-gray-500">Acompanhe seus objetivos de compra por categoria e ano.</p>
+        </div>
+        <div class="flex items-center gap-2">
+          <!-- Filtro de ano dos desejos -->
+          <div class="flex flex-col items-end">
+            <label for="wishYearFilter" class="text-[11px] font-medium text-gray-500 uppercase tracking-wide">Ano</label>
+            <select id="wishYearFilter" class="mt-1 w-32 rounded-lg border border-gray-200 px-2 py-1 text-xs bg-white focus:outline-none focus:ring-2 focus:ring-yellow-400 focus:border-yellow-400">
+              <!-- populado via JS -->
+            </select>
+          </div>
+          <button id="btnAddWish" class="inline-flex items-center gap-1.5 px-3 py-2 text-xs font-semibold rounded-lg bg-yellow-400 text-gray-900 hover:bg-yellow-500 transition shadow-sm mt-4">
+            <i class="fa-solid fa-plus text-[11px]"></i>
+            Novo Desejo
+          </button>
+        </div>
+      </div>
+
+      <!-- Tabs de categoria -->
+      <div class="flex gap-2 flex-wrap">
+        <button data-wish-cat="all" class="wish-cat-btn px-4 py-1.5 text-xs font-semibold rounded-full border border-gray-300 text-gray-700 bg-white hover:bg-gray-50 transition">Todos</button>
+        <button data-wish-cat="casa" class="wish-cat-btn px-4 py-1.5 text-xs font-semibold rounded-full border border-amber-300 text-amber-800 bg-amber-50 hover:bg-amber-100 transition">
+          <i class="fa-solid fa-house text-[11px]"></i> Casa
+        </button>
+        <button data-wish-cat="cristiano" class="wish-cat-btn px-4 py-1.5 text-xs font-semibold rounded-full border border-blue-300 text-blue-800 bg-blue-50 hover:bg-blue-100 transition">
+          <i class="fa-solid fa-person text-[11px]"></i> Cristiano
+        </button>
+        <button data-wish-cat="debora" class="wish-cat-btn px-4 py-1.5 text-xs font-semibold rounded-full border border-pink-300 text-pink-800 bg-pink-50 hover:bg-pink-100 transition">
+          <i class="fa-solid fa-person-dress text-[11px]"></i> Débora
+        </button>
+        <button data-wish-cat="emanuel" class="wish-cat-btn px-4 py-1.5 text-xs font-semibold rounded-full border border-green-300 text-green-800 bg-green-50 hover:bg-green-100 transition">
+          <i class="fa-solid fa-child text-[11px]"></i> Emanuel
+        </button>
+      </div>
+
+      <!-- Grid de cards de desejos -->
+      <div id="wishesGrid" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
+        <!-- Renderizado via JS -->
+      </div>
+
+      <!-- Seção de comprados -->
+      <div id="wishBoughtSection" class="hidden">
+        <div class="flex items-center gap-2 mb-3 mt-2">
+          <i class="fa-solid fa-check-circle text-emerald-500"></i>
+          <h3 class="text-sm font-semibold text-gray-700">Comprados</h3>
+          <span id="wishBoughtCount" class="text-xs bg-emerald-100 text-emerald-700 px-2 py-0.5 rounded-full font-semibold">0</span>
+        </div>
+        <div id="wishBoughtGrid" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
+          <!-- Renderizado via JS -->
+        </div>
+      </div>
+    </div>
   </main>
+
+  <!-- MODAL ADICIONAR DESEJO -->
+  <div id="wishModal" class="fixed inset-0 z-50 hidden bg-black/40 items-center justify-center p-4">
+    <div class="bg-white rounded-xl shadow-lg w-full max-w-md mx-auto p-5 space-y-4">
+      <div class="flex items-center justify-between">
+        <h2 class="text-sm font-semibold text-gray-900 flex items-center gap-2">
+          <i class="fa-solid fa-star text-yellow-400"></i>
+          <span id="wishModalTitle">Novo Desejo</span>
+        </h2>
+        <button id="btnCloseWishModal" class="text-gray-400 hover:text-gray-600 transition text-lg leading-none">&times;</button>
+      </div>
+      <form id="formWish" class="space-y-3">
+        <input type="hidden" id="wishEditId" value="" />
+        <div>
+          <label class="text-xs font-medium text-gray-700 block mb-1">Nome do item</label>
+          <input id="wishName" type="text" required placeholder="Ex: Smart TV 65&quot;, Tênis Nike..." class="w-full rounded-lg border border-gray-200 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-yellow-400 focus:border-yellow-400" />
+        </div>
+        <div class="grid grid-cols-2 gap-3">
+          <div>
+            <label class="text-xs font-medium text-gray-700 block mb-1">Categoria</label>
+            <select id="wishCategory" class="w-full rounded-lg border border-gray-200 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-yellow-400 focus:border-yellow-400">
+              <option value="casa">🏠 Casa</option>
+              <option value="cristiano">👤 Cristiano</option>
+              <option value="debora">👗 Débora</option>
+              <option value="emanuel">👦 Emanuel</option>
+            </select>
+          </div>
+          <div>
+            <label class="text-xs font-medium text-gray-700 block mb-1">Ano</label>
+            <select id="wishYear" class="w-full rounded-lg border border-gray-200 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-yellow-400 focus:border-yellow-400">
+              <!-- populado via JS -->
+            </select>
+          </div>
+        </div>
+        <div>
+          <label class="text-xs font-medium text-gray-700 block mb-1">Valor alvo (R$)</label>
+          <input id="wishTarget" type="number" min="0" step="0.01" required placeholder="0,00" class="w-full rounded-lg border border-gray-200 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-yellow-400 focus:border-yellow-400" />
+        </div>
+        <div>
+          <label class="text-xs font-medium text-gray-700 block mb-1">Já guardei (R$)</label>
+          <input id="wishSaved" type="number" min="0" step="0.01" placeholder="0,00" class="w-full rounded-lg border border-gray-200 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-yellow-400 focus:border-yellow-400" />
+        </div>
+        <div class="flex justify-end gap-2 pt-1">
+          <button type="button" id="btnCancelWish" class="px-4 py-2 text-xs font-semibold rounded-lg border border-gray-200 text-gray-600 hover:bg-gray-50 transition">Cancelar</button>
+          <button type="submit" class="px-4 py-2 text-xs font-semibold rounded-lg bg-yellow-400 text-gray-900 hover:bg-yellow-500 transition">Salvar</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- MODAL ADICIONAR VALOR GUARDADO -->
+  <div id="wishSavedModal" class="fixed inset-0 z-50 hidden bg-black/40 items-center justify-center p-4">
+    <div class="bg-white rounded-xl shadow-lg w-full max-w-xs mx-auto p-5 space-y-4">
+      <div class="flex items-center justify-between">
+        <h2 class="text-sm font-semibold text-gray-900 flex items-center gap-2">
+          <i class="fa-solid fa-piggy-bank text-pink-400"></i>
+          Atualizar valor guardado
+        </h2>
+        <button id="btnCloseWishSavedModal" class="text-gray-400 hover:text-gray-600 transition text-lg leading-none">&times;</button>
+      </div>
+      <p id="wishSavedModalDesc" class="text-xs text-gray-500"></p>
+      <input type="hidden" id="wishSavedId" />
+      <div>
+        <label class="text-xs font-medium text-gray-700 block mb-1">Valor total guardado (R$)</label>
+        <input id="wishSavedAmount" type="number" min="0" step="0.01" placeholder="0,00" class="w-full rounded-lg border border-gray-200 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-pink-400 focus:border-pink-400" />
+      </div>
+      <div class="flex justify-end gap-2">
+        <button type="button" id="btnCancelWishSaved" class="px-4 py-2 text-xs font-semibold rounded-lg border border-gray-200 text-gray-600 hover:bg-gray-50 transition">Cancelar</button>
+        <button type="button" id="btnConfirmWishSaved" class="px-4 py-2 text-xs font-semibold rounded-lg bg-pink-500 text-white hover:bg-pink-600 transition">Atualizar</button>
+      </div>
+    </div>
+  </div>
 
   <!-- MODAL EDIÇÃO (copiado como estava) -->
   <div id="editModal" class="fixed inset-0 z-50 hidden bg-black/40 items-center justify-center">
@@ -1639,6 +1794,7 @@
       const INVOICE_KEY = 'financeDashboard_invoicesPaid';
       const CARDS_KEY = 'financeDashboard_cards';
       const SETTINGS_KEY = 'financeDashboard_settings';
+      const WISHES_KEY = 'financeDashboard_wishes';
 
       // Constantes e mapeamentos (mantidos e expandidos)
       const CATEGORY_LABELS = { receita: 'Receita', investimento: 'Investimento', fixa: 'Despesa Fixa', variavel: 'Despesa Variável' };
@@ -1733,7 +1889,10 @@
         deletingGroupId: null,
         deletingMode: 'single', // 'single' | 'all'
         selectedCard: null,
-        selectedCategory: null
+        selectedCategory: null,
+        wishes: [],          // [{id, name, category, targetValue, savedValue, year, bought}]
+        wishesYear: new Date().getFullYear(),
+        wishesCategory: 'all'
       };
 
       // Charts placeholders
@@ -2092,6 +2251,73 @@
           await deleteDoc(doc(db, "cards", cardId));
         } catch(e) {
           console.error("Erro ao deletar card do Firestore", e);
+          throw e;
+        }
+      }
+
+      // ---------- WISHES PERSISTENCE ----------
+      async function loadWishes() {
+        const currentYear = new Date().getFullYear();
+        try {
+          const colRef = collection(db, "wishes");
+          const snap = await fetchCollectionPreferServer(colRef);
+          const result = [];
+          snap.forEach(docSnap => {
+            const d = docSnap.data();
+            result.push({
+              id: docSnap.id,
+              name: d.name || '',
+              category: d.category || 'casa',
+              targetValue: Number(d.targetValue) || 0,
+              savedValue: Number(d.savedValue) || 0,
+              year: Number(d.year) || currentYear,
+              bought: !!d.bought
+            });
+          });
+          state.wishes = result;
+          // Migrate unfulfilled wishes from past years to current year
+          let migrated = false;
+          state.wishes.forEach(w => {
+            if (!w.bought && w.year < currentYear) {
+              w.year = currentYear;
+              migrated = true;
+            }
+          });
+          if (migrated) await saveWishes();
+          try { localStorage.setItem(WISHES_KEY, JSON.stringify(state.wishes)); } catch(e) {}
+        } catch(e) {
+          console.error("Erro ao carregar wishes do Firestore", e);
+          try {
+            const raw = localStorage.getItem(WISHES_KEY);
+            if (raw) { state.wishes = JSON.parse(raw); return; }
+          } catch(_) {}
+          state.wishes = [];
+        }
+      }
+
+      async function saveWishes() {
+        try {
+          await Promise.all(state.wishes.map(w => setDoc(doc(db, "wishes", w.id), {
+            name: w.name,
+            category: w.category,
+            targetValue: w.targetValue,
+            savedValue: w.savedValue,
+            year: w.year,
+            bought: w.bought
+          })));
+          try { localStorage.setItem(WISHES_KEY, JSON.stringify(state.wishes)); } catch(e) {}
+        } catch(e) {
+          console.error("Erro ao salvar wishes no Firestore", e);
+          try { localStorage.setItem(WISHES_KEY, JSON.stringify(state.wishes)); } catch(_) {}
+          throw e;
+        }
+      }
+
+      async function deleteWishFromFirestore(wishId) {
+        try {
+          await deleteDoc(doc(db, "wishes", wishId));
+        } catch(e) {
+          console.error("Erro ao deletar wish do Firestore", e);
           throw e;
         }
       }
@@ -2466,7 +2692,10 @@
         const titleEl = document.getElementById('viewTitle');
         const subtitleEl = document.getElementById('viewSubtitle');
 
-        if (state.selectedMonth === null) {
+        if (state.selectedMonth === 'wishes') {
+          titleEl.textContent = 'Desejos';
+          subtitleEl.textContent = 'Acompanhe seus objetivos de compra por categoria e ano.';
+        } else if (state.selectedMonth === null) {
           if (state.selectedYear === 'all') {
             titleEl.textContent = 'Visão Anual - Resumo Geral';
             subtitleEl.textContent = 'Totais consolidados por mês para todas as transações registradas.';
@@ -3698,11 +3927,206 @@
         renderAnnualInvestSummary(investByType, totalInvestYear);
       }
 
+      // ---------- WISHES VIEW ----------
+      const WISH_CAT_CONFIG = {
+        casa:      { label: 'Casa',      icon: 'fa-house',         color: 'amber',  border: 'border-amber-300', bg: 'bg-amber-50',  text: 'text-amber-800',  bar: 'bg-amber-400' },
+        cristiano: { label: 'Cristiano', icon: 'fa-person',        color: 'blue',   border: 'border-blue-300',  bg: 'bg-blue-50',   text: 'text-blue-800',   bar: 'bg-blue-400' },
+        debora:    { label: 'Débora',    icon: 'fa-person-dress',  color: 'pink',   border: 'border-pink-300',  bg: 'bg-pink-50',   text: 'text-pink-800',   bar: 'bg-pink-400' },
+        emanuel:   { label: 'Emanuel',   icon: 'fa-child',         color: 'green',  border: 'border-green-300', bg: 'bg-green-50',  text: 'text-green-800',  bar: 'bg-green-400' }
+      };
+
+      function populateWishYearFilter() {
+        const currentYear = new Date().getFullYear();
+        const years = new Set();
+        years.add(currentYear);
+        state.wishes.forEach(w => years.add(w.year));
+        // also add next year
+        years.add(currentYear + 1);
+
+        const sel = document.getElementById('wishYearFilter');
+        if (!sel) return;
+        const prev = sel.value;
+        sel.innerHTML = '';
+        [...years].sort((a,b) => b - a).forEach(y => {
+          const opt = document.createElement('option');
+          opt.value = y;
+          opt.textContent = y;
+          sel.appendChild(opt);
+        });
+        sel.value = prev && [...years].map(String).includes(prev) ? prev : String(state.wishesYear);
+        state.wishesYear = parseInt(sel.value, 10);
+
+        // Also populate year options in wishModal
+        const wishYearSel = document.getElementById('wishYear');
+        if (wishYearSel) {
+          const prevWY = wishYearSel.value;
+          wishYearSel.innerHTML = '';
+          [...years].sort((a,b) => b - a).forEach(y => {
+            const opt = document.createElement('option');
+            opt.value = y;
+            opt.textContent = y;
+            wishYearSel.appendChild(opt);
+          });
+          wishYearSel.value = prevWY && [...years].map(String).includes(prevWY) ? prevWY : String(currentYear);
+        }
+      }
+
+      function renderWishesView() {
+        populateWishYearFilter();
+
+        // Update category tab active state
+        document.querySelectorAll('.wish-cat-btn').forEach(btn => {
+          const cat = btn.getAttribute('data-wish-cat');
+          btn.classList.toggle('active', cat === state.wishesCategory);
+        });
+
+        const year = state.wishesYear;
+        const cat = state.wishesCategory;
+
+        const activeWishes = state.wishes.filter(w =>
+          !w.bought &&
+          w.year === year &&
+          (cat === 'all' || w.category === cat)
+        );
+        const boughtWishes = state.wishes.filter(w =>
+          w.bought &&
+          w.year === year &&
+          (cat === 'all' || w.category === cat)
+        );
+
+        const grid = document.getElementById('wishesGrid');
+        grid.innerHTML = activeWishes.length === 0
+          ? `<div class="col-span-full text-center py-12 text-gray-400">
+               <i class="fa-solid fa-star text-4xl mb-3 block text-gray-200"></i>
+               <p class="text-sm">Nenhum desejo para este ano/categoria.</p>
+               <p class="text-xs mt-1">Clique em <strong>Novo Desejo</strong> para adicionar.</p>
+             </div>`
+          : activeWishes.map(w => renderWishCard(w)).join('');
+
+        const boughtSection = document.getElementById('wishBoughtSection');
+        const boughtGrid = document.getElementById('wishBoughtGrid');
+        const boughtCount = document.getElementById('wishBoughtCount');
+
+        if (boughtWishes.length > 0) {
+          boughtSection.classList.remove('hidden');
+          boughtCount.textContent = boughtWishes.length;
+          boughtGrid.innerHTML = boughtWishes.map(w => renderWishCard(w, true)).join('');
+        } else {
+          boughtSection.classList.add('hidden');
+        }
+      }
+
+      function renderWishCard(w, isBought = false) {
+        const cfg = WISH_CAT_CONFIG[w.category] || WISH_CAT_CONFIG.casa;
+        const pct = w.targetValue > 0 ? Math.min(100, Math.round((w.savedValue / w.targetValue) * 100)) : 0;
+        const isComplete = pct >= 100;
+
+        return `
+          <div class="bg-white rounded-xl border ${cfg.border} shadow-sm p-4 flex flex-col gap-3 ${isBought ? 'opacity-60' : ''}">
+            <div class="flex items-start justify-between gap-2">
+              <div class="flex items-center gap-2 min-w-0">
+                <span class="inline-flex items-center justify-center w-8 h-8 rounded-full ${cfg.bg} flex-shrink-0">
+                  <i class="fa-solid ${cfg.icon} ${cfg.text} text-sm"></i>
+                </span>
+                <div class="min-w-0">
+                  <p class="text-sm font-semibold text-gray-900 truncate">${w.name}</p>
+                  <span class="text-[10px] font-medium ${cfg.text} ${cfg.bg} px-2 py-0.5 rounded-full border ${cfg.border}">${cfg.label}</span>
+                </div>
+              </div>
+              <div class="flex items-center gap-1 flex-shrink-0">
+                ${!isBought ? `
+                <button onclick="window._openEditWish('${w.id}')" class="p-1 text-gray-400 hover:text-indigo-500 transition" title="Editar">
+                  <i class="fa-solid fa-pen text-xs"></i>
+                </button>` : ''}
+                <button onclick="window._deleteWish('${w.id}')" class="p-1 text-gray-400 hover:text-red-500 transition" title="Excluir">
+                  <i class="fa-solid fa-trash text-xs"></i>
+                </button>
+              </div>
+            </div>
+
+            <div class="space-y-1">
+              <div class="flex justify-between text-xs text-gray-500">
+                <span>Guardado: <strong class="text-gray-800">${formatCurrency(w.savedValue)}</strong></span>
+                <span>Meta: <strong class="text-gray-800">${formatCurrency(w.targetValue)}</strong></span>
+              </div>
+              <div class="w-full h-3 bg-gray-100 rounded-full overflow-hidden">
+                <div class="wish-progress-bar h-full rounded-full ${isComplete ? 'bg-emerald-500' : cfg.bar}" style="width:${pct}%"></div>
+              </div>
+              <div class="flex justify-between text-[11px]">
+                <span class="${isComplete ? 'text-emerald-600 font-semibold' : 'text-gray-500'}">${pct}% ${isComplete ? '✓ Meta atingida!' : 'concluído'}</span>
+                <span class="text-gray-400">Faltam: ${formatCurrency(Math.max(0, w.targetValue - w.savedValue))}</span>
+              </div>
+            </div>
+
+            ${!isBought ? `
+            <div class="flex gap-2 pt-1 border-t border-gray-100">
+              <button onclick="window._openWishSavedModal('${w.id}')" class="flex-1 inline-flex items-center justify-center gap-1.5 px-2 py-1.5 text-[11px] font-semibold rounded-lg bg-gray-100 text-gray-700 hover:bg-gray-200 transition">
+                <i class="fa-solid fa-piggy-bank text-[10px]"></i> Guardar
+              </button>
+              <button onclick="window._markWishBought('${w.id}')" class="flex-1 inline-flex items-center justify-center gap-1.5 px-2 py-1.5 text-[11px] font-semibold rounded-lg bg-emerald-500 text-white hover:bg-emerald-600 transition">
+                <i class="fa-solid fa-check text-[10px]"></i> Comprado!
+              </button>
+            </div>` : `
+            <div class="flex items-center gap-1.5 pt-1 border-t border-gray-100 text-xs text-emerald-600 font-semibold">
+              <i class="fa-solid fa-circle-check"></i> Comprado
+            </div>`}
+          </div>`;
+      }
+
+      // Expose wish actions globally for inline onclick handlers
+      window._openEditWish = function(id) {
+        const w = state.wishes.find(x => x.id === id);
+        if (!w) return;
+        document.getElementById('wishEditId').value = w.id;
+        document.getElementById('wishName').value = w.name;
+        document.getElementById('wishCategory').value = w.category;
+        document.getElementById('wishYear').value = w.year;
+        document.getElementById('wishTarget').value = w.targetValue;
+        document.getElementById('wishSaved').value = w.savedValue;
+        document.getElementById('wishModalTitle').textContent = 'Editar Desejo';
+        const modal = document.getElementById('wishModal');
+        modal.classList.remove('hidden');
+        modal.classList.add('flex');
+      };
+
+      window._deleteWish = async function(id) {
+        if (!confirm('Deseja excluir este desejo?')) return;
+        state.wishes = state.wishes.filter(w => w.id !== id);
+        try {
+          await deleteWishFromFirestore(id);
+          await saveWishes();
+        } catch(e) {
+          showToast('Erro ao excluir desejo.', 'error');
+        }
+        renderWishesView();
+      };
+
+      window._markWishBought = async function(id) {
+        const w = state.wishes.find(x => x.id === id);
+        if (!w) return;
+        w.bought = true;
+        renderWishesView();
+        try { await saveWishes(); showToast('Parabéns! Desejo marcado como comprado! 🎉', 'success'); } catch(e) { showToast('Erro ao salvar.', 'error'); }
+      };
+
+      window._openWishSavedModal = function(id) {
+        const w = state.wishes.find(x => x.id === id);
+        if (!w) return;
+        document.getElementById('wishSavedId').value = id;
+        document.getElementById('wishSavedAmount').value = w.savedValue || 0;
+        document.getElementById('wishSavedModalDesc').textContent = `Atualize o valor total que você já guardou para: ${w.name}`;
+        const modal = document.getElementById('wishSavedModal');
+        modal.classList.remove('hidden');
+        modal.classList.add('flex');
+      };
+
       function renderSidebarHighlight() {
         const monthButtons = document.querySelectorAll('.month-btn');
         const btnAnnual = document.getElementById('btnAnnual');
+        const btnDesejos = document.getElementById('btnDesejos');
 
         if (state.selectedMonth === null) btnAnnual.classList.add('bg-indigo-600','text-white','border-indigo-500'); else btnAnnual.classList.remove('bg-indigo-600','text-white','border-indigo-500');
+        if (state.selectedMonth === 'wishes') btnDesejos.classList.add('bg-yellow-500','text-gray-900','border-yellow-400'); else btnDesejos.classList.remove('bg-yellow-500','text-gray-900','border-yellow-400');
 
         monthButtons.forEach((btn) => {
           const idx = parseInt(btn.getAttribute('data-month-index'), 10);
@@ -3724,13 +4148,21 @@
 
         const monthlyView = document.getElementById('monthlyView');
         const annualView = document.getElementById('annualView');
+        const wishesView = document.getElementById('wishesView');
 
-        if (state.selectedMonth === null) {
+        if (state.selectedMonth === 'wishes') {
+          monthlyView.classList.add('hidden');
+          annualView.classList.add('hidden');
+          wishesView.classList.remove('hidden');
+          renderWishesView();
+        } else if (state.selectedMonth === null) {
           monthlyView.classList.add('hidden');
           annualView.classList.remove('hidden');
+          wishesView.classList.add('hidden');
           renderAnnualView();
         } else {
           annualView.classList.add('hidden');
+          wishesView.classList.add('hidden');
           monthlyView.classList.remove('hidden');
           renderSummaryCards();
           renderBudgetRuleCards();
@@ -4835,6 +5267,82 @@ if (isParceladoSerie && previewBox && previewList) {
           btn.addEventListener('click', () => renderDashboard(parseInt(btn.getAttribute('data-month-index'), 10)));
         });
         document.getElementById('btnAnnual').addEventListener('click', () => renderDashboard(null));
+        document.getElementById('btnDesejos').addEventListener('click', () => renderDashboard('wishes'));
+
+        // ---- Wishes events ----
+        document.getElementById('btnAddWish').addEventListener('click', () => {
+          document.getElementById('wishEditId').value = '';
+          document.getElementById('wishName').value = '';
+          document.getElementById('wishCategory').value = 'casa';
+          document.getElementById('wishYear').value = state.wishesYear;
+          document.getElementById('wishTarget').value = '';
+          document.getElementById('wishSaved').value = '';
+          document.getElementById('wishModalTitle').textContent = 'Novo Desejo';
+          populateWishYearFilter();
+          const modal = document.getElementById('wishModal');
+          modal.classList.remove('hidden');
+          modal.classList.add('flex');
+        });
+
+        function closeWishModal() {
+          const modal = document.getElementById('wishModal');
+          modal.classList.add('hidden');
+          modal.classList.remove('flex');
+        }
+        document.getElementById('btnCloseWishModal').addEventListener('click', closeWishModal);
+        document.getElementById('btnCancelWish').addEventListener('click', closeWishModal);
+
+        document.getElementById('formWish').addEventListener('submit', async (e) => {
+          e.preventDefault();
+          const editId = document.getElementById('wishEditId').value;
+          const name = document.getElementById('wishName').value.trim();
+          const category = document.getElementById('wishCategory').value;
+          const year = parseInt(document.getElementById('wishYear').value, 10);
+          const targetValue = parseFloat(document.getElementById('wishTarget').value) || 0;
+          const savedValue = parseFloat(document.getElementById('wishSaved').value) || 0;
+          if (!name) return;
+
+          if (editId) {
+            const w = state.wishes.find(x => x.id === editId);
+            if (w) { w.name = name; w.category = category; w.year = year; w.targetValue = targetValue; w.savedValue = savedValue; }
+          } else {
+            state.wishes.push({ id: 'wish_' + Date.now().toString(36) + '_' + Math.random().toString(36).slice(2), name, category, targetValue, savedValue, year, bought: false });
+          }
+          closeWishModal();
+          renderWishesView();
+          try { await saveWishes(); showToast(editId ? 'Desejo atualizado!' : 'Desejo adicionado!', 'success'); } catch(ex) { showToast('Erro ao salvar desejo.', 'error'); }
+        });
+
+        function closeWishSavedModal() {
+          const modal = document.getElementById('wishSavedModal');
+          modal.classList.add('hidden');
+          modal.classList.remove('flex');
+        }
+        document.getElementById('btnCloseWishSavedModal').addEventListener('click', closeWishSavedModal);
+        document.getElementById('btnCancelWishSaved').addEventListener('click', closeWishSavedModal);
+
+        document.getElementById('btnConfirmWishSaved').addEventListener('click', async () => {
+          const id = document.getElementById('wishSavedId').value;
+          const amount = parseFloat(document.getElementById('wishSavedAmount').value) || 0;
+          const w = state.wishes.find(x => x.id === id);
+          if (!w) { closeWishSavedModal(); return; }
+          w.savedValue = amount;
+          closeWishSavedModal();
+          renderWishesView();
+          try { await saveWishes(); showToast('Valor guardado atualizado!', 'success'); } catch(ex) { showToast('Erro ao salvar.', 'error'); }
+        });
+
+        document.getElementById('wishYearFilter').addEventListener('change', (e) => {
+          state.wishesYear = parseInt(e.target.value, 10);
+          renderWishesView();
+        });
+
+        document.querySelectorAll('.wish-cat-btn').forEach(btn => {
+          btn.addEventListener('click', () => {
+            state.wishesCategory = btn.getAttribute('data-wish-cat');
+            renderWishesView();
+          });
+        });
 
         const despCategoria = document.getElementById('despCategoria');
 
@@ -5281,6 +5789,7 @@ if (category === 'fixa') {
         // Garantir que a página abra no mês e ano atuais
         state.selectedMonth = new Date().getMonth();
         state.selectedYear = new Date().getFullYear();
+        state.wishesYear = new Date().getFullYear();
         console.log('Init: setting selectedMonth to', state.selectedMonth, 'and selectedYear to', state.selectedYear);
 
         // Avisa o usuário se a autenticação anônima falhou
@@ -5292,6 +5801,7 @@ if (category === 'fixa') {
         await loadSettings();
         await loadTransactions();
         await loadInvoices();
+        await loadWishes();
 
         // Populate dynamic selects after data is loaded
         populateCardSelects(false);
