@@ -1340,27 +1340,7 @@
       </div>
 
       <!-- Tabs de categoria -->
-      <div class="flex gap-2 flex-wrap">
-        <button data-wish-cat="all" class="wish-cat-btn px-4 py-1.5 text-xs font-semibold rounded-full border border-gray-300 text-gray-700 bg-white hover:bg-gray-50 transition">Todos</button>
-        <button data-wish-cat="utensilios" class="wish-cat-btn px-4 py-1.5 text-xs font-semibold rounded-full border border-cyan-300 text-cyan-800 bg-cyan-50 hover:bg-cyan-100 transition">
-          <i class="fa-solid fa-kitchen-set text-[11px]"></i> Utensílios
-        </button>
-        <button data-wish-cat="vestuario" class="wish-cat-btn px-4 py-1.5 text-xs font-semibold rounded-full border border-fuchsia-300 text-fuchsia-800 bg-fuchsia-50 hover:bg-fuchsia-100 transition">
-          <i class="fa-solid fa-shirt text-[11px]"></i> Vestuário
-        </button>
-        <button data-wish-cat="casa" class="wish-cat-btn px-4 py-1.5 text-xs font-semibold rounded-full border border-amber-300 text-amber-800 bg-amber-50 hover:bg-amber-100 transition">
-          <i class="fa-solid fa-house text-[11px]"></i> Casa
-        </button>
-        <button data-wish-cat="mercado" class="wish-cat-btn px-4 py-1.5 text-xs font-semibold rounded-full border border-emerald-300 text-emerald-800 bg-emerald-50 hover:bg-emerald-100 transition">
-          <i class="fa-solid fa-basket-shopping text-[11px]"></i> Mercado
-        </button>
-        <button data-wish-cat="brinquedos" class="wish-cat-btn px-4 py-1.5 text-xs font-semibold rounded-full border border-violet-300 text-violet-800 bg-violet-50 hover:bg-violet-100 transition">
-          <i class="fa-solid fa-puzzle-piece text-[11px]"></i> Brinquedos
-        </button>
-        <button data-wish-cat="maiscoisas" class="wish-cat-btn px-4 py-1.5 text-xs font-semibold rounded-full border border-slate-300 text-slate-700 bg-slate-50 hover:bg-slate-100 transition">
-          <i class="fa-solid fa-box-open text-[11px]"></i> Mais coisas
-        </button>
-      </div>
+      <div id="wishCategoryTabs" class="flex gap-2 flex-wrap"></div>
 
       <!-- Cards de resumo dos desejos -->
       <section class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4">
@@ -1405,37 +1385,8 @@
       </section>
 
       <!-- Grid de cards de desejos -->
-      <div id="wishesGrid" class="grid grid-cols-1 lg:grid-cols-3 gap-4 lg:gap-0">
-        <section class="bg-white/80 border border-white/30 lg:border-y-0 lg:border-l-0 lg:border-r border-gray-200/70 rounded-xl lg:rounded-none p-4 space-y-3">
-          <div class="flex items-center justify-between">
-            <h3 class="text-sm font-semibold text-sky-700 flex items-center gap-2">
-              <i class="fa-solid fa-people-group text-sky-500"></i>
-              Família
-            </h3>
-            <span id="wishCount_familiar" class="text-[11px] font-semibold px-2 py-0.5 rounded-full bg-sky-100 text-sky-700">0</span>
-          </div>
-          <div id="wishesColumn_familiar" class="space-y-3"></div>
-        </section>
-        <section class="bg-white/80 border border-white/30 lg:border-y-0 lg:border-l-0 lg:border-r border-gray-200/70 rounded-xl lg:rounded-none p-4 space-y-3">
-          <div class="flex items-center justify-between">
-            <h3 class="text-sm font-semibold text-indigo-700 flex items-center gap-2">
-              <i class="fa-solid fa-user text-indigo-500"></i>
-              Débora
-            </h3>
-            <span id="wishCount_debora" class="text-[11px] font-semibold px-2 py-0.5 rounded-full bg-indigo-100 text-indigo-700">0</span>
-          </div>
-          <div id="wishesColumn_debora" class="space-y-3"></div>
-        </section>
-        <section class="bg-white/80 border border-white/30 lg:border-y-0 lg:border-l-0 border-gray-200/70 rounded-xl lg:rounded-none p-4 space-y-3">
-          <div class="flex items-center justify-between">
-            <h3 class="text-sm font-semibold text-amber-700 flex items-center gap-2">
-              <i class="fa-solid fa-child text-amber-500"></i>
-              Emanuel
-            </h3>
-            <span id="wishCount_emanuel" class="text-[11px] font-semibold px-2 py-0.5 rounded-full bg-amber-100 text-amber-700">0</span>
-          </div>
-          <div id="wishesColumn_emanuel" class="space-y-3"></div>
-        </section>
+      <div id="wishesGrid" class="grid grid-cols-1 lg:grid-cols-1 gap-4 lg:gap-0">
+        <!-- colunas renderizadas via JS -->
       </div>
 
       <!-- Seção de comprados -->
@@ -1470,14 +1421,12 @@
         </div>
         <div class="grid grid-cols-2 gap-3">
           <div>
-            <label class="text-xs font-medium text-gray-700 block mb-1">Categoria</label>
+            <div class="flex items-center justify-between mb-1">
+              <label class="text-xs font-medium text-gray-700 block">Categoria</label>
+              <button type="button" id="btnManageWishCategories" class="text-[10px] text-gray-400 hover:text-gray-600 flex items-center gap-0.5"><i class="fa-solid fa-plus-circle"></i> Gerenciar</button>
+            </div>
             <select id="wishCategory" class="w-full rounded-lg border border-gray-200 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-yellow-400 focus:border-yellow-400">
-              <option value="utensilios">🍽️ Utensílios</option>
-              <option value="vestuario">👕 Vestuário</option>
-              <option value="casa">🏠 Casa</option>
-              <option value="mercado">🛒 Mercado</option>
-              <option value="brinquedos">🧩 Brinquedos</option>
-              <option value="maiscoisas">📦 Mais coisas</option>
+              <!-- opções via JS -->
             </select>
           </div>
           <div>
@@ -1840,12 +1789,13 @@
         <!-- Aba Categorias -->
         <div id="tabCategories" class="settings-tab-content space-y-4">
           <div class="space-y-1">
-            <label for="settingsCatType" class="text-xs font-medium text-gray-700">Tipo de lançamento</label>
+            <label for="settingsCatType" class="text-xs font-medium text-gray-700">Tipo</label>
             <select id="settingsCatType" class="w-full rounded-lg border border-gray-200 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500">
               <option value="receita">Receita</option>
               <option value="fixa">Despesa Fixa</option>
               <option value="variavel">Despesa Variável</option>
               <option value="investimento">Investimento</option>
+              <option value="desejos">Desejos</option>
             </select>
           </div>
           <div id="settingsCatList" class="space-y-1.5">
@@ -1956,6 +1906,17 @@
         { id: 'cristiano', label: 'Cristiano' },
         { id: 'emanuel', label: 'Emanuel' }
       ];
+      const DEFAULT_WISH_CATEGORIES = [
+        { value: 'utensilios', label: 'Utensílios' },
+        { value: 'remedio', label: 'Remédio' },
+        { value: 'farmacia', label: 'Farmácia' },
+        { value: 'presentes', label: 'Presentes' },
+        { value: 'moveis', label: 'Móveis' },
+        { value: 'vestuario', label: 'Vestuário' },
+        { value: 'brinquedos', label: 'Brinquedos' },
+        { value: 'cosmeticos', label: 'Cosméticos' }
+      ];
+      const FALLBACK_WISH_CATEGORY_KEY = DEFAULT_WISH_CATEGORIES[0]?.value || 'utensilios';
       const PERSON_COLOR_PRESETS = {
         familiar: 'bg-sky-50 text-sky-700 border-sky-200',
         debora: 'bg-indigo-50 text-indigo-700 border-indigo-200',
@@ -2053,6 +2014,7 @@
         invoicesPaid: {},
         cards: [],           // [{id, label, limit, color}]
         people: DEFAULT_PEOPLE.map(person => ({ ...person })),
+        wishCategories: DEFAULT_WISH_CATEGORIES.map(category => ({ ...category })),
         customSubCategories: { receita: [], fixa: [], variavel: [], investimento: [] }, // [{value, label}]
         customTypes: [],     // [{value, label, baseType}]
         settingsContext: null,
@@ -2092,12 +2054,25 @@
           .replace(/^_|_$/g, '');
       }
 
-      function formatPersonId(personId) {
-        return String(personId || '')
+      function formatKeyLabel(value) {
+        return String(value || '')
           .split('_')
           .filter(Boolean)
           .map(part => part.charAt(0).toUpperCase() + part.slice(1))
           .join(' ');
+      }
+
+      function formatPersonId(personId) {
+        return formatKeyLabel(personId);
+      }
+
+      function escapeHtml(value) {
+        return String(value ?? '')
+          .replaceAll('&', '&amp;')
+          .replaceAll('<', '&lt;')
+          .replaceAll('>', '&gt;')
+          .replaceAll('"', '&quot;')
+          .replaceAll("'", '&#39;');
       }
 
       function normalizeCompareValue(value) {
@@ -2121,16 +2096,9 @@
         const normalized = [];
         const seen = new Set();
         const source = Array.isArray(people) ? people : [];
+        const basePeople = source.length > 0 ? source : DEFAULT_PEOPLE;
 
-        DEFAULT_PEOPLE.forEach((person) => {
-          const saved = source.find(item => getSettingItemId(item) === person.id);
-          const savedLabel = typeof saved === 'object' && saved?.label ? String(saved.label).trim() : '';
-          const label = savedLabel || person.label;
-          normalized.push({ id: person.id, label });
-          seen.add(person.id);
-        });
-
-        source.forEach((item) => {
+        basePeople.forEach((item) => {
           const id = getSettingItemId(item);
           const label = getSettingItemLabel(item);
           if (!id || seen.has(id)) return;
@@ -2143,6 +2111,32 @@
 
       function getPeopleList() {
         return normalizePeople(state.people);
+      }
+
+      function normalizeWishCategories(categories = []) {
+        const source = Array.isArray(categories) ? categories : [];
+        const normalized = [];
+        const seen = new Set();
+        const baseCategories = source.length > 0 ? source : DEFAULT_WISH_CATEGORIES;
+
+        baseCategories.forEach((item) => {
+          const label = typeof item === 'object' && item?.label
+            ? String(item.label).trim()
+            : String(item || '').trim();
+          const value = typeof item === 'object' && item?.value
+            ? slugifyLabel(item.value)
+            : slugifyLabel(label);
+          if (!value || !label || seen.has(value)) return;
+          normalized.push({ value, label });
+          seen.add(value);
+        });
+
+        return normalized;
+      }
+
+      function getWishCategoriesList() {
+        state.wishCategories = normalizeWishCategories(state.wishCategories);
+        return state.wishCategories;
       }
 
       function getPersonLabel(personId) {
@@ -2637,9 +2631,13 @@
             if (docSnap.id === 'people') {
               state.people = normalizePeople(d.people);
             }
+            if (docSnap.id === 'wishCategories') {
+              state.wishCategories = normalizeWishCategories(d.categories);
+            }
           });
           state.people = normalizePeople(state.people);
-          try { localStorage.setItem(SETTINGS_KEY, JSON.stringify({ customSubCategories: state.customSubCategories, customTypes: state.customTypes, people: state.people })); } catch(e) {}
+          state.wishCategories = normalizeWishCategories(state.wishCategories);
+          try { localStorage.setItem(SETTINGS_KEY, JSON.stringify({ customSubCategories: state.customSubCategories, customTypes: state.customTypes, people: state.people, wishCategories: state.wishCategories })); } catch(e) {}
         } catch (e) {
           console.error("Erro ao carregar settings do Firestore", e);
           try {
@@ -2649,10 +2647,12 @@
               if (parsed.customSubCategories) state.customSubCategories = parsed.customSubCategories;
               if (parsed.customTypes) state.customTypes = parsed.customTypes;
               if (parsed.people) state.people = normalizePeople(parsed.people);
+              if (parsed.wishCategories) state.wishCategories = normalizeWishCategories(parsed.wishCategories);
             }
           } catch(_) {}
         }
         state.people = normalizePeople(state.people);
+        state.wishCategories = normalizeWishCategories(state.wishCategories);
       }
 
       async function saveSettings() {
@@ -2660,10 +2660,11 @@
           await setDoc(doc(db, "settings", "subcategories"), state.customSubCategories);
           await setDoc(doc(db, "settings", "customTypes"), { types: state.customTypes });
           await setDoc(doc(db, "settings", "people"), { people: normalizePeople(state.people) });
-          try { localStorage.setItem(SETTINGS_KEY, JSON.stringify({ customSubCategories: state.customSubCategories, customTypes: state.customTypes, people: normalizePeople(state.people) })); } catch(e) {}
+          await setDoc(doc(db, "settings", "wishCategories"), { categories: normalizeWishCategories(state.wishCategories) });
+          try { localStorage.setItem(SETTINGS_KEY, JSON.stringify({ customSubCategories: state.customSubCategories, customTypes: state.customTypes, people: normalizePeople(state.people), wishCategories: normalizeWishCategories(state.wishCategories) })); } catch(e) {}
         } catch (e) {
           console.error("Erro ao salvar settings no Firestore", e);
-          try { localStorage.setItem(SETTINGS_KEY, JSON.stringify({ customSubCategories: state.customSubCategories, customTypes: state.customTypes, people: normalizePeople(state.people) })); } catch(_) {}
+          try { localStorage.setItem(SETTINGS_KEY, JSON.stringify({ customSubCategories: state.customSubCategories, customTypes: state.customTypes, people: normalizePeople(state.people), wishCategories: normalizeWishCategories(state.wishCategories) })); } catch(_) {}
           throw e;
         }
       }
@@ -4239,14 +4240,137 @@
       }
 
       // ---------- WISHES VIEW ----------
-      const WISH_CAT_CONFIG = {
-        utensilios:  { label: 'Utensílios',  icon: 'fa-kitchen-set',     color: 'cyan',    border: 'border-cyan-300',    bg: 'bg-cyan-50',    text: 'text-cyan-800',    bar: 'bg-cyan-400' },
-        vestuario:   { label: 'Vestuário',   icon: 'fa-shirt',           color: 'fuchsia', border: 'border-fuchsia-300', bg: 'bg-fuchsia-50', text: 'text-fuchsia-800', bar: 'bg-fuchsia-400' },
-        casa:        { label: 'Casa',        icon: 'fa-house',           color: 'amber',   border: 'border-amber-300',   bg: 'bg-amber-50',   text: 'text-amber-800',   bar: 'bg-amber-400' },
-        mercado:     { label: 'Mercado',     icon: 'fa-basket-shopping', color: 'emerald', border: 'border-emerald-300', bg: 'bg-emerald-50', text: 'text-emerald-800', bar: 'bg-emerald-400' },
-        brinquedos:  { label: 'Brinquedos',  icon: 'fa-puzzle-piece',    color: 'violet',  border: 'border-violet-300',  bg: 'bg-violet-50',  text: 'text-violet-800',  bar: 'bg-violet-400' },
-        maiscoisas:  { label: 'Mais coisas', icon: 'fa-box-open',      color: 'slate',   border: 'border-slate-300',   bg: 'bg-slate-50',   text: 'text-slate-700',   bar: 'bg-slate-400' }
+      const WISH_PERSON_DISPLAY_CONFIG = {
+        familiar: { icon: 'fa-people-group', text: 'text-sky-700', iconText: 'text-sky-500', badge: 'bg-sky-100 text-sky-700' },
+        debora: { icon: 'fa-user', text: 'text-indigo-700', iconText: 'text-indigo-500', badge: 'bg-indigo-100 text-indigo-700' },
+        cristiano: { icon: 'fa-user-tie', text: 'text-violet-700', iconText: 'text-violet-500', badge: 'bg-violet-100 text-violet-700' },
+        emanuel: { icon: 'fa-child', text: 'text-amber-700', iconText: 'text-amber-500', badge: 'bg-amber-100 text-amber-700' }
       };
+      const WISH_CATEGORY_STYLE_PRESETS = {
+        utensilios: { icon: 'fa-kitchen-set', border: 'border-cyan-300', bg: 'bg-cyan-50', text: 'text-cyan-800', bar: 'bg-cyan-400' },
+        remedio: { icon: 'fa-pills', border: 'border-red-300', bg: 'bg-red-50', text: 'text-red-800', bar: 'bg-red-400' },
+        farmacia: { icon: 'fa-prescription-bottle-medical', border: 'border-rose-300', bg: 'bg-rose-50', text: 'text-rose-800', bar: 'bg-rose-400' },
+        presentes: { icon: 'fa-gift', border: 'border-pink-300', bg: 'bg-pink-50', text: 'text-pink-800', bar: 'bg-pink-400' },
+        moveis: { icon: 'fa-couch', border: 'border-amber-300', bg: 'bg-amber-50', text: 'text-amber-800', bar: 'bg-amber-400' },
+        vestuario: { icon: 'fa-shirt', border: 'border-fuchsia-300', bg: 'bg-fuchsia-50', text: 'text-fuchsia-800', bar: 'bg-fuchsia-400' },
+        brinquedos: { icon: 'fa-puzzle-piece', border: 'border-violet-300', bg: 'bg-violet-50', text: 'text-violet-800', bar: 'bg-violet-400' },
+        cosmeticos: { icon: 'fa-spray-can-sparkles', border: 'border-purple-300', bg: 'bg-purple-50', text: 'text-purple-800', bar: 'bg-purple-400' }
+      };
+      const WISH_CATEGORY_STYLE_FALLBACKS = [
+        { icon: 'fa-tag', border: 'border-slate-300', bg: 'bg-slate-50', text: 'text-slate-700', bar: 'bg-slate-400' },
+        { icon: 'fa-shapes', border: 'border-emerald-300', bg: 'bg-emerald-50', text: 'text-emerald-800', bar: 'bg-emerald-400' },
+        { icon: 'fa-box-open', border: 'border-blue-300', bg: 'bg-blue-50', text: 'text-blue-800', bar: 'bg-blue-400' }
+      ];
+
+      function getWishCategoryConfig(categoryKey) {
+        const configured = getWishCategoriesList();
+        const configuredLabel = configured.find(cat => cat.value === categoryKey)?.label || formatKeyLabel(categoryKey);
+        if (WISH_CATEGORY_STYLE_PRESETS[categoryKey]) return { label: configuredLabel, ...WISH_CATEGORY_STYLE_PRESETS[categoryKey] };
+        const fallbackPool = WISH_CATEGORY_STYLE_FALLBACKS.length
+          ? WISH_CATEGORY_STYLE_FALLBACKS
+          : [{ icon: 'fa-tag', border: 'border-gray-300', bg: 'bg-gray-50', text: 'text-gray-700', bar: 'bg-gray-400' }];
+        const index = configured.findIndex(cat => cat.value === categoryKey);
+        const fallback = fallbackPool[(index >= 0 ? index : 0) % fallbackPool.length];
+        return { label: configuredLabel, ...fallback };
+      }
+
+      function renderWishCategoryTabs() {
+        const tabs = document.getElementById('wishCategoryTabs');
+        if (!tabs) return;
+        const categories = getWishCategoriesList();
+        tabs.innerHTML = '<button data-wish-cat="all" class="wish-cat-btn px-4 py-1.5 text-xs font-semibold rounded-full border border-gray-300 text-gray-700 bg-white hover:bg-gray-50 transition">Todos</button>';
+        categories.forEach((category) => {
+          const cfg = getWishCategoryConfig(category.value);
+          const button = document.createElement('button');
+          button.setAttribute('data-wish-cat', category.value);
+          button.className = `wish-cat-btn px-4 py-1.5 text-xs font-semibold rounded-full border ${cfg.border} ${cfg.text} ${cfg.bg} hover:brightness-95 transition`;
+          button.innerHTML = `<i class="fa-solid ${cfg.icon} text-[11px]"></i> ${escapeHtml(category.label)}`;
+          tabs.appendChild(button);
+        });
+      }
+
+      function populateWishCategorySelect(selectedValue = null) {
+        const select = document.getElementById('wishCategory');
+        if (!select) return;
+        const categories = getWishCategoriesList();
+        const currentValue = selectedValue ?? select.value ?? '';
+        select.innerHTML = '';
+        categories.forEach((category) => {
+          const option = document.createElement('option');
+          option.value = category.value;
+          option.textContent = category.label;
+          select.appendChild(option);
+        });
+        if (currentValue && !categories.some(category => category.value === currentValue)) {
+          const customOption = document.createElement('option');
+          customOption.value = currentValue;
+          customOption.textContent = formatKeyLabel(currentValue);
+          select.appendChild(customOption);
+        }
+        if (categories.length === 0) {
+          const fallback = document.createElement('option');
+          fallback.value = '';
+          fallback.textContent = 'Sem categorias';
+          select.appendChild(fallback);
+        }
+        if (currentValue) select.value = currentValue;
+        if (!select.value && categories.length) select.value = categories[0].value;
+      }
+
+      function renderWishesColumns(activeWishes) {
+        const grid = document.getElementById('wishesGrid');
+        if (!grid) return;
+        const people = getPeopleList();
+        if (!people.length) {
+          grid.innerHTML = '';
+          return;
+        }
+        let gridColsClass = 'lg:grid-cols-1';
+        if (people.length === 2) gridColsClass = 'lg:grid-cols-2';
+        else if (people.length === 3) gridColsClass = 'lg:grid-cols-3';
+        else if (people.length >= 4) gridColsClass = 'lg:grid-cols-4';
+        grid.className = `grid grid-cols-1 ${gridColsClass} gap-4 lg:gap-0`;
+        grid.innerHTML = people.map((person, idx) => {
+          const display = WISH_PERSON_DISPLAY_CONFIG[person.id] || { icon: 'fa-user', text: 'text-gray-700', iconText: 'text-gray-500', badge: 'bg-gray-100 text-gray-700' };
+          const sectionBorderClass = idx < people.length - 1 ? 'lg:border-r' : '';
+          const safePersonLabel = escapeHtml(person.label);
+          return `
+            <section class="bg-white/80 border border-white/30 lg:border-y-0 lg:border-l-0 ${sectionBorderClass} border-gray-200/70 rounded-xl lg:rounded-none p-4 space-y-3">
+              <div class="flex items-center justify-between">
+                <h3 class="text-sm font-semibold ${display.text} flex items-center gap-2">
+                  <i class="fa-solid ${display.icon} ${display.iconText}"></i>
+                  ${safePersonLabel}
+                </h3>
+                <span id="wishCount_${person.id}" class="text-[11px] font-semibold px-2 py-0.5 rounded-full ${display.badge}">0</span>
+              </div>
+              <div id="wishesColumn_${person.id}" class="space-y-3"></div>
+            </section>
+          `;
+        }).join('');
+
+        const defaultPerson = people[0]?.id || null;
+        const validPersonIds = new Set(people.map(person => person.id));
+        const columnBuckets = people.reduce((acc, person) => {
+          acc[person.id] = [];
+          return acc;
+        }, {});
+
+        activeWishes.forEach((wish) => {
+          const personKey = validPersonIds.has(wish.person) ? wish.person : defaultPerson;
+          if (!personKey) return;
+          if (!columnBuckets[personKey]) columnBuckets[personKey] = [];
+          columnBuckets[personKey].push(wish);
+        });
+
+        people.forEach((person) => {
+          const column = document.getElementById(`wishesColumn_${person.id}`);
+          const count = document.getElementById(`wishCount_${person.id}`);
+          if (!column || !count) return;
+          const wishesByPerson = columnBuckets[person.id] || [];
+          count.textContent = wishesByPerson.length;
+          column.innerHTML = renderWishPersonGroups(wishesByPerson);
+        });
+      }
 
       function populateWishYearFilter() {
         const currentYear = new Date().getFullYear();
@@ -4286,6 +4410,11 @@
 
       function renderWishesView() {
         populateWishYearFilter();
+        renderWishCategoryTabs();
+        const validWishCategories = new Set(getWishCategoriesList().map(category => category.value));
+        if (state.wishesCategory !== 'all' && !validWishCategories.has(state.wishesCategory)) {
+          state.wishesCategory = 'all';
+        }
 
         // Update category tab active state
         document.querySelectorAll('.wish-cat-btn').forEach(btn => {
@@ -4313,27 +4442,7 @@
         document.getElementById('wishTotalAmount').textContent = formatCurrency(wishTotals.target);
         document.getElementById('wishSavedAmount').textContent = formatCurrency(wishTotals.saved);
         document.getElementById('wishBoughtAmount').textContent = formatCurrency(wishTotals.bought);
-
-        const DEFAULT_WISH_COLUMN = 'familiar';
-        const personColumns = [DEFAULT_WISH_COLUMN, 'debora', 'emanuel'];
-        const columnBuckets = personColumns.reduce((acc, personId) => {
-          acc[personId] = [];
-          return acc;
-        }, {});
-
-        activeWishes.forEach((wish) => {
-          const personKey = personColumns.includes(wish.person) ? wish.person : DEFAULT_WISH_COLUMN;
-          columnBuckets[personKey].push(wish);
-        });
-
-        personColumns.forEach((personId) => {
-          const column = document.getElementById(`wishesColumn_${personId}`);
-          const count = document.getElementById(`wishCount_${personId}`);
-          if (!column || !count) return;
-          const wishesByPerson = columnBuckets[personId];
-          count.textContent = wishesByPerson.length;
-          column.innerHTML = renderWishPersonGroups(wishesByPerson);
-        });
+        renderWishesColumns(activeWishes);
 
         const boughtSection = document.getElementById('wishBoughtSection');
         const boughtGrid = document.getElementById('wishBoughtGrid');
@@ -4349,7 +4458,8 @@
       }
 
       function renderWishPersonGroups(wishes) {
-        const DEFAULT_WISH_CATEGORY = 'maiscoisas';
+        const availableCategories = getWishCategoriesList();
+        const defaultWishCategory = availableCategories[0]?.value || FALLBACK_WISH_CATEGORY_KEY;
         if (!wishes.length) {
           return `
             <div class="text-center py-10 text-gray-400 border border-dashed border-gray-200 rounded-lg bg-white/50">
@@ -4359,20 +4469,20 @@
         }
 
         const grouped = wishes.reduce((acc, wish) => {
-          const key = wish.category || DEFAULT_WISH_CATEGORY;
+          const key = wish.category || defaultWishCategory;
           if (!acc[key]) acc[key] = [];
           acc[key].push(wish);
           return acc;
         }, {});
 
-        const categories = Object.keys(WISH_CAT_CONFIG);
+        const categories = availableCategories.map(category => category.value);
         const orderedCategories = [
           ...categories.filter(cat => grouped[cat]?.length),
           ...Object.keys(grouped).filter(cat => !categories.includes(cat))
         ];
 
         return orderedCategories.map((categoryKey) => {
-          const cfg = WISH_CAT_CONFIG[categoryKey] || WISH_CAT_CONFIG.maiscoisas;
+          const cfg = getWishCategoryConfig(categoryKey);
           const items = grouped[categoryKey] || [];
           return `
             <div class="space-y-2">
@@ -4389,7 +4499,8 @@
       }
 
       function renderWishCard(w, isBought = false) {
-        const cfg = WISH_CAT_CONFIG[w.category] || WISH_CAT_CONFIG.casa;
+        const categoryKey = w.category || getWishCategoriesList()[0]?.value || FALLBACK_WISH_CATEGORY_KEY;
+        const cfg = getWishCategoryConfig(categoryKey);
         const pct = w.targetValue > 0 ? Math.min(100, Math.round((w.savedValue / w.targetValue) * 100)) : 0;
         const isComplete = pct >= 100;
         const personLabel = w.person ? getPersonLabel(w.person) : '';
@@ -4454,6 +4565,7 @@
       window._openEditWish = function(id) {
         const w = state.wishes.find(x => x.id === id);
         if (!w) return;
+        populateWishCategorySelect(w.category);
         document.getElementById('wishEditId').value = w.id;
         document.getElementById('wishName').value = w.name;
         document.getElementById('wishCategory').value = w.category;
@@ -4578,7 +4690,7 @@
         thead.innerHTML = `
           <tr class="text-xs text-gray-500 uppercase tracking-wide">
             <th class="text-left px-4 py-2">Subcategoria</th>
-            ${people.map(person => `<th class="text-right px-4 py-2 ${getPersonTextColor(person.id)}">${person.label}</th>`).join('')}
+            ${people.map(person => `<th class="text-right px-4 py-2 ${getPersonTextColor(person.id)}">${escapeHtml(person.label)}</th>`).join('')}
             ${hasUnassigned ? '<th class="text-right px-4 py-2 text-gray-500">Sem resp.</th>' : ''}
             <th class="text-right px-4 py-2 font-semibold text-gray-700">Total</th>
           </tr>
@@ -5628,6 +5740,9 @@ if (isParceladoSerie && previewBox && previewList) {
             };
             return { tab: 'people', selectId: personSelectMap[triggerId] };
           }
+          if (triggerId === 'btnManageWishCategories') {
+            return { tab: 'categories', categoryType: 'desejos', selectId: 'wishCategory' };
+          }
           return null;
         }
 
@@ -5644,7 +5759,7 @@ if (isParceladoSerie && previewBox && previewList) {
           document.getElementById('settingsModal').classList.remove('flex');
         }
 
-        ['btnManageTypes','btnManageCategories','btnManageCategoriesRec','btnManagePeopleRec','btnManagePeopleDesp','btnManagePeopleWish','btnManagePeopleEdit'].forEach(id => {
+        ['btnManageTypes','btnManageCategories','btnManageCategoriesRec','btnManagePeopleRec','btnManagePeopleDesp','btnManagePeopleWish','btnManagePeopleEdit','btnManageWishCategories'].forEach(id => {
           const btn = document.getElementById(id);
           if (btn) btn.addEventListener('click', () => {
             openSettingsModal(getSettingsContext(id));
@@ -5681,7 +5796,12 @@ if (isParceladoSerie && previewBox && previewList) {
 
         function refreshConfiguredViews() {
           state.people = normalizePeople(state.people);
+          state.wishCategories = normalizeWishCategories(state.wishCategories);
+          if (state.wishesCategory !== 'all' && !getWishCategoriesList().some(category => category.value === state.wishesCategory)) {
+            state.wishesCategory = 'all';
+          }
           populateAllPersonSelects();
+          populateWishCategorySelect();
           populateDespesaSubcategorias();
           populateReceitaCategoria();
           populateDespCategoria();
@@ -5691,6 +5811,10 @@ if (isParceladoSerie && previewBox && previewList) {
         function applyNewCategorySelection(type, value) {
           const context = state.settingsContext;
           if (!context?.selectId) return;
+          if (context.selectId === 'wishCategory' && type === 'desejos') {
+            populateWishCategorySelect(value);
+            return;
+          }
           if (context.selectId === 'recCategoria' && type === 'receita') {
             const select = document.getElementById('recCategoria');
             if (select) select.value = value;
@@ -5729,7 +5853,9 @@ if (isParceladoSerie && previewBox && previewList) {
           const list = document.getElementById('settingsCatList');
           if (!list) return;
           list.innerHTML = '';
-          const customs = state.customSubCategories[type] || [];
+          const customs = type === 'desejos'
+            ? getWishCategoriesList()
+            : (state.customSubCategories[type] || []);
           if (customs.length === 0) {
             list.innerHTML = '<p class="text-[10px] text-gray-400">Nenhuma categoria personalizada ainda.</p>';
             return;
@@ -5737,7 +5863,8 @@ if (isParceladoSerie && previewBox && previewList) {
           customs.forEach((cat, idx) => {
             const row = document.createElement('div');
             row.className = 'flex items-center justify-between px-2 py-1.5 rounded-lg bg-gray-50 border border-gray-100';
-            row.innerHTML = `<span class="text-xs text-gray-700">${cat.label}</span>
+            const safeCatLabel = escapeHtml(cat.label);
+            row.innerHTML = `<span class="text-xs text-gray-700">${safeCatLabel}</span>
               <div class="flex items-center gap-1">
                 <button class="w-6 h-6 rounded text-indigo-500 hover:bg-indigo-50 flex items-center justify-center btn-edit-cat" data-type="${type}" data-idx="${idx}">
                   <i class="fa-solid fa-pen text-[10px]"></i>
@@ -5749,15 +5876,24 @@ if (isParceladoSerie && previewBox && previewList) {
             row.querySelector('.btn-edit-cat').addEventListener('click', async (e) => {
               const t = e.currentTarget.dataset.type;
               const i = parseInt(e.currentTarget.dataset.idx, 10);
-              const current = state.customSubCategories[t]?.[i];
+              const current = t === 'desejos'
+                ? getWishCategoriesList()?.[i]
+                : state.customSubCategories[t]?.[i];
               if (!current) return;
               const nextLabel = prompt('Novo nome da subcategoria:', current.label)?.trim();
               if (!nextLabel || nextLabel === current.label) return;
-              if (state.customSubCategories[t].some((item, index) => index !== i && normalizeCompareValue(item.label) === normalizeCompareValue(nextLabel))) {
+              const compareList = t === 'desejos'
+                ? getWishCategoriesList()
+                : state.customSubCategories[t];
+              if (compareList.some((item, index) => index !== i && normalizeCompareValue(item.label) === normalizeCompareValue(nextLabel))) {
                 showToast('Já existe uma subcategoria com esse nome.', 'warning');
                 return;
               }
-              current.label = nextLabel;
+              if (t === 'desejos') {
+                state.wishCategories[i].label = nextLabel;
+              } else {
+                current.label = nextLabel;
+              }
               try {
                 await saveSettings();
                 refreshConfiguredViews();
@@ -5770,7 +5906,15 @@ if (isParceladoSerie && previewBox && previewList) {
             row.querySelector('.btn-del-cat').addEventListener('click', async (e) => {
               const t = e.currentTarget.dataset.type;
               const i = parseInt(e.currentTarget.dataset.idx, 10);
-              state.customSubCategories[t].splice(i, 1);
+              if (t === 'desejos') {
+                if (state.wishCategories.length <= 1) {
+                  showToast('É necessário manter pelo menos uma categoria de desejo.', 'warning');
+                  return;
+                }
+                state.wishCategories.splice(i, 1);
+              } else {
+                state.customSubCategories[t].splice(i, 1);
+              }
               try {
                 await saveSettings();
                 refreshConfiguredViews();
@@ -5794,11 +5938,20 @@ if (isParceladoSerie && previewBox && previewList) {
             showToast('Informe um nome válido.', 'warning');
             return;
           }
-          if (!state.customSubCategories[type]) state.customSubCategories[type] = [];
-          if (state.customSubCategories[type].some(c => c.value === valueKey)) {
-            showToast('Esta categoria já existe.', 'warning'); return;
+          if (type === 'desejos') {
+            if (!state.wishCategories.some(c => c.value === valueKey)) {
+              state.wishCategories.push({ value: valueKey, label: labelVal });
+            } else {
+              showToast('Esta categoria já existe.', 'warning');
+              return;
+            }
+          } else {
+            if (!state.customSubCategories[type]) state.customSubCategories[type] = [];
+            if (state.customSubCategories[type].some(c => c.value === valueKey)) {
+              showToast('Esta categoria já existe.', 'warning'); return;
+            }
+            state.customSubCategories[type].push({ value: valueKey, label: labelVal });
           }
-          state.customSubCategories[type].push({ value: valueKey, label: labelVal });
           try {
             await saveSettings();
             document.getElementById('newCatLabel').value = '';
@@ -5823,8 +5976,9 @@ if (isParceladoSerie && previewBox && previewList) {
             const baseName = CATEGORY_LABELS[ct.baseType] || ct.baseType;
             const row = document.createElement('div');
             row.className = 'flex items-center justify-between px-2 py-1.5 rounded-lg bg-gray-50 border border-gray-100';
+            const safeTypeLabel = escapeHtml(ct.label);
             row.innerHTML = `<div>
-              <span class="text-xs text-gray-700 font-medium">${ct.label}</span>
+              <span class="text-xs text-gray-700 font-medium">${safeTypeLabel}</span>
               <span class="text-[10px] text-gray-400 ml-1">(base: ${baseName})</span>
             </div>
             <button class="w-6 h-6 rounded text-red-400 hover:bg-red-50 flex items-center justify-center btn-del-type" data-idx="${idx}">
@@ -5883,20 +6037,19 @@ if (isParceladoSerie && previewBox && previewList) {
           }
 
           people.forEach((person) => {
-            const isDefault = DEFAULT_PEOPLE.some(item => item.id === person.id);
             const row = document.createElement('div');
             row.className = 'flex items-center justify-between px-2 py-1.5 rounded-lg bg-gray-50 border border-gray-100';
+            const safePersonLabel = escapeHtml(person.label);
             row.innerHTML = `<div class="flex items-center gap-2">
-                <span class="inline-flex items-center px-2 py-0.5 rounded-full border text-[10px] font-medium ${getPersonColor(person.id)}">${person.label}</span>
-                ${isDefault ? '<span class="text-[10px] text-gray-400">padrão</span>' : ''}
+                <span class="inline-flex items-center px-2 py-0.5 rounded-full border text-[10px] font-medium ${getPersonColor(person.id)}">${safePersonLabel}</span>
               </div>
               <div class="flex items-center gap-1">
                 <button class="w-6 h-6 rounded text-indigo-500 hover:bg-indigo-50 flex items-center justify-center btn-edit-person" data-id="${person.id}">
                   <i class="fa-solid fa-pen text-[10px]"></i>
                 </button>
-                ${isDefault ? '' : `<button class="w-6 h-6 rounded text-red-400 hover:bg-red-50 flex items-center justify-center btn-del-person" data-id="${person.id}">
+                <button class="w-6 h-6 rounded text-red-400 hover:bg-red-50 flex items-center justify-center btn-del-person" data-id="${person.id}">
                   <i class="fa-solid fa-xmark text-[10px]"></i>
-                </button>`}
+                </button>
               </div>`;
 
             row.querySelector('.btn-edit-person').addEventListener('click', async (e) => {
@@ -5925,8 +6078,13 @@ if (isParceladoSerie && previewBox && previewList) {
             if (deleteBtn) {
               deleteBtn.addEventListener('click', async (e) => {
                 const personId = e.currentTarget.dataset.id;
+                const currentPeople = getPeopleList();
+                if (currentPeople.length <= 1) {
+                  showToast('É necessário manter pelo menos uma pessoa.', 'warning');
+                  return;
+                }
                 if (!confirm('Excluir esta pessoa? Lançamentos antigos continuarão com o valor salvo.')) return;
-                state.people = getPeopleList().filter(item => item.id !== personId);
+                state.people = currentPeople.filter(item => item.id !== personId);
                 try {
                   await saveSettings();
                   refreshConfiguredViews();
@@ -5977,9 +6135,11 @@ if (isParceladoSerie && previewBox && previewList) {
 
         // ---- Wishes events ----
         document.getElementById('btnAddWish').addEventListener('click', () => {
+          populateWishCategorySelect();
           document.getElementById('wishEditId').value = '';
           document.getElementById('wishName').value = '';
-          document.getElementById('wishCategory').value = 'casa';
+          const firstWishCategory = getWishCategoriesList()[0]?.value || '';
+          document.getElementById('wishCategory').value = firstWishCategory;
           document.getElementById('wishYear').value = state.wishesYear;
           document.getElementById('wishTarget').value = '';
           document.getElementById('wishSaved').value = '';
@@ -6045,12 +6205,15 @@ if (isParceladoSerie && previewBox && previewList) {
           renderWishesView();
         });
 
-        document.querySelectorAll('.wish-cat-btn').forEach(btn => {
-          btn.addEventListener('click', () => {
+        const wishCategoryTabs = document.getElementById('wishCategoryTabs');
+        if (wishCategoryTabs) {
+          wishCategoryTabs.addEventListener('click', (e) => {
+            const btn = e.target.closest('.wish-cat-btn');
+            if (!btn) return;
             state.wishesCategory = btn.getAttribute('data-wish-cat');
             renderWishesView();
           });
-        });
+        }
 
         const despCategoria = document.getElementById('despCategoria');
 
@@ -6523,6 +6686,7 @@ if (category === 'fixa') {
         // Populate dynamic selects after data is loaded
         populateCardSelects(false);
         populateAllPersonSelects();
+        populateWishCategorySelect();
         populateDespesaSubcategorias();
         populateReceitaCategoria();
         populateDespCategoria();
