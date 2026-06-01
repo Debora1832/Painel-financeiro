@@ -1865,6 +1865,9 @@
 
       // Constantes e mapeamentos (mantidos e expandidos)
       const CATEGORY_LABELS = { receita: 'Receita', investimento: 'Investimento', fixa: 'Despesa Fixa', variavel: 'Despesa Variável' };
+      const PEOPLE = ['debora', 'cristiano', 'emanuel'];
+      const PERSON_LABELS = { debora: 'Débora', cristiano: 'Cristiano', emanuel: 'Emanuel' };
+      const PERSON_COLORS = { debora: 'bg-indigo-50 text-indigo-700 border-indigo-200', cristiano: 'bg-violet-50 text-violet-700 border-violet-200', emanuel: 'bg-amber-50 text-amber-700 border-amber-200' };
       const RECEITA_SUBCATEGORIES = {
         salario: 'Salário', freelancer: 'Freelancer / Extra', decimo: '13º / Bônus',
         reembolso: 'Reembolso', alugueis: 'Aluguéis', juros_dividendos: 'Juros / Dividendos', outros: 'Outros'
@@ -3262,10 +3265,8 @@
             badgesHTML += `<span class="inline-flex items-center px-2 py-0.5 rounded-full border text-[10px] font-medium ${colorClasses}">Lazer</span>`;
           }
           if (t.person) {
-            const personColors = { debora: 'bg-indigo-50 text-indigo-700 border-indigo-200', cristiano: 'bg-violet-50 text-violet-700 border-violet-200', emanuel: 'bg-amber-50 text-amber-700 border-amber-200' };
-            const personLabels = { debora: 'Débora', cristiano: 'Cristiano', emanuel: 'Emanuel' };
-            const pc = personColors[t.person] || 'bg-gray-50 text-gray-600 border-gray-200';
-            const pl = personLabels[t.person] || t.person;
+            const pc = PERSON_COLORS[t.person] || 'bg-gray-50 text-gray-600 border-gray-200';
+            const pl = PERSON_LABELS[t.person] || t.person;
             badgesHTML += `<span class="inline-flex items-center px-2 py-0.5 rounded-full border text-[10px] font-medium ${pc}"><i class="fa-solid fa-user mr-1 text-[9px]"></i>${pl}</span>`;
           }
 
@@ -3273,6 +3274,37 @@
           if (t.isCreditCard && t.card) pagamentoTexto = getCardLabels()[t.card] || t.card || '-';
           else if (t.paymentMethod === 'debito_pix') pagamentoTexto = 'Débito/Pix';
           else if (t.paymentMethod === 'boleto') pagamentoTexto = 'Boleto';
+
+          let statusHtml = '';
+          if (t.isCreditCard) {
+            statusHtml = `<span class="text-[11px] text-gray-400">Cartão</span>`;
+          } else {
+            const isReceita = t.category === 'receita';
+            const statusLabel = isReceita ? (t.paid ? 'Recebido' : 'Não recebido') : (t.paid ? 'Pago' : 'Não pago');
+            const statusIcon  = t.paid ? 'fa-thumbs-up' : 'fa-thumbs-down';
+            const statusClasses = t.paid ? 'bg-emerald-50 text-emerald-600 border-emerald-200' : 'bg-red-50 text-red-500 border-red-200';
+            statusHtml = `<button class="btn-toggle-paid inline-flex items-center justify-center px-2.5 py-1 rounded-full border ${statusClasses}" data-id="${t.id}" title="${statusLabel}"><i class="fa-solid ${statusIcon} mr-1 text-[10px]"></i><span class="text-[10px] font-medium">${statusLabel}</span></button>`;
+          }
+
+          tr.innerHTML = `
+            <td class="px-4 py-2 text-xs text-gray-700 whitespace-nowrap">${formatDate(t.date)}</td>
+            <td class="px-4 py-2 text-xs text-gray-800">${t.description || '-'}</td>
+            <td class="px-4 py-2 text-xs text-gray-600"><div class="flex flex-wrap gap-1">${badgesHTML}</div></td>
+            <td class="px-4 py-2 text-xs text-gray-600">${pagamentoTexto}</td>
+            <td class="px-4 py-2 text-xs text-gray-800 text-right">${formatCurrency(t.value)}</td>
+            <td class="px-4 py-2 text-xs text-center">${statusHtml}</td>
+            <td class="px-4 py-2 text-xs text-center">
+              <div class="flex items-center justify-center gap-1">
+                <button class="btn-edit inline-flex items-center justify-center w-7 h-7 rounded-full border border-indigo-100 text-indigo-500 hover:bg-indigo-50" data-id="${t.id}" title="Editar"><i class="fa-solid fa-pen text-[10px]"></i></button>
+                <button class="btn-delete inline-flex items-center justify-center w-7 h-7 rounded-full border border-red-100 text-red-500 hover:bg-red-50" data-id="${t.id}" title="Excluir"><i class="fa-solid fa-trash text-[11px]"></i></button>
+              </div>
+            </td>
+          `;
+          tbody.appendChild(tr);
+        });
+      }
+
+      // Build rows specifically for investimentos (com toggle aportado)
       function buildInvestRows(list, tbodyId, emptyText) {
         const tbody = document.getElementById(tbodyId);
         tbody.innerHTML = '';
@@ -3351,10 +3383,8 @@
             badgesHTML += `<span class="inline-flex items-center px-2 py-0.5 rounded-full border text-[10px] font-medium ${colorClasses}">Lazer</span>`;
           }
           if (t.person) {
-            const personColors = { debora: 'bg-indigo-50 text-indigo-700 border-indigo-200', cristiano: 'bg-violet-50 text-violet-700 border-violet-200', emanuel: 'bg-amber-50 text-amber-700 border-amber-200' };
-            const personLabels = { debora: 'Débora', cristiano: 'Cristiano', emanuel: 'Emanuel' };
-            const pc = personColors[t.person] || 'bg-gray-50 text-gray-600 border-gray-200';
-            const pl = personLabels[t.person] || t.person;
+            const pc = PERSON_COLORS[t.person] || 'bg-gray-50 text-gray-600 border-gray-200';
+            const pl = PERSON_LABELS[t.person] || t.person;
             badgesHTML += `<span class="inline-flex items-center px-2 py-0.5 rounded-full border text-[10px] font-medium ${pc}"><i class="fa-solid fa-user mr-1 text-[9px]"></i>${pl}</span>`;
           }
 
@@ -4195,8 +4225,7 @@
         const tfoot = document.getElementById('personBreakdownFoot');
         if (!section || !tbody || !tfoot) return;
 
-        const people = ['debora', 'cristiano', 'emanuel'];
-        const personLabels = { debora: 'Débora', cristiano: 'Cristiano', emanuel: 'Emanuel' };
+        const people = PEOPLE;
 
         // Get transactions for the current view (expenses + investments only)
         const txs = getFilteredTransactions().filter(t =>
