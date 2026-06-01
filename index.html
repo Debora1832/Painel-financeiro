@@ -1405,8 +1405,8 @@
       </section>
 
       <!-- Grid de cards de desejos -->
-      <div id="wishesGrid" class="grid grid-cols-1 xl:grid-cols-3 gap-4 xl:gap-0">
-        <section class="bg-white/80 border border-white/30 xl:border-y-0 xl:border-l-0 xl:border-r border-gray-200/70 rounded-xl xl:rounded-none p-4 space-y-3">
+      <div id="wishesGrid" class="grid grid-cols-1 lg:grid-cols-3 gap-4 lg:gap-0">
+        <section class="bg-white/80 border border-white/30 lg:border-y-0 lg:border-l-0 lg:border-r border-gray-200/70 rounded-xl lg:rounded-none p-4 space-y-3">
           <div class="flex items-center justify-between">
             <h3 class="text-sm font-semibold text-sky-700 flex items-center gap-2">
               <i class="fa-solid fa-people-group text-sky-500"></i>
@@ -1416,7 +1416,7 @@
           </div>
           <div id="wishesColumn_familiar" class="space-y-3"></div>
         </section>
-        <section class="bg-white/80 border border-white/30 xl:border-y-0 xl:border-l-0 xl:border-r border-gray-200/70 rounded-xl xl:rounded-none p-4 space-y-3">
+        <section class="bg-white/80 border border-white/30 lg:border-y-0 lg:border-l-0 lg:border-r border-gray-200/70 rounded-xl lg:rounded-none p-4 space-y-3">
           <div class="flex items-center justify-between">
             <h3 class="text-sm font-semibold text-indigo-700 flex items-center gap-2">
               <i class="fa-solid fa-user text-indigo-500"></i>
@@ -1426,7 +1426,7 @@
           </div>
           <div id="wishesColumn_debora" class="space-y-3"></div>
         </section>
-        <section class="bg-white/80 border border-white/30 xl:border-y-0 xl:border-l-0 border-gray-200/70 rounded-xl xl:rounded-none p-4 space-y-3">
+        <section class="bg-white/80 border border-white/30 lg:border-y-0 lg:border-l-0 border-gray-200/70 rounded-xl lg:rounded-none p-4 space-y-3">
           <div class="flex items-center justify-between">
             <h3 class="text-sm font-semibold text-amber-700 flex items-center gap-2">
               <i class="fa-solid fa-child text-amber-500"></i>
@@ -4349,6 +4349,7 @@
       }
 
       function renderWishPersonGroups(wishes) {
+        const DEFAULT_WISH_CATEGORY = 'maiscoisas';
         if (!wishes.length) {
           return `
             <div class="text-center py-10 text-gray-400 border border-dashed border-gray-200 rounded-lg bg-white/50">
@@ -4358,7 +4359,7 @@
         }
 
         const grouped = wishes.reduce((acc, wish) => {
-          const key = wish.category || 'maiscoisas';
+          const key = wish.category || DEFAULT_WISH_CATEGORY;
           if (!acc[key]) acc[key] = [];
           acc[key].push(wish);
           return acc;
