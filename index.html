@@ -4113,14 +4113,8 @@
           (cat === 'all' || w.category === cat)
         );
 
-        const activeWishes = filteredWishes.filter(w =>
-          !w.bought &&
-          true
-        );
-        const boughtWishes = filteredWishes.filter(w =>
-          w.bought &&
-          true
-        );
+        const activeWishes = filteredWishes.filter(w => !w.bought);
+        const boughtWishes = filteredWishes.filter(w => w.bought);
 
         const wishTotals = filteredWishes.reduce((acc, wish) => {
           acc.target += Number(wish.targetValue) || 0;
