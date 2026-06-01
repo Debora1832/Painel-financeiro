@@ -1925,7 +1925,7 @@
         { id: 'familiar', label: 'Familiar' },
         { id: 'debora', label: 'Débora' },
         { id: 'cristiano', label: 'Cristiano' },
-        { id: 'emanuel', label: 'Emanul' }
+        { id: 'emanuel', label: 'Emanuel' }
       ];
       const PERSON_COLOR_PRESETS = {
         familiar: 'bg-sky-50 text-sky-700 border-sky-200',
@@ -5727,7 +5727,7 @@ if (isParceladoSerie && previewBox && previewList) {
               <i class="fa-solid fa-xmark text-[10px]"></i>
             </button>`;
             row.querySelector('.btn-del-type').addEventListener('click', async (e) => {
-              const i = parseInt(e.currentTarget.dataset.idx);
+              const i = parseInt(e.currentTarget.dataset.idx, 10);
               state.customTypes.splice(i, 1);
               try {
                 await saveSettings();
