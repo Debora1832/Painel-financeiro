@@ -1405,8 +1405,37 @@
       </section>
 
       <!-- Grid de cards de desejos -->
-      <div id="wishesGrid" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
-        <!-- Renderizado via JS -->
+      <div id="wishesGrid" class="grid grid-cols-1 lg:grid-cols-3 gap-4 lg:gap-0">
+        <section class="bg-white/80 border border-white/30 lg:border-y-0 lg:border-l-0 lg:border-r border-gray-200/70 rounded-xl lg:rounded-none p-4 space-y-3">
+          <div class="flex items-center justify-between">
+            <h3 class="text-sm font-semibold text-sky-700 flex items-center gap-2">
+              <i class="fa-solid fa-people-group text-sky-500"></i>
+              Família
+            </h3>
+            <span id="wishCount_familiar" class="text-[11px] font-semibold px-2 py-0.5 rounded-full bg-sky-100 text-sky-700">0</span>
+          </div>
+          <div id="wishesColumn_familiar" class="space-y-3"></div>
+        </section>
+        <section class="bg-white/80 border border-white/30 lg:border-y-0 lg:border-l-0 lg:border-r border-gray-200/70 rounded-xl lg:rounded-none p-4 space-y-3">
+          <div class="flex items-center justify-between">
+            <h3 class="text-sm font-semibold text-indigo-700 flex items-center gap-2">
+              <i class="fa-solid fa-user text-indigo-500"></i>
+              Débora
+            </h3>
+            <span id="wishCount_debora" class="text-[11px] font-semibold px-2 py-0.5 rounded-full bg-indigo-100 text-indigo-700">0</span>
+          </div>
+          <div id="wishesColumn_debora" class="space-y-3"></div>
+        </section>
+        <section class="bg-white/80 border border-white/30 lg:border-y-0 lg:border-l-0 border-gray-200/70 rounded-xl lg:rounded-none p-4 space-y-3">
+          <div class="flex items-center justify-between">
+            <h3 class="text-sm font-semibold text-amber-700 flex items-center gap-2">
+              <i class="fa-solid fa-child text-amber-500"></i>
+              Emanuel
+            </h3>
+            <span id="wishCount_emanuel" class="text-[11px] font-semibold px-2 py-0.5 rounded-full bg-amber-100 text-amber-700">0</span>
+          </div>
+          <div id="wishesColumn_emanuel" class="space-y-3"></div>
+        </section>
       </div>
 
       <!-- Seção de comprados -->
@@ -4285,14 +4314,26 @@
         document.getElementById('wishSavedAmount').textContent = formatCurrency(wishTotals.saved);
         document.getElementById('wishBoughtAmount').textContent = formatCurrency(wishTotals.bought);
 
-        const grid = document.getElementById('wishesGrid');
-        grid.innerHTML = activeWishes.length === 0
-          ? `<div class="col-span-full text-center py-12 text-gray-400">
-               <i class="fa-solid fa-star text-4xl mb-3 block text-gray-200"></i>
-               <p class="text-sm">Nenhum desejo para este ano/categoria.</p>
-               <p class="text-xs mt-1">Clique em <strong>Novo Desejo</strong> para adicionar.</p>
-             </div>`
-          : activeWishes.map(w => renderWishCard(w)).join('');
+        const DEFAULT_WISH_COLUMN = 'familiar';
+        const personColumns = [DEFAULT_WISH_COLUMN, 'debora', 'emanuel'];
+        const columnBuckets = personColumns.reduce((acc, personId) => {
+          acc[personId] = [];
+          return acc;
+        }, {});
+
+        activeWishes.forEach((wish) => {
+          const personKey = personColumns.includes(wish.person) ? wish.person : DEFAULT_WISH_COLUMN;
+          columnBuckets[personKey].push(wish);
+        });
+
+        personColumns.forEach((personId) => {
+          const column = document.getElementById(`wishesColumn_${personId}`);
+          const count = document.getElementById(`wishCount_${personId}`);
+          if (!column || !count) return;
+          const wishesByPerson = columnBuckets[personId];
+          count.textContent = wishesByPerson.length;
+          column.innerHTML = renderWishPersonGroups(wishesByPerson);
+        });
 
         const boughtSection = document.getElementById('wishBoughtSection');
         const boughtGrid = document.getElementById('wishBoughtGrid');
@@ -4305,6 +4346,46 @@
         } else {
           boughtSection.classList.add('hidden');
         }
+      }
+
+      function renderWishPersonGroups(wishes) {
+        const DEFAULT_WISH_CATEGORY = 'maiscoisas';
+        if (!wishes.length) {
+          return `
+            <div class="text-center py-10 text-gray-400 border border-dashed border-gray-200 rounded-lg bg-white/50">
+              <i class="fa-solid fa-star text-2xl mb-2 block text-gray-200"></i>
+              <p class="text-xs">Nenhum desejo nesta coluna.</p>
+            </div>`;
+        }
+
+        const grouped = wishes.reduce((acc, wish) => {
+          const key = wish.category || DEFAULT_WISH_CATEGORY;
+          if (!acc[key]) acc[key] = [];
+          acc[key].push(wish);
+          return acc;
+        }, {});
+
+        const categories = Object.keys(WISH_CAT_CONFIG);
+        const orderedCategories = [
+          ...categories.filter(cat => grouped[cat]?.length),
+          ...Object.keys(grouped).filter(cat => !categories.includes(cat))
+        ];
+
+        return orderedCategories.map((categoryKey) => {
+          const cfg = WISH_CAT_CONFIG[categoryKey] || WISH_CAT_CONFIG.maiscoisas;
+          const items = grouped[categoryKey] || [];
+          return `
+            <div class="space-y-2">
+              <div class="inline-flex items-center gap-1.5 px-2 py-1 rounded-md text-[10px] font-semibold uppercase tracking-wide border ${cfg.border} ${cfg.bg} ${cfg.text}">
+                <i class="fa-solid ${cfg.icon} text-[10px]"></i>
+                ${cfg.label}
+                <span class="opacity-70">(${items.length})</span>
+              </div>
+              <div class="space-y-3">
+                ${items.map(w => renderWishCard(w)).join('')}
+              </div>
+            </div>`;
+        }).join('');
       }
 
       function renderWishCard(w, isBought = false) {
