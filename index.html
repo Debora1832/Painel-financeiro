@@ -1304,17 +1304,23 @@
       <!-- Tabs de categoria -->
       <div class="flex gap-2 flex-wrap">
         <button data-wish-cat="all" class="wish-cat-btn px-4 py-1.5 text-xs font-semibold rounded-full border border-gray-300 text-gray-700 bg-white hover:bg-gray-50 transition">Todos</button>
+        <button data-wish-cat="utensilios" class="wish-cat-btn px-4 py-1.5 text-xs font-semibold rounded-full border border-cyan-300 text-cyan-800 bg-cyan-50 hover:bg-cyan-100 transition">
+          <i class="fa-solid fa-kitchen-set text-[11px]"></i> Utensílios
+        </button>
+        <button data-wish-cat="vestuario" class="wish-cat-btn px-4 py-1.5 text-xs font-semibold rounded-full border border-fuchsia-300 text-fuchsia-800 bg-fuchsia-50 hover:bg-fuchsia-100 transition">
+          <i class="fa-solid fa-shirt text-[11px]"></i> Vestuário
+        </button>
         <button data-wish-cat="casa" class="wish-cat-btn px-4 py-1.5 text-xs font-semibold rounded-full border border-amber-300 text-amber-800 bg-amber-50 hover:bg-amber-100 transition">
           <i class="fa-solid fa-house text-[11px]"></i> Casa
         </button>
-        <button data-wish-cat="cristiano" class="wish-cat-btn px-4 py-1.5 text-xs font-semibold rounded-full border border-blue-300 text-blue-800 bg-blue-50 hover:bg-blue-100 transition">
-          <i class="fa-solid fa-person text-[11px]"></i> Cristiano
+        <button data-wish-cat="mercado" class="wish-cat-btn px-4 py-1.5 text-xs font-semibold rounded-full border border-emerald-300 text-emerald-800 bg-emerald-50 hover:bg-emerald-100 transition">
+          <i class="fa-solid fa-basket-shopping text-[11px]"></i> Mercado
         </button>
-        <button data-wish-cat="debora" class="wish-cat-btn px-4 py-1.5 text-xs font-semibold rounded-full border border-pink-300 text-pink-800 bg-pink-50 hover:bg-pink-100 transition">
-          <i class="fa-solid fa-person-dress text-[11px]"></i> Débora
+        <button data-wish-cat="brinquedos" class="wish-cat-btn px-4 py-1.5 text-xs font-semibold rounded-full border border-violet-300 text-violet-800 bg-violet-50 hover:bg-violet-100 transition">
+          <i class="fa-solid fa-puzzle-piece text-[11px]"></i> Brinquedos
         </button>
-        <button data-wish-cat="emanuel" class="wish-cat-btn px-4 py-1.5 text-xs font-semibold rounded-full border border-green-300 text-green-800 bg-green-50 hover:bg-green-100 transition">
-          <i class="fa-solid fa-child text-[11px]"></i> Emanuel
+        <button data-wish-cat="maiscoisas" class="wish-cat-btn px-4 py-1.5 text-xs font-semibold rounded-full border border-slate-300 text-slate-700 bg-slate-50 hover:bg-slate-100 transition">
+          <i class="fa-solid fa-box-open text-[11px]"></i> Mais coisas
         </button>
       </div>
 
@@ -1357,10 +1363,12 @@
           <div>
             <label class="text-xs font-medium text-gray-700 block mb-1">Categoria</label>
             <select id="wishCategory" class="w-full rounded-lg border border-gray-200 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-yellow-400 focus:border-yellow-400">
+              <option value="utensilios">🍽️ Utensílios</option>
+              <option value="vestuario">👕 Vestuário</option>
               <option value="casa">🏠 Casa</option>
-              <option value="cristiano">👤 Cristiano</option>
-              <option value="debora">👗 Débora</option>
-              <option value="emanuel">👦 Emanuel</option>
+              <option value="mercado">🛒 Mercado</option>
+              <option value="brinquedos">🧩 Brinquedos</option>
+              <option value="maiscoisas">📦 Mais coisas</option>
             </select>
           </div>
           <div>
@@ -3929,10 +3937,12 @@
 
       // ---------- WISHES VIEW ----------
       const WISH_CAT_CONFIG = {
-        casa:      { label: 'Casa',      icon: 'fa-house',         color: 'amber',  border: 'border-amber-300', bg: 'bg-amber-50',  text: 'text-amber-800',  bar: 'bg-amber-400' },
-        cristiano: { label: 'Cristiano', icon: 'fa-person',        color: 'blue',   border: 'border-blue-300',  bg: 'bg-blue-50',   text: 'text-blue-800',   bar: 'bg-blue-400' },
-        debora:    { label: 'Débora',    icon: 'fa-person-dress',  color: 'pink',   border: 'border-pink-300',  bg: 'bg-pink-50',   text: 'text-pink-800',   bar: 'bg-pink-400' },
-        emanuel:   { label: 'Emanuel',   icon: 'fa-child',         color: 'green',  border: 'border-green-300', bg: 'bg-green-50',  text: 'text-green-800',  bar: 'bg-green-400' }
+        utensilios:  { label: 'Utensílios',  icon: 'fa-kitchen-set',     color: 'cyan',    border: 'border-cyan-300',    bg: 'bg-cyan-50',    text: 'text-cyan-800',    bar: 'bg-cyan-400' },
+        vestuario:   { label: 'Vestuário',   icon: 'fa-shirt',           color: 'fuchsia', border: 'border-fuchsia-300', bg: 'bg-fuchsia-50', text: 'text-fuchsia-800', bar: 'bg-fuchsia-400' },
+        casa:        { label: 'Casa',        icon: 'fa-house',           color: 'amber',   border: 'border-amber-300',   bg: 'bg-amber-50',   text: 'text-amber-800',   bar: 'bg-amber-400' },
+        mercado:     { label: 'Mercado',     icon: 'fa-basket-shopping', color: 'emerald', border: 'border-emerald-300', bg: 'bg-emerald-50', text: 'text-emerald-800', bar: 'bg-emerald-400' },
+        brinquedos:  { label: 'Brinquedos',  icon: 'fa-puzzle-piece',    color: 'violet',  border: 'border-violet-300',  bg: 'bg-violet-50',  text: 'text-violet-800',  bar: 'bg-violet-400' },
+        maiscoisas:  { label: 'Mais coisas', icon: 'fa-box-open',      color: 'slate',   border: 'border-slate-300',   bg: 'bg-slate-50',   text: 'text-slate-700',   bar: 'bg-slate-400' }
       };
 
       function populateWishYearFilter() {
