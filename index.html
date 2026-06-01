@@ -718,7 +718,6 @@
                 <!-- opções via JS -->
               </select>
             </div>
-
             <div class="space-y-1">
               <label for="despPessoa" class="font-medium text-gray-700">Responsável</label>
               <select id="despPessoa"
@@ -1475,6 +1474,15 @@
         <div>
           <label class="text-xs font-medium text-gray-700 block mb-1">Já guardei (R$)</label>
           <input id="wishSaved" type="number" min="0" step="0.01" placeholder="0,00" class="w-full rounded-lg border border-gray-200 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-yellow-400 focus:border-yellow-400" />
+        </div>
+        <div>
+          <label class="text-xs font-medium text-gray-700 block mb-1">Responsável</label>
+          <select id="wishPerson" class="w-full rounded-lg border border-gray-200 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-yellow-400 focus:border-yellow-400">
+            <option value="">— Sem responsável —</option>
+            <option value="debora">Débora</option>
+            <option value="cristiano">Cristiano</option>
+            <option value="emanuel">Emanuel</option>
+          </select>
         </div>
         <div class="flex justify-end gap-2 pt-1">
           <button type="button" id="btnCancelWish" class="px-4 py-2 text-xs font-semibold rounded-lg border border-gray-200 text-gray-600 hover:bg-gray-50 transition">Cancelar</button>
@@ -2389,7 +2397,8 @@
               targetValue: Number(d.targetValue) || 0,
               savedValue: Number(d.savedValue) || 0,
               year: Number(d.year) || currentYear,
-              bought: !!d.bought
+              bought: !!d.bought,
+              person: d.person || null
             });
           });
           state.wishes = result;
@@ -2407,7 +2416,13 @@
           console.error("Erro ao carregar wishes do Firestore", e);
           try {
             const raw = localStorage.getItem(WISHES_KEY);
-            if (raw) { state.wishes = JSON.parse(raw); return; }
+            if (raw) {
+              state.wishes = JSON.parse(raw).map(w => ({
+                ...w,
+                person: w.person || null
+              }));
+              return;
+            }
           } catch(_) {}
           state.wishes = [];
         }
@@ -2421,7 +2436,8 @@
             targetValue: w.targetValue,
             savedValue: w.savedValue,
             year: w.year,
-            bought: w.bought
+            bought: w.bought,
+            person: w.person || null
           })));
           try { localStorage.setItem(WISHES_KEY, JSON.stringify(state.wishes)); } catch(e) {}
         } catch(e) {
@@ -4157,6 +4173,8 @@
         const cfg = WISH_CAT_CONFIG[w.category] || WISH_CAT_CONFIG.casa;
         const pct = w.targetValue > 0 ? Math.min(100, Math.round((w.savedValue / w.targetValue) * 100)) : 0;
         const isComplete = pct >= 100;
+        const personLabel = w.person ? (PERSON_LABELS[w.person] || w.person) : '';
+        const personColors = w.person ? (PERSON_COLORS[w.person] || 'bg-gray-50 text-gray-600 border-gray-200') : '';
 
         return `
           <div class="bg-white rounded-xl border ${cfg.border} shadow-sm p-4 flex flex-col gap-3 ${isBought ? 'opacity-60' : ''}">
@@ -4167,7 +4185,10 @@
                 </span>
                 <div class="min-w-0">
                   <p class="text-sm font-semibold text-gray-900 truncate">${w.name}</p>
-                  <span class="text-[10px] font-medium ${cfg.text} ${cfg.bg} px-2 py-0.5 rounded-full border ${cfg.border}">${cfg.label}</span>
+                  <div class="flex flex-wrap items-center gap-1 mt-1">
+                    <span class="text-[10px] font-medium ${cfg.text} ${cfg.bg} px-2 py-0.5 rounded-full border ${cfg.border}">${cfg.label}</span>
+                    ${personLabel ? `<span class="inline-flex items-center px-2 py-0.5 rounded-full border text-[10px] font-medium ${personColors}"><i class="fa-solid fa-user mr-1 text-[9px]"></i>${personLabel}</span>` : ''}
+                  </div>
                 </div>
               </div>
               <div class="flex items-center gap-1 flex-shrink-0">
@@ -4220,6 +4241,7 @@
         document.getElementById('wishYear').value = w.year;
         document.getElementById('wishTarget').value = w.targetValue;
         document.getElementById('wishSaved').value = w.savedValue;
+        document.getElementById('wishPerson').value = w.person || '';
         document.getElementById('wishModalTitle').textContent = 'Editar Desejo';
         const modal = document.getElementById('wishModal');
         modal.classList.remove('hidden');
@@ -5562,6 +5584,7 @@ if (isParceladoSerie && previewBox && previewList) {
           document.getElementById('wishYear').value = state.wishesYear;
           document.getElementById('wishTarget').value = '';
           document.getElementById('wishSaved').value = '';
+          document.getElementById('wishPerson').value = '';
           document.getElementById('wishModalTitle').textContent = 'Novo Desejo';
           populateWishYearFilter();
           const modal = document.getElementById('wishModal');
@@ -5585,13 +5608,14 @@ if (isParceladoSerie && previewBox && previewList) {
           const year = parseInt(document.getElementById('wishYear').value, 10);
           const targetValue = parseFloat(document.getElementById('wishTarget').value) || 0;
           const savedValue = parseFloat(document.getElementById('wishSaved').value) || 0;
+          const person = document.getElementById('wishPerson').value || null;
           if (!name) return;
 
           if (editId) {
             const w = state.wishes.find(x => x.id === editId);
-            if (w) { w.name = name; w.category = category; w.year = year; w.targetValue = targetValue; w.savedValue = savedValue; }
+            if (w) { w.name = name; w.category = category; w.year = year; w.targetValue = targetValue; w.savedValue = savedValue; w.person = person; }
           } else {
-            state.wishes.push({ id: 'wish_' + Date.now().toString(36) + '_' + Math.random().toString(36).slice(2), name, category, targetValue, savedValue, year, bought: false });
+            state.wishes.push({ id: 'wish_' + Date.now().toString(36) + '_' + Math.random().toString(36).slice(2), name, category, targetValue, savedValue, year, bought: false, person });
           }
           closeWishModal();
           renderWishesView();
