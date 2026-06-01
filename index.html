@@ -2071,21 +2071,34 @@
           .join(' ');
       }
 
+      function normalizeCompareValue(value) {
+        return String(value || '').trim().toLowerCase();
+      }
+
+      function getSettingItemId(item) {
+        return slugifyLabel(typeof item === 'string' ? item : item?.id);
+      }
+
+      function getSettingItemLabel(item) {
+        if (typeof item === 'object' && item?.label) return String(item.label).trim();
+        return formatPersonId(item);
+      }
+
       function normalizePeople(people = []) {
         const normalized = [];
         const seen = new Set();
         const source = Array.isArray(people) ? people : [];
 
         DEFAULT_PEOPLE.forEach((person) => {
-          const saved = source.find(item => (typeof item === 'string' ? item : item?.id) === person.id);
+          const saved = source.find(item => getSettingItemId(item) === person.id);
           const label = typeof saved === 'object' && saved?.label ? String(saved.label).trim() : person.label;
           normalized.push({ id: person.id, label: label || person.label });
           seen.add(person.id);
         });
 
         source.forEach((item) => {
-          const id = slugifyLabel(typeof item === 'string' ? item : item?.id);
-          const label = typeof item === 'object' ? String(item?.label || '').trim() : formatPersonId(item);
+          const id = getSettingItemId(item);
+          const label = getSettingItemLabel(item);
           if (!id || seen.has(id)) return;
           normalized.push({ id, label: label || formatPersonId(id) });
           seen.add(id);
@@ -4427,6 +4440,7 @@
         const txs = getFilteredTransactions().filter(t =>
           t.category === 'fixa' || t.category === 'variavel' || t.category === 'investimento'
         );
+        const personIds = new Set(people.map(person => person.id));
 
         // Check if any transaction has a person assigned
         const hasPersonData = txs.some(t => t.person);
@@ -4435,7 +4449,7 @@
           return;
         }
         section.classList.remove('hidden');
-        const hasUnassigned = txs.some(t => !t.person || !people.some(person => person.id === t.person));
+        const hasUnassigned = txs.some(t => !t.person || !personIds.has(t.person));
 
         // Build subcategory → person → total map
         const allSubCats = new Set();
@@ -4451,7 +4465,7 @@
             }, { '': 0 });
           }
           const p = t.person || '';
-          if (people.some(person => person.id === p)) {
+          if (personIds.has(p)) {
             dataMap[subKey][p] += Number(t.value) || 0;
           } else {
             dataMap[subKey][''] += Number(t.value) || 0;
@@ -5653,7 +5667,7 @@ if (isParceladoSerie && previewBox && previewList) {
               if (!current) return;
               const nextLabel = prompt('Novo nome da subcategoria:', current.label)?.trim();
               if (!nextLabel || nextLabel === current.label) return;
-              if (state.customSubCategories[t].some((item, index) => index !== i && item.label.toLowerCase() === nextLabel.toLowerCase())) {
+              if (state.customSubCategories[t].some((item, index) => index !== i && normalizeCompareValue(item.label) === normalizeCompareValue(nextLabel))) {
                 showToast('Já existe uma subcategoria com esse nome.', 'warning');
                 return;
               }
@@ -5690,6 +5704,10 @@ if (isParceladoSerie && previewBox && previewList) {
           const labelVal = document.getElementById('newCatLabel').value.trim();
           if (!labelVal) return;
           const valueKey = slugifyLabel(labelVal);
+          if (!valueKey) {
+            showToast('Informe um nome válido.', 'warning');
+            return;
+          }
           if (!state.customSubCategories[type]) state.customSubCategories[type] = [];
           if (state.customSubCategories[type].some(c => c.value === valueKey)) {
             showToast('Esta categoria já existe.', 'warning'); return;
@@ -5797,7 +5815,7 @@ if (isParceladoSerie && previewBox && previewList) {
               if (!current) return;
               const nextLabel = prompt('Novo nome da pessoa:', current.label)?.trim();
               if (!nextLabel || nextLabel === current.label) return;
-              if (getPeopleList().some(item => item.id !== personId && item.label.toLowerCase() === nextLabel.toLowerCase())) {
+              if (getPeopleList().some(item => item.id !== personId && normalizeCompareValue(item.label) === normalizeCompareValue(nextLabel))) {
                 showToast('Já existe uma pessoa com esse nome.', 'warning');
                 return;
               }
@@ -5842,7 +5860,7 @@ if (isParceladoSerie && previewBox && previewList) {
             showToast('Informe um nome válido.', 'warning');
             return;
           }
-          if (getPeopleList().some(person => person.id === valueKey || person.label.toLowerCase() === labelVal.toLowerCase())) {
+          if (getPeopleList().some(person => person.id === valueKey || normalizeCompareValue(person.label) === normalizeCompareValue(labelVal))) {
             showToast('Esta pessoa já existe.', 'warning');
             return;
           }
