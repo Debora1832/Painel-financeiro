@@ -2072,7 +2072,11 @@
       }
 
       function normalizeCompareValue(value) {
-        return String(value || '').trim().toLowerCase();
+        return String(value || '')
+          .trim()
+          .toLowerCase()
+          .normalize('NFD')
+          .replace(/[\u0300-\u036f]/g, '');
       }
 
       function getSettingItemId(item) {
@@ -2091,8 +2095,9 @@
 
         DEFAULT_PEOPLE.forEach((person) => {
           const saved = source.find(item => getSettingItemId(item) === person.id);
-          const label = typeof saved === 'object' && saved?.label ? String(saved.label).trim() : person.label;
-          normalized.push({ id: person.id, label: label || person.label });
+          const savedLabel = typeof saved === 'object' && saved?.label ? String(saved.label).trim() : '';
+          const label = savedLabel || person.label;
+          normalized.push({ id: person.id, label });
           seen.add(person.id);
         });
 
@@ -5766,6 +5771,10 @@ if (isParceladoSerie && previewBox && previewList) {
           const baseType = document.getElementById('newTypeBase').value;
           if (!labelVal) return;
           const valueKey = `${slugifyLabel(labelVal)}_custom`;
+          if (valueKey === '_custom') {
+            showToast('Informe um nome válido.', 'warning');
+            return;
+          }
           if (state.customTypes.some(ct => ct.value === valueKey)) {
             showToast('Este tipo já existe.', 'warning'); return;
           }
@@ -5811,15 +5820,16 @@ if (isParceladoSerie && previewBox && previewList) {
 
             row.querySelector('.btn-edit-person').addEventListener('click', async (e) => {
               const personId = e.currentTarget.dataset.id;
-              const current = getPeopleList().find(item => item.id === personId);
+              const currentPeople = getPeopleList();
+              const current = currentPeople.find(item => item.id === personId);
               if (!current) return;
               const nextLabel = prompt('Novo nome da pessoa:', current.label)?.trim();
               if (!nextLabel || nextLabel === current.label) return;
-              if (getPeopleList().some(item => item.id !== personId && normalizeCompareValue(item.label) === normalizeCompareValue(nextLabel))) {
+              if (currentPeople.some(item => item.id !== personId && normalizeCompareValue(item.label) === normalizeCompareValue(nextLabel))) {
                 showToast('Já existe uma pessoa com esse nome.', 'warning');
                 return;
               }
-              state.people = getPeopleList().map(item => item.id === personId ? { ...item, label: nextLabel } : item);
+              state.people = currentPeople.map(item => item.id === personId ? { ...item, label: nextLabel } : item);
               try {
                 await saveSettings();
                 refreshConfiguredViews();
@@ -5856,15 +5866,16 @@ if (isParceladoSerie && previewBox && previewList) {
           const labelVal = document.getElementById('newPersonLabel').value.trim();
           if (!labelVal) return;
           const valueKey = slugifyLabel(labelVal);
+          const currentPeople = getPeopleList();
           if (!valueKey) {
             showToast('Informe um nome válido.', 'warning');
             return;
           }
-          if (getPeopleList().some(person => person.id === valueKey || normalizeCompareValue(person.label) === normalizeCompareValue(labelVal))) {
+          if (currentPeople.some(person => person.id === valueKey || normalizeCompareValue(person.label) === normalizeCompareValue(labelVal))) {
             showToast('Esta pessoa já existe.', 'warning');
             return;
           }
-          state.people = [...getPeopleList(), { id: valueKey, label: labelVal }];
+          state.people = [...currentPeople, { id: valueKey, label: labelVal }];
           try {
             await saveSettings();
             document.getElementById('newPersonLabel').value = '';
