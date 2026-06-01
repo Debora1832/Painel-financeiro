@@ -1994,6 +1994,7 @@
         cards: [],           // [{id, label, limit, color}]
         customSubCategories: { receita: [], fixa: [], variavel: [], investimento: [] }, // [{value, label}]
         customTypes: [],     // [{value, label, baseType}]
+        settingsContext: null,
         selectedMonth: new Date().getMonth(),
         selectedYear: 'all',
         editingId: null,
@@ -5346,12 +5347,33 @@ if (isParceladoSerie && previewBox && previewList) {
         }
 
         // ---------- SETTINGS MODAL ----------
-        function openSettingsModal() {
+        function getSettingsContext(triggerId) {
+          if (triggerId === 'btnManageCategoriesRec') {
+            return { tab: 'categories', categoryType: 'receita', selectId: 'recCategoria' };
+          }
+          if (triggerId === 'btnManageCategories') {
+            const typeSelect = document.getElementById('despCategoria');
+            return {
+              tab: 'categories',
+              categoryType: getBaseType(typeSelect ? typeSelect.value : 'fixa'),
+              selectId: 'despSubCategoria'
+            };
+          }
+          if (triggerId === 'btnManageTypes') {
+            return { tab: 'types', selectId: 'despCategoria' };
+          }
+          return null;
+        }
+
+        function openSettingsModal(context = null) {
+          state.settingsContext = context;
           document.getElementById('settingsModal').classList.remove('hidden');
           document.getElementById('settingsModal').classList.add('flex');
-          switchSettingsTab('categories');
+          if (context?.categoryType) settingsCatType.value = context.categoryType;
+          switchSettingsTab(context?.tab || 'categories');
         }
         function closeSettingsModal() {
+          state.settingsContext = null;
           document.getElementById('settingsModal').classList.add('hidden');
           document.getElementById('settingsModal').classList.remove('flex');
         }
@@ -5359,9 +5381,7 @@ if (isParceladoSerie && previewBox && previewList) {
         ['btnManageTypes','btnManageCategories','btnManageCategoriesRec'].forEach(id => {
           const btn = document.getElementById(id);
           if (btn) btn.addEventListener('click', () => {
-            openSettingsModal();
-            if (id === 'btnManageTypes') switchSettingsTab('types');
-            else switchSettingsTab('categories');
+            openSettingsModal(getSettingsContext(id));
           });
         });
         document.getElementById('btnSettingsModalClose').addEventListener('click', closeSettingsModal);
@@ -5391,6 +5411,34 @@ if (isParceladoSerie && previewBox && previewList) {
 
         const settingsCatType = document.getElementById('settingsCatType');
         settingsCatType.addEventListener('change', renderSettingsCatList);
+
+        function applyNewCategorySelection(type, value) {
+          const context = state.settingsContext;
+          if (!context?.selectId) return;
+          if (context.selectId === 'recCategoria' && type === 'receita') {
+            const select = document.getElementById('recCategoria');
+            if (select) select.value = value;
+            return;
+          }
+          if (context.selectId === 'despSubCategoria') {
+            const typeSelect = document.getElementById('despCategoria');
+            const currentBaseType = getBaseType(typeSelect ? typeSelect.value : 'fixa');
+            if (currentBaseType === type) {
+              const select = document.getElementById('despSubCategoria');
+              if (select) select.value = value;
+            }
+          }
+        }
+
+        function applyNewTypeSelection(value) {
+          const context = state.settingsContext;
+          if (context?.selectId !== 'despCategoria') return;
+          const select = document.getElementById('despCategoria');
+          if (!select) return;
+          select.value = value;
+          populateDespesaSubcategorias();
+          updateParcelVisibilityAndCard();
+        }
 
         function renderSettingsCatList() {
           const type = settingsCatType.value;
@@ -5439,6 +5487,7 @@ if (isParceladoSerie && previewBox && previewList) {
             document.getElementById('newCatLabel').value = '';
             populateDespesaSubcategorias();
             populateReceitaCategoria();
+            applyNewCategorySelection(type, valueKey);
             renderSettingsCatList();
             showToast('Categoria adicionada!', 'success');
           } catch(err) {
@@ -5491,6 +5540,7 @@ if (isParceladoSerie && previewBox && previewList) {
             await saveSettings();
             document.getElementById('newTypeLabel').value = '';
             populateDespCategoria();
+            applyNewTypeSelection(valueKey);
             renderSettingsTypesList();
             showToast('Tipo adicionado!', 'success');
           } catch(err) {
