@@ -642,13 +642,13 @@
               </select>
             </div>
             <div class="space-y-1">
-              <label for="recPessoa" class="font-medium text-gray-700">Responsável</label>
+              <div class="flex items-center justify-between">
+                <label for="recPessoa" class="font-medium text-gray-700">Responsável</label>
+                <button type="button" id="btnManagePeopleRec" class="text-[10px] text-gray-400 hover:text-gray-600 flex items-center gap-0.5"><i class="fa-solid fa-plus-circle"></i> Gerenciar</button>
+              </div>
               <select id="recPessoa"
                 class="w-full rounded-lg border border-gray-200 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500">
-                <option value="">— Sem responsável —</option>
-                <option value="debora">Débora</option>
-                <option value="cristiano">Cristiano</option>
-                <option value="emanuel">Emanuel</option>
+                <!-- opções via JS -->
               </select>
             </div>
           </div>
@@ -719,13 +719,13 @@
               </select>
             </div>
             <div class="space-y-1">
-              <label for="despPessoa" class="font-medium text-gray-700">Responsável</label>
+              <div class="flex items-center justify-between">
+                <label for="despPessoa" class="font-medium text-gray-700">Responsável</label>
+                <button type="button" id="btnManagePeopleDesp" class="text-[10px] text-gray-400 hover:text-gray-600 flex items-center gap-0.5"><i class="fa-solid fa-plus-circle"></i> Gerenciar</button>
+              </div>
               <select id="despPessoa"
                 class="w-full rounded-lg border border-gray-200 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-orange-500">
-                <option value="">— Sem responsável —</option>
-                <option value="debora">Débora</option>
-                <option value="cristiano">Cristiano</option>
-                <option value="emanuel">Emanuel</option>
+                <!-- opções via JS -->
               </select>
             </div>
 
@@ -805,16 +805,7 @@
         </div>
         <div class="overflow-x-auto">
           <table class="min-w-full text-xs">
-            <thead class="bg-gray-50 border-b border-gray-100">
-              <tr class="text-xs text-gray-500 uppercase tracking-wide">
-                <th class="text-left px-4 py-2">Subcategoria</th>
-                <th class="text-right px-4 py-2 text-indigo-600">Débora</th>
-                <th class="text-right px-4 py-2 text-violet-600">Cristiano</th>
-                <th class="text-right px-4 py-2 text-amber-600">Emanuel</th>
-                <th class="text-right px-4 py-2 text-gray-500">Sem resp.</th>
-                <th class="text-right px-4 py-2 font-semibold text-gray-700">Total</th>
-              </tr>
-            </thead>
+            <thead id="personBreakdownHead" class="bg-gray-50 border-b border-gray-100"></thead>
             <tbody id="personBreakdownBody" class="divide-y divide-gray-100"></tbody>
             <tfoot id="personBreakdownFoot" class="bg-gray-50 border-t border-gray-200"></tfoot>
           </table>
@@ -1476,12 +1467,12 @@
           <input id="wishSaved" type="number" min="0" step="0.01" placeholder="0,00" class="w-full rounded-lg border border-gray-200 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-yellow-400 focus:border-yellow-400" />
         </div>
         <div>
-          <label class="text-xs font-medium text-gray-700 block mb-1">Responsável</label>
+          <div class="flex items-center justify-between mb-1">
+            <label class="text-xs font-medium text-gray-700 block">Responsável</label>
+            <button type="button" id="btnManagePeopleWish" class="text-[10px] text-gray-400 hover:text-gray-600 flex items-center gap-0.5"><i class="fa-solid fa-plus-circle"></i> Gerenciar</button>
+          </div>
           <select id="wishPerson" class="w-full rounded-lg border border-gray-200 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-yellow-400 focus:border-yellow-400">
-            <option value="">— Sem responsável —</option>
-            <option value="debora">Débora</option>
-            <option value="cristiano">Cristiano</option>
-            <option value="emanuel">Emanuel</option>
+            <!-- opções via JS -->
           </select>
         </div>
         <div class="flex justify-end gap-2 pt-1">
@@ -1575,13 +1566,13 @@
         </div>
 
         <div class="space-y-1">
-          <label for="editPessoa" class="font-medium text-gray-700">Responsável</label>
+          <div class="flex items-center justify-between">
+            <label for="editPessoa" class="font-medium text-gray-700">Responsável</label>
+            <button type="button" id="btnManagePeopleEdit" class="text-[10px] text-gray-400 hover:text-gray-600 flex items-center gap-0.5"><i class="fa-solid fa-plus-circle"></i> Gerenciar</button>
+          </div>
           <select id="editPessoa"
             class="w-full rounded-lg border border-gray-200 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500">
-            <option value="">— Sem responsável —</option>
-            <option value="debora">Débora</option>
-            <option value="cristiano">Cristiano</option>
-            <option value="emanuel">Emanuel</option>
+            <!-- opções via JS -->
           </select>
         </div>
 
@@ -1793,16 +1784,16 @@
     </div>
   </div>
 
-  <!-- MODAL: Gerenciar Categorias e Tipos -->
+  <!-- MODAL: Gerenciar Categorias, Tipos e Pessoas -->
   <div id="settingsModal" class="fixed inset-0 z-50 hidden bg-black/40 items-center justify-center p-4">
     <div class="bg-white rounded-xl shadow-lg w-full max-w-lg mx-4 flex flex-col max-h-[90vh]">
       <div class="flex items-center justify-between px-5 py-4 border-b border-gray-100">
         <div>
           <h2 class="text-sm font-semibold text-gray-900 flex items-center gap-2">
             <i class="fa-solid fa-sliders text-indigo-500"></i>
-            Gerenciar Categorias e Tipos
+            Gerenciar Categorias, Tipos e Pessoas
           </h2>
-          <p class="text-xs text-gray-500">Adicione categorias personalizadas e novos tipos de lançamento.</p>
+          <p class="text-xs text-gray-500">Edite subcategorias, tipos personalizados e responsáveis usados no painel.</p>
         </div>
         <button id="btnSettingsModalClose" class="w-7 h-7 rounded-full flex items-center justify-center text-gray-400 hover:bg-gray-100">
           <i class="fa-solid fa-xmark text-xs"></i>
@@ -1813,6 +1804,7 @@
       <div class="flex border-b border-gray-100 px-5">
         <button class="settings-tab-btn py-2.5 px-3 text-xs font-medium border-b-2 border-indigo-500 text-indigo-600" data-tab="categories">Categorias</button>
         <button class="settings-tab-btn py-2.5 px-3 text-xs font-medium border-b-2 border-transparent text-gray-500 hover:text-gray-700" data-tab="types">Tipos</button>
+        <button class="settings-tab-btn py-2.5 px-3 text-xs font-medium border-b-2 border-transparent text-gray-500 hover:text-gray-700" data-tab="people">Pessoas</button>
       </div>
 
       <div class="overflow-y-auto flex-1 px-5 py-3">
@@ -1868,6 +1860,20 @@
             </div>
           </form>
         </div>
+
+        <div id="tabPeople" class="settings-tab-content hidden space-y-4">
+          <p class="text-xs text-gray-500">Defina os responsáveis usados nos lançamentos do mês, desejos e no resumo por pessoa.</p>
+          <div id="settingsPeopleList" class="space-y-1.5">
+            <!-- lista via JS -->
+          </div>
+          <form id="formAddPerson" class="flex gap-2 pt-1 border-t border-gray-100">
+            <input id="newPersonLabel" type="text" required placeholder="Nome da pessoa"
+              class="flex-1 rounded-lg border border-gray-200 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500" />
+            <button type="submit" class="px-3 py-2 text-xs font-semibold rounded-lg bg-indigo-600 text-white hover:bg-indigo-700 flex items-center gap-1">
+              <i class="fa-solid fa-plus text-[10px]"></i> Adicionar
+            </button>
+          </form>
+        </div>
       </div>
     </div>
   </div>
@@ -1915,9 +1921,26 @@
 
       // Constantes e mapeamentos (mantidos e expandidos)
       const CATEGORY_LABELS = { receita: 'Receita', investimento: 'Investimento', fixa: 'Despesa Fixa', variavel: 'Despesa Variável' };
-      const PEOPLE = ['debora', 'cristiano', 'emanuel'];
-      const PERSON_LABELS = { debora: 'Débora', cristiano: 'Cristiano', emanuel: 'Emanuel' };
-      const PERSON_COLORS = { debora: 'bg-indigo-50 text-indigo-700 border-indigo-200', cristiano: 'bg-violet-50 text-violet-700 border-violet-200', emanuel: 'bg-amber-50 text-amber-700 border-amber-200' };
+      const DEFAULT_PEOPLE = [
+        { id: 'familiar', label: 'Familiar' },
+        { id: 'debora', label: 'Débora' },
+        { id: 'cristiano', label: 'Cristiano' },
+        { id: 'emanuel', label: 'Emanul' }
+      ];
+      const PERSON_COLOR_PRESETS = {
+        familiar: 'bg-sky-50 text-sky-700 border-sky-200',
+        debora: 'bg-indigo-50 text-indigo-700 border-indigo-200',
+        cristiano: 'bg-violet-50 text-violet-700 border-violet-200',
+        emanuel: 'bg-amber-50 text-amber-700 border-amber-200'
+      };
+      const PERSON_COLOR_PALETTE = [
+        'bg-emerald-50 text-emerald-700 border-emerald-200',
+        'bg-rose-50 text-rose-700 border-rose-200',
+        'bg-cyan-50 text-cyan-700 border-cyan-200',
+        'bg-lime-50 text-lime-700 border-lime-200',
+        'bg-fuchsia-50 text-fuchsia-700 border-fuchsia-200',
+        'bg-slate-50 text-slate-700 border-slate-200'
+      ];
       const RECEITA_SUBCATEGORIES = {
         salario: 'Salário', freelancer: 'Freelancer / Extra', decimo: '13º / Bônus',
         reembolso: 'Reembolso', alugueis: 'Aluguéis', juros_dividendos: 'Juros / Dividendos', outros: 'Outros'
@@ -2000,6 +2023,7 @@
         transactions: [],
         invoicesPaid: {},
         cards: [],           // [{id, label, limit, color}]
+        people: DEFAULT_PEOPLE.map(person => ({ ...person })),
         customSubCategories: { receita: [], fixa: [], variavel: [], investimento: [] }, // [{value, label}]
         customTypes: [],     // [{value, label, baseType}]
         settingsContext: null,
@@ -2027,6 +2051,95 @@
       let investPieChart = null;
 
       // ---------- HELPERS ----------
+      function slugifyLabel(value) {
+        return String(value || '')
+          .trim()
+          .toLowerCase()
+          .normalize('NFD')
+          .replace(/[\u0300-\u036f]/g, '')
+          .replace(/\s+/g, '_')
+          .replace(/[^a-z0-9_]/g, '')
+          .replace(/_+/g, '_')
+          .replace(/^_|_$/g, '');
+      }
+
+      function formatPersonId(personId) {
+        return String(personId || '')
+          .split('_')
+          .filter(Boolean)
+          .map(part => part.charAt(0).toUpperCase() + part.slice(1))
+          .join(' ');
+      }
+
+      function normalizePeople(people = []) {
+        const normalized = [];
+        const seen = new Set();
+        const source = Array.isArray(people) ? people : [];
+
+        DEFAULT_PEOPLE.forEach((person) => {
+          const saved = source.find(item => (typeof item === 'string' ? item : item?.id) === person.id);
+          const label = typeof saved === 'object' && saved?.label ? String(saved.label).trim() : person.label;
+          normalized.push({ id: person.id, label: label || person.label });
+          seen.add(person.id);
+        });
+
+        source.forEach((item) => {
+          const id = slugifyLabel(typeof item === 'string' ? item : item?.id);
+          const label = typeof item === 'object' ? String(item?.label || '').trim() : formatPersonId(item);
+          if (!id || seen.has(id)) return;
+          normalized.push({ id, label: label || formatPersonId(id) });
+          seen.add(id);
+        });
+
+        return normalized;
+      }
+
+      function getPeopleList() {
+        return normalizePeople(state.people);
+      }
+
+      function getPersonLabel(personId) {
+        return getPeopleList().find(person => person.id === personId)?.label || formatPersonId(personId);
+      }
+
+      function getPersonColor(personId) {
+        if (PERSON_COLOR_PRESETS[personId]) return PERSON_COLOR_PRESETS[personId];
+        const customPeople = getPeopleList().filter(person => !PERSON_COLOR_PRESETS[person.id]);
+        const idx = customPeople.findIndex(person => person.id === personId);
+        if (idx === -1) return 'bg-gray-50 text-gray-600 border-gray-200';
+        return PERSON_COLOR_PALETTE[idx % PERSON_COLOR_PALETTE.length];
+      }
+
+      function getPersonTextColor(personId) {
+        return getPersonColor(personId).match(/text-[^\s]+/)?.[0] || 'text-gray-700';
+      }
+
+      function populatePersonSelect(selectId, selectedValue = null) {
+        const select = document.getElementById(selectId);
+        if (!select) return;
+        const currentValue = selectedValue ?? select.value ?? '';
+        select.innerHTML = '';
+
+        const emptyOption = document.createElement('option');
+        emptyOption.value = '';
+        emptyOption.textContent = '— Sem responsável —';
+        select.appendChild(emptyOption);
+
+        getPeopleList().forEach((person) => {
+          const option = document.createElement('option');
+          option.value = person.id;
+          option.textContent = person.label;
+          select.appendChild(option);
+        });
+
+        select.value = currentValue;
+        if (select.value !== currentValue) select.value = '';
+      }
+
+      function populateAllPersonSelects() {
+        ['recPessoa', 'despPessoa', 'wishPerson', 'editPessoa'].forEach((selectId) => populatePersonSelect(selectId));
+      }
+
       function buildParcelPreview(groupId) {
         if (!groupId) return [];
 
@@ -2474,8 +2587,12 @@
             if (docSnap.id === 'customTypes') {
               state.customTypes = Array.isArray(d.types) ? d.types : [];
             }
+            if (docSnap.id === 'people') {
+              state.people = normalizePeople(d.people);
+            }
           });
-          try { localStorage.setItem(SETTINGS_KEY, JSON.stringify({ customSubCategories: state.customSubCategories, customTypes: state.customTypes })); } catch(e) {}
+          state.people = normalizePeople(state.people);
+          try { localStorage.setItem(SETTINGS_KEY, JSON.stringify({ customSubCategories: state.customSubCategories, customTypes: state.customTypes, people: state.people })); } catch(e) {}
         } catch (e) {
           console.error("Erro ao carregar settings do Firestore", e);
           try {
@@ -2484,19 +2601,22 @@
               const parsed = JSON.parse(raw);
               if (parsed.customSubCategories) state.customSubCategories = parsed.customSubCategories;
               if (parsed.customTypes) state.customTypes = parsed.customTypes;
+              if (parsed.people) state.people = normalizePeople(parsed.people);
             }
           } catch(_) {}
         }
+        state.people = normalizePeople(state.people);
       }
 
       async function saveSettings() {
         try {
           await setDoc(doc(db, "settings", "subcategories"), state.customSubCategories);
           await setDoc(doc(db, "settings", "customTypes"), { types: state.customTypes });
-          try { localStorage.setItem(SETTINGS_KEY, JSON.stringify({ customSubCategories: state.customSubCategories, customTypes: state.customTypes })); } catch(e) {}
+          await setDoc(doc(db, "settings", "people"), { people: normalizePeople(state.people) });
+          try { localStorage.setItem(SETTINGS_KEY, JSON.stringify({ customSubCategories: state.customSubCategories, customTypes: state.customTypes, people: normalizePeople(state.people) })); } catch(e) {}
         } catch (e) {
           console.error("Erro ao salvar settings no Firestore", e);
-          try { localStorage.setItem(SETTINGS_KEY, JSON.stringify({ customSubCategories: state.customSubCategories, customTypes: state.customTypes })); } catch(_) {}
+          try { localStorage.setItem(SETTINGS_KEY, JSON.stringify({ customSubCategories: state.customSubCategories, customTypes: state.customTypes, people: normalizePeople(state.people) })); } catch(_) {}
           throw e;
         }
       }
@@ -3327,8 +3447,8 @@
             badgesHTML += `<span class="inline-flex items-center px-2 py-0.5 rounded-full border text-[10px] font-medium ${colorClasses}">Lazer</span>`;
           }
           if (t.person) {
-            const pc = PERSON_COLORS[t.person] || 'bg-gray-50 text-gray-600 border-gray-200';
-            const pl = PERSON_LABELS[t.person] || t.person;
+            const pc = getPersonColor(t.person);
+            const pl = getPersonLabel(t.person);
             badgesHTML += `<span class="inline-flex items-center px-2 py-0.5 rounded-full border text-[10px] font-medium ${pc}"><i class="fa-solid fa-user mr-1 text-[9px]"></i>${pl}</span>`;
           }
 
@@ -3445,8 +3565,8 @@
             badgesHTML += `<span class="inline-flex items-center px-2 py-0.5 rounded-full border text-[10px] font-medium ${colorClasses}">Lazer</span>`;
           }
           if (t.person) {
-            const pc = PERSON_COLORS[t.person] || 'bg-gray-50 text-gray-600 border-gray-200';
-            const pl = PERSON_LABELS[t.person] || t.person;
+            const pc = getPersonColor(t.person);
+            const pl = getPersonLabel(t.person);
             badgesHTML += `<span class="inline-flex items-center px-2 py-0.5 rounded-full border text-[10px] font-medium ${pc}"><i class="fa-solid fa-user mr-1 text-[9px]"></i>${pl}</span>`;
           }
 
@@ -4173,8 +4293,8 @@
         const cfg = WISH_CAT_CONFIG[w.category] || WISH_CAT_CONFIG.casa;
         const pct = w.targetValue > 0 ? Math.min(100, Math.round((w.savedValue / w.targetValue) * 100)) : 0;
         const isComplete = pct >= 100;
-        const personLabel = w.person ? (PERSON_LABELS[w.person] || w.person) : '';
-        const personColors = w.person ? (PERSON_COLORS[w.person] || 'bg-gray-50 text-gray-600 border-gray-200') : '';
+        const personLabel = w.person ? getPersonLabel(w.person) : '';
+        const personColors = w.person ? getPersonColor(w.person) : '';
 
         return `
           <div class="bg-white rounded-xl border ${cfg.border} shadow-sm p-4 flex flex-col gap-3 ${isBought ? 'opacity-60' : ''}">
@@ -4296,11 +4416,12 @@
 
       function renderPersonBreakdown() {
         const section = document.getElementById('personBreakdownSection');
+        const thead = document.getElementById('personBreakdownHead');
         const tbody = document.getElementById('personBreakdownBody');
         const tfoot = document.getElementById('personBreakdownFoot');
-        if (!section || !tbody || !tfoot) return;
+        if (!section || !thead || !tbody || !tfoot) return;
 
-        const people = PEOPLE;
+        const people = getPeopleList();
 
         // Get transactions for the current view (expenses + investments only)
         const txs = getFilteredTransactions().filter(t =>
@@ -4314,17 +4435,23 @@
           return;
         }
         section.classList.remove('hidden');
+        const hasUnassigned = txs.some(t => !t.person || !people.some(person => person.id === t.person));
 
         // Build subcategory → person → total map
         const allSubCats = new Set();
-        const dataMap = {}; // subcat -> { debora: 0, cristiano: 0, emanuel: 0, '': 0 }
+        const dataMap = {};
 
         txs.forEach(t => {
           const subKey = t.subCategory || '__sem_cat__';
           allSubCats.add(subKey);
-          if (!dataMap[subKey]) dataMap[subKey] = { debora: 0, cristiano: 0, emanuel: 0, '': 0 };
+          if (!dataMap[subKey]) {
+            dataMap[subKey] = people.reduce((acc, person) => {
+              acc[person.id] = 0;
+              return acc;
+            }, { '': 0 });
+          }
           const p = t.person || '';
-          if (p === 'debora' || p === 'cristiano' || p === 'emanuel') {
+          if (people.some(person => person.id === p)) {
             dataMap[subKey][p] += Number(t.value) || 0;
           } else {
             dataMap[subKey][''] += Number(t.value) || 0;
@@ -4343,18 +4470,30 @@
 
         // Sort subcategories by total descending
         const sortedSubs = [...allSubCats].sort((a, b) => {
-          const totalA = people.reduce((s, p) => s + (dataMap[a][p] || 0), 0) + (dataMap[a][''] || 0);
-          const totalB = people.reduce((s, p) => s + (dataMap[b][p] || 0), 0) + (dataMap[b][''] || 0);
+          const totalA = people.reduce((s, person) => s + (dataMap[a][person.id] || 0), 0) + (dataMap[a][''] || 0);
+          const totalB = people.reduce((s, person) => s + (dataMap[b][person.id] || 0), 0) + (dataMap[b][''] || 0);
           return totalB - totalA;
         });
 
+        thead.innerHTML = `
+          <tr class="text-xs text-gray-500 uppercase tracking-wide">
+            <th class="text-left px-4 py-2">Subcategoria</th>
+            ${people.map(person => `<th class="text-right px-4 py-2 ${getPersonTextColor(person.id)}">${person.label}</th>`).join('')}
+            ${hasUnassigned ? '<th class="text-right px-4 py-2 text-gray-500">Sem resp.</th>' : ''}
+            <th class="text-right px-4 py-2 font-semibold text-gray-700">Total</th>
+          </tr>
+        `;
+
         tbody.innerHTML = '';
-        const footTotals = { debora: 0, cristiano: 0, emanuel: 0, '': 0, total: 0 };
+        const footTotals = people.reduce((acc, person) => {
+          acc[person.id] = 0;
+          return acc;
+        }, { '': 0, total: 0 });
 
         sortedSubs.forEach((subKey, idx) => {
           const row = dataMap[subKey];
-          const rowTotal = people.reduce((s, p) => s + (row[p] || 0), 0) + (row[''] || 0);
-          people.forEach(p => { footTotals[p] += row[p] || 0; });
+          const rowTotal = people.reduce((s, person) => s + (row[person.id] || 0), 0) + (row[''] || 0);
+          people.forEach(person => { footTotals[person.id] += row[person.id] || 0; });
           footTotals[''] += row[''] || 0;
           footTotals.total += rowTotal;
 
@@ -4363,10 +4502,8 @@
           tr.className = zebra;
           tr.innerHTML = `
             <td class="px-4 py-2 text-xs text-gray-700 font-medium">${getSubLabel(subKey)}</td>
-            <td class="px-4 py-2 text-xs text-right ${row.debora > 0 ? 'text-indigo-700 font-medium' : 'text-gray-300'}">${row.debora > 0 ? formatCurrency(row.debora) : '—'}</td>
-            <td class="px-4 py-2 text-xs text-right ${row.cristiano > 0 ? 'text-violet-700 font-medium' : 'text-gray-300'}">${row.cristiano > 0 ? formatCurrency(row.cristiano) : '—'}</td>
-            <td class="px-4 py-2 text-xs text-right ${row.emanuel > 0 ? 'text-amber-700 font-medium' : 'text-gray-300'}">${row.emanuel > 0 ? formatCurrency(row.emanuel) : '—'}</td>
-            <td class="px-4 py-2 text-xs text-right ${row[''] > 0 ? 'text-gray-500' : 'text-gray-300'}">${row[''] > 0 ? formatCurrency(row['']) : '—'}</td>
+            ${people.map((person) => `<td class="px-4 py-2 text-xs text-right ${row[person.id] > 0 ? `${getPersonTextColor(person.id)} font-medium` : 'text-gray-300'}">${row[person.id] > 0 ? formatCurrency(row[person.id]) : '—'}</td>`).join('')}
+            ${hasUnassigned ? `<td class="px-4 py-2 text-xs text-right ${row[''] > 0 ? 'text-gray-500' : 'text-gray-300'}">${row[''] > 0 ? formatCurrency(row['']) : '—'}</td>` : ''}
             <td class="px-4 py-2 text-xs text-right font-semibold text-gray-800">${formatCurrency(rowTotal)}</td>
           `;
           tbody.appendChild(tr);
@@ -4376,10 +4513,8 @@
         tfoot.innerHTML = `
           <tr class="text-xs font-bold">
             <td class="px-4 py-2 text-gray-700 uppercase tracking-wide">Total</td>
-            <td class="px-4 py-2 text-right text-indigo-700">${formatCurrency(footTotals.debora)}</td>
-            <td class="px-4 py-2 text-right text-violet-700">${formatCurrency(footTotals.cristiano)}</td>
-            <td class="px-4 py-2 text-right text-amber-700">${formatCurrency(footTotals.emanuel)}</td>
-            <td class="px-4 py-2 text-right text-gray-500">${formatCurrency(footTotals[''])}</td>
+            ${people.map(person => `<td class="px-4 py-2 text-right ${getPersonTextColor(person.id)}">${formatCurrency(footTotals[person.id])}</td>`).join('')}
+            ${hasUnassigned ? `<td class="px-4 py-2 text-right text-gray-500">${formatCurrency(footTotals[''])}</td>` : ''}
             <td class="px-4 py-2 text-right text-gray-900">${formatCurrency(footTotals.total)}</td>
           </tr>
         `;
@@ -5384,6 +5519,15 @@ if (isParceladoSerie && previewBox && previewList) {
           if (triggerId === 'btnManageTypes') {
             return { tab: 'types', selectId: 'despCategoria' };
           }
+          if (['btnManagePeopleRec', 'btnManagePeopleDesp', 'btnManagePeopleWish', 'btnManagePeopleEdit'].includes(triggerId)) {
+            const personSelectMap = {
+              btnManagePeopleRec: 'recPessoa',
+              btnManagePeopleDesp: 'despPessoa',
+              btnManagePeopleWish: 'wishPerson',
+              btnManagePeopleEdit: 'editPessoa'
+            };
+            return { tab: 'people', selectId: personSelectMap[triggerId] };
+          }
           return null;
         }
 
@@ -5400,7 +5544,7 @@ if (isParceladoSerie && previewBox && previewList) {
           document.getElementById('settingsModal').classList.remove('flex');
         }
 
-        ['btnManageTypes','btnManageCategories','btnManageCategoriesRec'].forEach(id => {
+        ['btnManageTypes','btnManageCategories','btnManageCategoriesRec','btnManagePeopleRec','btnManagePeopleDesp','btnManagePeopleWish','btnManagePeopleEdit'].forEach(id => {
           const btn = document.getElementById(id);
           if (btn) btn.addEventListener('click', () => {
             openSettingsModal(getSettingsContext(id));
@@ -5429,10 +5573,20 @@ if (isParceladoSerie && previewBox && previewList) {
           if (tabEl) tabEl.classList.remove('hidden');
           if (tab === 'categories') renderSettingsCatList();
           if (tab === 'types') renderSettingsTypesList();
+          if (tab === 'people') renderSettingsPeopleList();
         }
 
         const settingsCatType = document.getElementById('settingsCatType');
         settingsCatType.addEventListener('change', renderSettingsCatList);
+
+        function refreshConfiguredViews() {
+          state.people = normalizePeople(state.people);
+          populateAllPersonSelects();
+          populateDespesaSubcategorias();
+          populateReceitaCategoria();
+          populateDespCategoria();
+          renderDashboard(state.selectedMonth);
+        }
 
         function applyNewCategorySelection(type, value) {
           const context = state.settingsContext;
@@ -5462,6 +5616,14 @@ if (isParceladoSerie && previewBox && previewList) {
           updateParcelVisibilityAndCard();
         }
 
+        function applyNewPersonSelection(value) {
+          const context = state.settingsContext;
+          if (!context?.selectId) return;
+          const select = document.getElementById(context.selectId);
+          if (!select) return;
+          populatePersonSelect(context.selectId, value);
+        }
+
         function renderSettingsCatList() {
           const type = settingsCatType.value;
           const list = document.getElementById('settingsCatList');
@@ -5476,18 +5638,47 @@ if (isParceladoSerie && previewBox && previewList) {
             const row = document.createElement('div');
             row.className = 'flex items-center justify-between px-2 py-1.5 rounded-lg bg-gray-50 border border-gray-100';
             row.innerHTML = `<span class="text-xs text-gray-700">${cat.label}</span>
-              <button class="w-6 h-6 rounded text-red-400 hover:bg-red-50 flex items-center justify-center btn-del-cat" data-type="${type}" data-idx="${idx}">
-                <i class="fa-solid fa-xmark text-[10px]"></i>
-              </button>`;
+              <div class="flex items-center gap-1">
+                <button class="w-6 h-6 rounded text-indigo-500 hover:bg-indigo-50 flex items-center justify-center btn-edit-cat" data-type="${type}" data-idx="${idx}">
+                  <i class="fa-solid fa-pen text-[10px]"></i>
+                </button>
+                <button class="w-6 h-6 rounded text-red-400 hover:bg-red-50 flex items-center justify-center btn-del-cat" data-type="${type}" data-idx="${idx}">
+                  <i class="fa-solid fa-xmark text-[10px]"></i>
+                </button>
+              </div>`;
+            row.querySelector('.btn-edit-cat').addEventListener('click', async (e) => {
+              const t = e.currentTarget.dataset.type;
+              const i = parseInt(e.currentTarget.dataset.idx, 10);
+              const current = state.customSubCategories[t]?.[i];
+              if (!current) return;
+              const nextLabel = prompt('Novo nome da subcategoria:', current.label)?.trim();
+              if (!nextLabel || nextLabel === current.label) return;
+              if (state.customSubCategories[t].some((item, index) => index !== i && item.label.toLowerCase() === nextLabel.toLowerCase())) {
+                showToast('Já existe uma subcategoria com esse nome.', 'warning');
+                return;
+              }
+              current.label = nextLabel;
+              try {
+                await saveSettings();
+                refreshConfiguredViews();
+                renderSettingsCatList();
+                showToast('Categoria atualizada!', 'success');
+              } catch(err) {
+                showToast('Erro ao atualizar categoria.', 'error');
+              }
+            });
             row.querySelector('.btn-del-cat').addEventListener('click', async (e) => {
               const t = e.currentTarget.dataset.type;
-              const i = parseInt(e.currentTarget.dataset.idx);
+              const i = parseInt(e.currentTarget.dataset.idx, 10);
               state.customSubCategories[t].splice(i, 1);
-              await saveSettings();
-              populateDespesaSubcategorias();
-              populateReceitaCategoria();
-              renderSettingsCatList();
-              showToast('Categoria removida.', 'success');
+              try {
+                await saveSettings();
+                refreshConfiguredViews();
+                renderSettingsCatList();
+                showToast('Categoria removida.', 'success');
+              } catch(err) {
+                showToast('Erro ao remover categoria.', 'error');
+              }
             });
             list.appendChild(row);
           });
@@ -5498,7 +5689,7 @@ if (isParceladoSerie && previewBox && previewList) {
           const type = settingsCatType.value;
           const labelVal = document.getElementById('newCatLabel').value.trim();
           if (!labelVal) return;
-          const valueKey = labelVal.toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g,'').replace(/\s+/g,'_').replace(/[^a-z0-9_]/g,'');
+          const valueKey = slugifyLabel(labelVal);
           if (!state.customSubCategories[type]) state.customSubCategories[type] = [];
           if (state.customSubCategories[type].some(c => c.value === valueKey)) {
             showToast('Esta categoria já existe.', 'warning'); return;
@@ -5507,8 +5698,7 @@ if (isParceladoSerie && previewBox && previewList) {
           try {
             await saveSettings();
             document.getElementById('newCatLabel').value = '';
-            populateDespesaSubcategorias();
-            populateReceitaCategoria();
+            refreshConfiguredViews();
             applyNewCategorySelection(type, valueKey);
             renderSettingsCatList();
             showToast('Categoria adicionada!', 'success');
@@ -5539,10 +5729,14 @@ if (isParceladoSerie && previewBox && previewList) {
             row.querySelector('.btn-del-type').addEventListener('click', async (e) => {
               const i = parseInt(e.currentTarget.dataset.idx);
               state.customTypes.splice(i, 1);
-              await saveSettings();
-              populateDespCategoria();
-              renderSettingsTypesList();
-              showToast('Tipo removido.', 'success');
+              try {
+                await saveSettings();
+                refreshConfiguredViews();
+                renderSettingsTypesList();
+                showToast('Tipo removido.', 'success');
+              } catch(err) {
+                showToast('Erro ao remover tipo.', 'error');
+              }
             });
             list.appendChild(row);
           });
@@ -5553,7 +5747,7 @@ if (isParceladoSerie && previewBox && previewList) {
           const labelVal = document.getElementById('newTypeLabel').value.trim();
           const baseType = document.getElementById('newTypeBase').value;
           if (!labelVal) return;
-          const valueKey = labelVal.toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g,'').replace(/\s+/g,'_').replace(/[^a-z0-9_]/g,'') + '_custom';
+          const valueKey = `${slugifyLabel(labelVal)}_custom`;
           if (state.customTypes.some(ct => ct.value === valueKey)) {
             showToast('Este tipo já existe.', 'warning'); return;
           }
@@ -5561,12 +5755,107 @@ if (isParceladoSerie && previewBox && previewList) {
           try {
             await saveSettings();
             document.getElementById('newTypeLabel').value = '';
-            populateDespCategoria();
+            refreshConfiguredViews();
             applyNewTypeSelection(valueKey);
             renderSettingsTypesList();
             showToast('Tipo adicionado!', 'success');
           } catch(err) {
             showToast('Erro ao salvar tipo.', 'error');
+          }
+        });
+
+        function renderSettingsPeopleList() {
+          const list = document.getElementById('settingsPeopleList');
+          if (!list) return;
+          list.innerHTML = '';
+          const people = getPeopleList();
+          if (people.length === 0) {
+            list.innerHTML = '<p class="text-[10px] text-gray-400">Nenhuma pessoa cadastrada.</p>';
+            return;
+          }
+
+          people.forEach((person) => {
+            const isDefault = DEFAULT_PEOPLE.some(item => item.id === person.id);
+            const row = document.createElement('div');
+            row.className = 'flex items-center justify-between px-2 py-1.5 rounded-lg bg-gray-50 border border-gray-100';
+            row.innerHTML = `<div class="flex items-center gap-2">
+                <span class="inline-flex items-center px-2 py-0.5 rounded-full border text-[10px] font-medium ${getPersonColor(person.id)}">${person.label}</span>
+                ${isDefault ? '<span class="text-[10px] text-gray-400">padrão</span>' : ''}
+              </div>
+              <div class="flex items-center gap-1">
+                <button class="w-6 h-6 rounded text-indigo-500 hover:bg-indigo-50 flex items-center justify-center btn-edit-person" data-id="${person.id}">
+                  <i class="fa-solid fa-pen text-[10px]"></i>
+                </button>
+                ${isDefault ? '' : `<button class="w-6 h-6 rounded text-red-400 hover:bg-red-50 flex items-center justify-center btn-del-person" data-id="${person.id}">
+                  <i class="fa-solid fa-xmark text-[10px]"></i>
+                </button>`}
+              </div>`;
+
+            row.querySelector('.btn-edit-person').addEventListener('click', async (e) => {
+              const personId = e.currentTarget.dataset.id;
+              const current = getPeopleList().find(item => item.id === personId);
+              if (!current) return;
+              const nextLabel = prompt('Novo nome da pessoa:', current.label)?.trim();
+              if (!nextLabel || nextLabel === current.label) return;
+              if (getPeopleList().some(item => item.id !== personId && item.label.toLowerCase() === nextLabel.toLowerCase())) {
+                showToast('Já existe uma pessoa com esse nome.', 'warning');
+                return;
+              }
+              state.people = getPeopleList().map(item => item.id === personId ? { ...item, label: nextLabel } : item);
+              try {
+                await saveSettings();
+                refreshConfiguredViews();
+                renderSettingsPeopleList();
+                showToast('Pessoa atualizada!', 'success');
+              } catch(err) {
+                showToast('Erro ao atualizar pessoa.', 'error');
+              }
+            });
+
+            const deleteBtn = row.querySelector('.btn-del-person');
+            if (deleteBtn) {
+              deleteBtn.addEventListener('click', async (e) => {
+                const personId = e.currentTarget.dataset.id;
+                if (!confirm('Excluir esta pessoa? Lançamentos antigos continuarão com o valor salvo.')) return;
+                state.people = getPeopleList().filter(item => item.id !== personId);
+                try {
+                  await saveSettings();
+                  refreshConfiguredViews();
+                  renderSettingsPeopleList();
+                  showToast('Pessoa removida.', 'success');
+                } catch(err) {
+                  showToast('Erro ao remover pessoa.', 'error');
+                }
+              });
+            }
+
+            list.appendChild(row);
+          });
+        }
+
+        document.getElementById('formAddPerson').addEventListener('submit', async (e) => {
+          e.preventDefault();
+          const labelVal = document.getElementById('newPersonLabel').value.trim();
+          if (!labelVal) return;
+          const valueKey = slugifyLabel(labelVal);
+          if (!valueKey) {
+            showToast('Informe um nome válido.', 'warning');
+            return;
+          }
+          if (getPeopleList().some(person => person.id === valueKey || person.label.toLowerCase() === labelVal.toLowerCase())) {
+            showToast('Esta pessoa já existe.', 'warning');
+            return;
+          }
+          state.people = [...getPeopleList(), { id: valueKey, label: labelVal }];
+          try {
+            await saveSettings();
+            document.getElementById('newPersonLabel').value = '';
+            refreshConfiguredViews();
+            applyNewPersonSelection(valueKey);
+            renderSettingsPeopleList();
+            showToast('Pessoa adicionada!', 'success');
+          } catch(err) {
+            showToast('Erro ao salvar pessoa.', 'error');
           }
         });
 
@@ -6123,6 +6412,7 @@ if (category === 'fixa') {
 
         // Populate dynamic selects after data is loaded
         populateCardSelects(false);
+        populateAllPersonSelects();
         populateDespesaSubcategorias();
         populateReceitaCategoria();
         populateDespCategoria();
