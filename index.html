@@ -1385,7 +1385,7 @@
       </section>
 
       <!-- Grid de cards de desejos -->
-      <div id="wishesGrid" class="grid grid-cols-1 lg:grid-cols-4 gap-4 lg:gap-0">
+      <div id="wishesGrid" class="grid grid-cols-1 lg:grid-cols-1 gap-4 lg:gap-0">
         <!-- colunas renderizadas via JS -->
       </div>
 
@@ -1916,6 +1916,7 @@
         { value: 'brinquedos', label: 'Brinquedos' },
         { value: 'cosmeticos', label: 'Cosméticos' }
       ];
+      const FALLBACK_WISH_CATEGORY_KEY = DEFAULT_WISH_CATEGORIES[0]?.value || 'utensilios';
       const PERSON_COLOR_PRESETS = {
         familiar: 'bg-sky-50 text-sky-700 border-sky-200',
         debora: 'bg-indigo-50 text-indigo-700 border-indigo-200',
@@ -2053,12 +2054,25 @@
           .replace(/^_|_$/g, '');
       }
 
-      function formatPersonId(personId) {
-        return String(personId || '')
+      function formatKeyLabel(value) {
+        return String(value || '')
           .split('_')
           .filter(Boolean)
           .map(part => part.charAt(0).toUpperCase() + part.slice(1))
           .join(' ');
+      }
+
+      function formatPersonId(personId) {
+        return formatKeyLabel(personId);
+      }
+
+      function escapeHtml(value) {
+        return String(value ?? '')
+          .replaceAll('&', '&amp;')
+          .replaceAll('<', '&lt;')
+          .replaceAll('>', '&gt;')
+          .replaceAll('"', '&quot;')
+          .replaceAll("'", '&#39;');
       }
 
       function normalizeCompareValue(value) {
@@ -2076,10 +2090,6 @@
       function getSettingItemLabel(item) {
         if (typeof item === 'object' && item?.label) return String(item.label).trim();
         return formatPersonId(item);
-      }
-
-      function hashCode(value = '') {
-        return String(value).split('').reduce((acc, ch) => ((acc << 5) - acc) + ch.charCodeAt(0), 0);
       }
 
       function normalizePeople(people = []) {
@@ -4254,9 +4264,13 @@
 
       function getWishCategoryConfig(categoryKey) {
         const configured = getWishCategoriesList();
-        const configuredLabel = configured.find(cat => cat.value === categoryKey)?.label || formatPersonId(categoryKey);
+        const configuredLabel = configured.find(cat => cat.value === categoryKey)?.label || formatKeyLabel(categoryKey);
         if (WISH_CATEGORY_STYLE_PRESETS[categoryKey]) return { label: configuredLabel, ...WISH_CATEGORY_STYLE_PRESETS[categoryKey] };
-        const fallback = WISH_CATEGORY_STYLE_FALLBACKS[Math.abs(hashCode(categoryKey)) % WISH_CATEGORY_STYLE_FALLBACKS.length];
+        const fallbackPool = WISH_CATEGORY_STYLE_FALLBACKS.length
+          ? WISH_CATEGORY_STYLE_FALLBACKS
+          : [{ icon: 'fa-tag', border: 'border-gray-300', bg: 'bg-gray-50', text: 'text-gray-700', bar: 'bg-gray-400' }];
+        const index = configured.findIndex(cat => cat.value === categoryKey);
+        const fallback = fallbackPool[(index >= 0 ? index : 0) % fallbackPool.length];
         return { label: configuredLabel, ...fallback };
       }
 
@@ -4264,15 +4278,15 @@
         const tabs = document.getElementById('wishCategoryTabs');
         if (!tabs) return;
         const categories = getWishCategoriesList();
-        tabs.innerHTML = `
-          <button data-wish-cat="all" class="wish-cat-btn px-4 py-1.5 text-xs font-semibold rounded-full border border-gray-300 text-gray-700 bg-white hover:bg-gray-50 transition">Todos</button>
-          ${categories.map((category) => {
-            const cfg = getWishCategoryConfig(category.value);
-            return `<button data-wish-cat="${category.value}" class="wish-cat-btn px-4 py-1.5 text-xs font-semibold rounded-full border ${cfg.border} ${cfg.text} ${cfg.bg} hover:brightness-95 transition">
-              <i class="fa-solid ${cfg.icon} text-[11px]"></i> ${category.label}
-            </button>`;
-          }).join('')}
-        `;
+        tabs.innerHTML = '<button data-wish-cat="all" class="wish-cat-btn px-4 py-1.5 text-xs font-semibold rounded-full border border-gray-300 text-gray-700 bg-white hover:bg-gray-50 transition">Todos</button>';
+        categories.forEach((category) => {
+          const cfg = getWishCategoryConfig(category.value);
+          const button = document.createElement('button');
+          button.setAttribute('data-wish-cat', category.value);
+          button.className = `wish-cat-btn px-4 py-1.5 text-xs font-semibold rounded-full border ${cfg.border} ${cfg.text} ${cfg.bg} hover:brightness-95 transition`;
+          button.innerHTML = `<i class="fa-solid ${cfg.icon} text-[11px]"></i> ${escapeHtml(category.label)}`;
+          tabs.appendChild(button);
+        });
       }
 
       function populateWishCategorySelect(selectedValue = null) {
@@ -4280,11 +4294,17 @@
         if (!select) return;
         const categories = getWishCategoriesList();
         const currentValue = selectedValue ?? select.value ?? '';
-        select.innerHTML = categories.map((category) => `<option value="${category.value}">${category.label}</option>`).join('');
+        select.innerHTML = '';
+        categories.forEach((category) => {
+          const option = document.createElement('option');
+          option.value = category.value;
+          option.textContent = category.label;
+          select.appendChild(option);
+        });
         if (currentValue && !categories.some(category => category.value === currentValue)) {
           const customOption = document.createElement('option');
           customOption.value = currentValue;
-          customOption.textContent = formatPersonId(currentValue);
+          customOption.textContent = formatKeyLabel(currentValue);
           select.appendChild(customOption);
         }
         if (categories.length === 0) {
@@ -4301,23 +4321,25 @@
         const grid = document.getElementById('wishesGrid');
         if (!grid) return;
         const people = getPeopleList();
-        const gridColsClass = people.length <= 1
-          ? 'lg:grid-cols-1'
-          : people.length === 2
-            ? 'lg:grid-cols-2'
-            : people.length === 3
-              ? 'lg:grid-cols-3'
-              : 'lg:grid-cols-4';
+        if (!people.length) {
+          grid.innerHTML = '';
+          return;
+        }
+        let gridColsClass = 'lg:grid-cols-1';
+        if (people.length === 2) gridColsClass = 'lg:grid-cols-2';
+        else if (people.length === 3) gridColsClass = 'lg:grid-cols-3';
+        else if (people.length >= 4) gridColsClass = 'lg:grid-cols-4';
         grid.className = `grid grid-cols-1 ${gridColsClass} gap-4 lg:gap-0`;
         grid.innerHTML = people.map((person, idx) => {
           const display = WISH_PERSON_DISPLAY_CONFIG[person.id] || { icon: 'fa-user', text: 'text-gray-700', iconText: 'text-gray-500', badge: 'bg-gray-100 text-gray-700' };
           const sectionBorderClass = idx < people.length - 1 ? 'lg:border-r' : '';
+          const safePersonLabel = escapeHtml(person.label);
           return `
             <section class="bg-white/80 border border-white/30 lg:border-y-0 lg:border-l-0 ${sectionBorderClass} border-gray-200/70 rounded-xl lg:rounded-none p-4 space-y-3">
               <div class="flex items-center justify-between">
                 <h3 class="text-sm font-semibold ${display.text} flex items-center gap-2">
                   <i class="fa-solid ${display.icon} ${display.iconText}"></i>
-                  ${person.label}
+                  ${safePersonLabel}
                 </h3>
                 <span id="wishCount_${person.id}" class="text-[11px] font-semibold px-2 py-0.5 rounded-full ${display.badge}">0</span>
               </div>
@@ -4326,7 +4348,7 @@
           `;
         }).join('');
 
-        const defaultPerson = people[0]?.id || 'familiar';
+        const defaultPerson = people[0]?.id || null;
         const validPersonIds = new Set(people.map(person => person.id));
         const columnBuckets = people.reduce((acc, person) => {
           acc[person.id] = [];
@@ -4335,6 +4357,7 @@
 
         activeWishes.forEach((wish) => {
           const personKey = validPersonIds.has(wish.person) ? wish.person : defaultPerson;
+          if (!personKey) return;
           if (!columnBuckets[personKey]) columnBuckets[personKey] = [];
           columnBuckets[personKey].push(wish);
         });
@@ -4436,7 +4459,7 @@
 
       function renderWishPersonGroups(wishes) {
         const availableCategories = getWishCategoriesList();
-        const defaultWishCategory = availableCategories[0]?.value || 'utensilios';
+        const defaultWishCategory = availableCategories[0]?.value || FALLBACK_WISH_CATEGORY_KEY;
         if (!wishes.length) {
           return `
             <div class="text-center py-10 text-gray-400 border border-dashed border-gray-200 rounded-lg bg-white/50">
@@ -4476,7 +4499,7 @@
       }
 
       function renderWishCard(w, isBought = false) {
-        const categoryKey = w.category || getWishCategoriesList()[0]?.value || 'utensilios';
+        const categoryKey = w.category || getWishCategoriesList()[0]?.value || FALLBACK_WISH_CATEGORY_KEY;
         const cfg = getWishCategoryConfig(categoryKey);
         const pct = w.targetValue > 0 ? Math.min(100, Math.round((w.savedValue / w.targetValue) * 100)) : 0;
         const isComplete = pct >= 100;
@@ -4667,7 +4690,7 @@
         thead.innerHTML = `
           <tr class="text-xs text-gray-500 uppercase tracking-wide">
             <th class="text-left px-4 py-2">Subcategoria</th>
-            ${people.map(person => `<th class="text-right px-4 py-2 ${getPersonTextColor(person.id)}">${person.label}</th>`).join('')}
+            ${people.map(person => `<th class="text-right px-4 py-2 ${getPersonTextColor(person.id)}">${escapeHtml(person.label)}</th>`).join('')}
             ${hasUnassigned ? '<th class="text-right px-4 py-2 text-gray-500">Sem resp.</th>' : ''}
             <th class="text-right px-4 py-2 font-semibold text-gray-700">Total</th>
           </tr>
@@ -5840,7 +5863,8 @@ if (isParceladoSerie && previewBox && previewList) {
           customs.forEach((cat, idx) => {
             const row = document.createElement('div');
             row.className = 'flex items-center justify-between px-2 py-1.5 rounded-lg bg-gray-50 border border-gray-100';
-            row.innerHTML = `<span class="text-xs text-gray-700">${cat.label}</span>
+            const safeCatLabel = escapeHtml(cat.label);
+            row.innerHTML = `<span class="text-xs text-gray-700">${safeCatLabel}</span>
               <div class="flex items-center gap-1">
                 <button class="w-6 h-6 rounded text-indigo-500 hover:bg-indigo-50 flex items-center justify-center btn-edit-cat" data-type="${type}" data-idx="${idx}">
                   <i class="fa-solid fa-pen text-[10px]"></i>
@@ -5883,6 +5907,10 @@ if (isParceladoSerie && previewBox && previewList) {
               const t = e.currentTarget.dataset.type;
               const i = parseInt(e.currentTarget.dataset.idx, 10);
               if (t === 'desejos') {
+                if (state.wishCategories.length <= 1) {
+                  showToast('É necessário manter pelo menos uma categoria de desejo.', 'warning');
+                  return;
+                }
                 state.wishCategories.splice(i, 1);
               } else {
                 state.customSubCategories[t].splice(i, 1);
@@ -5948,8 +5976,9 @@ if (isParceladoSerie && previewBox && previewList) {
             const baseName = CATEGORY_LABELS[ct.baseType] || ct.baseType;
             const row = document.createElement('div');
             row.className = 'flex items-center justify-between px-2 py-1.5 rounded-lg bg-gray-50 border border-gray-100';
+            const safeTypeLabel = escapeHtml(ct.label);
             row.innerHTML = `<div>
-              <span class="text-xs text-gray-700 font-medium">${ct.label}</span>
+              <span class="text-xs text-gray-700 font-medium">${safeTypeLabel}</span>
               <span class="text-[10px] text-gray-400 ml-1">(base: ${baseName})</span>
             </div>
             <button class="w-6 h-6 rounded text-red-400 hover:bg-red-50 flex items-center justify-center btn-del-type" data-idx="${idx}">
@@ -6010,8 +6039,9 @@ if (isParceladoSerie && previewBox && previewList) {
           people.forEach((person) => {
             const row = document.createElement('div');
             row.className = 'flex items-center justify-between px-2 py-1.5 rounded-lg bg-gray-50 border border-gray-100';
+            const safePersonLabel = escapeHtml(person.label);
             row.innerHTML = `<div class="flex items-center gap-2">
-                <span class="inline-flex items-center px-2 py-0.5 rounded-full border text-[10px] font-medium ${getPersonColor(person.id)}">${person.label}</span>
+                <span class="inline-flex items-center px-2 py-0.5 rounded-full border text-[10px] font-medium ${getPersonColor(person.id)}">${safePersonLabel}</span>
               </div>
               <div class="flex items-center gap-1">
                 <button class="w-6 h-6 rounded text-indigo-500 hover:bg-indigo-50 flex items-center justify-center btn-edit-person" data-id="${person.id}">
@@ -6048,8 +6078,13 @@ if (isParceladoSerie && previewBox && previewList) {
             if (deleteBtn) {
               deleteBtn.addEventListener('click', async (e) => {
                 const personId = e.currentTarget.dataset.id;
+                const currentPeople = getPeopleList();
+                if (currentPeople.length <= 1) {
+                  showToast('É necessário manter pelo menos uma pessoa.', 'warning');
+                  return;
+                }
                 if (!confirm('Excluir esta pessoa? Lançamentos antigos continuarão com o valor salvo.')) return;
-                state.people = getPeopleList().filter(item => item.id !== personId);
+                state.people = currentPeople.filter(item => item.id !== personId);
                 try {
                   await saveSettings();
                   refreshConfiguredViews();
