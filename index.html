@@ -641,6 +641,16 @@
                 <!-- opções via JS -->
               </select>
             </div>
+            <div class="space-y-1">
+              <label for="recPessoa" class="font-medium text-gray-700">Responsável</label>
+              <select id="recPessoa"
+                class="w-full rounded-lg border border-gray-200 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500">
+                <option value="">— Sem responsável —</option>
+                <option value="debora">Débora</option>
+                <option value="cristiano">Cristiano</option>
+                <option value="emanuel">Emanuel</option>
+              </select>
+            </div>
           </div>
 
           <div class="pt-2 flex justify-end">
@@ -709,6 +719,17 @@
               </select>
             </div>
 
+            <div class="space-y-1">
+              <label for="despPessoa" class="font-medium text-gray-700">Responsável</label>
+              <select id="despPessoa"
+                class="w-full rounded-lg border border-gray-200 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-orange-500">
+                <option value="">— Sem responsável —</option>
+                <option value="debora">Débora</option>
+                <option value="cristiano">Cristiano</option>
+                <option value="emanuel">Emanuel</option>
+              </select>
+            </div>
+
             <div class="flex items-center gap-2 text-xs text-gray-700">
               <input id="despTambemLazer" type="checkbox" class="rounded border-gray-300 text-indigo-600 focus:ring-indigo-500">
               <label for="despTambemLazer" class="select-none">Somar também como Lazer</label>
@@ -773,6 +794,33 @@
           Limpar filtro
         </button>
       </div>
+
+      <!-- 6) GASTOS POR PESSOA E SUBCATEGORIA -->
+      <section id="personBreakdownSection" class="bg-white rounded-xl shadow-sm border border-gray-100 hidden">
+        <div class="px-4 py-3 border-b border-gray-100 border-l-4 border-l-indigo-500 bg-indigo-50/30">
+          <h2 class="text-sm font-semibold text-indigo-700 flex items-center gap-2">
+            <i class="fa-solid fa-users text-indigo-500"></i>
+            Gastos por Pessoa e Subcategoria
+          </h2>
+          <p class="text-xs text-gray-500">Despesas e investimentos separados por responsável e categoria.</p>
+        </div>
+        <div class="overflow-x-auto">
+          <table class="min-w-full text-xs">
+            <thead class="bg-gray-50 border-b border-gray-100">
+              <tr class="text-xs text-gray-500 uppercase tracking-wide">
+                <th class="text-left px-4 py-2">Subcategoria</th>
+                <th class="text-right px-4 py-2 text-indigo-600">Débora</th>
+                <th class="text-right px-4 py-2 text-violet-600">Cristiano</th>
+                <th class="text-right px-4 py-2 text-amber-600">Emanuel</th>
+                <th class="text-right px-4 py-2 text-gray-500">Sem resp.</th>
+                <th class="text-right px-4 py-2 font-semibold text-gray-700">Total</th>
+              </tr>
+            </thead>
+            <tbody id="personBreakdownBody" class="divide-y divide-gray-100"></tbody>
+            <tfoot id="personBreakdownFoot" class="bg-gray-50 border-t border-gray-200"></tfoot>
+          </table>
+        </div>
+      </section>
 
       <!-- 5) TABELAS DE TRANSAÇÕES (mantidas) -->
       <section class="space-y-4">
@@ -1324,6 +1372,48 @@
         </button>
       </div>
 
+      <!-- Cards de resumo dos desejos -->
+      <section class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4">
+        <div class="bg-white rounded-xl shadow-sm border border-gray-100 flex flex-col p-4 border-l-4 border-l-yellow-400">
+          <div class="flex items-center justify-between mb-2">
+            <div>
+              <p class="text-xs uppercase tracking-wide text-gray-500">Total dos desejos</p>
+              <p class="text-sm text-gray-900 font-semibold" id="wishTotalAmount">R$ 0,00</p>
+            </div>
+            <div class="w-10 h-10 rounded-full bg-yellow-50 flex items-center justify-center">
+              <i class="fa-solid fa-star text-yellow-500"></i>
+            </div>
+          </div>
+          <p class="text-xs text-gray-500 mt-1">Soma das metas dos desejos filtrados.</p>
+        </div>
+
+        <div class="bg-white rounded-xl shadow-sm border border-gray-100 flex flex-col p-4 border-l-4 border-l-blue-500">
+          <div class="flex items-center justify-between mb-2">
+            <div>
+              <p class="text-xs uppercase tracking-wide text-gray-500">Total guardado</p>
+              <p class="text-sm text-gray-900 font-semibold" id="wishSavedAmount">R$ 0,00</p>
+            </div>
+            <div class="w-10 h-10 rounded-full bg-blue-50 flex items-center justify-center">
+              <i class="fa-solid fa-piggy-bank text-blue-500"></i>
+            </div>
+          </div>
+          <p class="text-xs text-gray-500 mt-1">Valor já juntado para esses desejos.</p>
+        </div>
+
+        <div class="bg-white rounded-xl shadow-sm border border-gray-100 flex flex-col p-4 border-l-4 border-l-emerald-500">
+          <div class="flex items-center justify-between mb-2">
+            <div>
+              <p class="text-xs uppercase tracking-wide text-gray-500">Total já comprado</p>
+              <p class="text-sm text-gray-900 font-semibold" id="wishBoughtAmount">R$ 0,00</p>
+            </div>
+            <div class="w-10 h-10 rounded-full bg-emerald-50 flex items-center justify-center">
+              <i class="fa-solid fa-circle-check text-emerald-500"></i>
+            </div>
+          </div>
+          <p class="text-xs text-gray-500 mt-1">Soma dos desejos marcados como comprados.</p>
+        </div>
+      </section>
+
       <!-- Grid de cards de desejos -->
       <div id="wishesGrid" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
         <!-- Renderizado via JS -->
@@ -1474,6 +1564,17 @@
         <div class="flex items-center gap-2 text-xs text-gray-700">
           <input id="editTambemLazer" type="checkbox" class="rounded border-gray-300 text-indigo-600 focus:ring-indigo-500">
           <label for="editTambemLazer" class="select-none">Somar também como Lazer</label>
+        </div>
+
+        <div class="space-y-1">
+          <label for="editPessoa" class="font-medium text-gray-700">Responsável</label>
+          <select id="editPessoa"
+            class="w-full rounded-lg border border-gray-200 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500">
+            <option value="">— Sem responsável —</option>
+            <option value="debora">Débora</option>
+            <option value="cristiano">Cristiano</option>
+            <option value="emanuel">Emanuel</option>
+          </select>
         </div>
 
         <div id="editPaymentContainer" class="space-y-2 pt-1">
@@ -1806,6 +1907,9 @@
 
       // Constantes e mapeamentos (mantidos e expandidos)
       const CATEGORY_LABELS = { receita: 'Receita', investimento: 'Investimento', fixa: 'Despesa Fixa', variavel: 'Despesa Variável' };
+      const PEOPLE = ['debora', 'cristiano', 'emanuel'];
+      const PERSON_LABELS = { debora: 'Débora', cristiano: 'Cristiano', emanuel: 'Emanuel' };
+      const PERSON_COLORS = { debora: 'bg-indigo-50 text-indigo-700 border-indigo-200', cristiano: 'bg-violet-50 text-violet-700 border-violet-200', emanuel: 'bg-amber-50 text-amber-700 border-amber-200' };
       const RECEITA_SUBCATEGORIES = {
         salario: 'Salário', freelancer: 'Freelancer / Extra', decimo: '13º / Bônus',
         reembolso: 'Reembolso', alugueis: 'Aluguéis', juros_dividendos: 'Juros / Dividendos', outros: 'Outros'
@@ -2044,7 +2148,8 @@
               groupId: data.groupId || null,
               paid: !!data.paid,
             aportado: !!data.aportado,
-              extraLazer: !!data.extraLazer
+              extraLazer: !!data.extraLazer,
+              person: data.person || null
             });
           });
           state.transactions = result;
@@ -2103,7 +2208,8 @@
                 groupId: data.groupId || null,
                 paid: !!data.paid,
                 aportado: !!data.aportado,
-                extraLazer: !!data.extraLazer
+                extraLazer: !!data.extraLazer,
+                person: data.person || null
               };
               return setDoc(doc(db, "transactions", id), payload);
             }));
@@ -3200,6 +3306,11 @@
             const colorClasses = SUBCATEGORY_COLOR_CLASSES['lazer'] || 'bg-purple-50 text-purple-700 border-purple-200';
             badgesHTML += `<span class="inline-flex items-center px-2 py-0.5 rounded-full border text-[10px] font-medium ${colorClasses}">Lazer</span>`;
           }
+          if (t.person) {
+            const pc = PERSON_COLORS[t.person] || 'bg-gray-50 text-gray-600 border-gray-200';
+            const pl = PERSON_LABELS[t.person] || t.person;
+            badgesHTML += `<span class="inline-flex items-center px-2 py-0.5 rounded-full border text-[10px] font-medium ${pc}"><i class="fa-solid fa-user mr-1 text-[9px]"></i>${pl}</span>`;
+          }
 
           let pagamentoTexto = '-';
           if (t.isCreditCard && t.card) pagamentoTexto = getCardLabels()[t.card] || t.card || '-';
@@ -3312,6 +3423,11 @@
           if (t.extraLazer && sub !== 'lazer') {
             const colorClasses = SUBCATEGORY_COLOR_CLASSES['lazer'] || 'bg-purple-50 text-purple-700 border-purple-200';
             badgesHTML += `<span class="inline-flex items-center px-2 py-0.5 rounded-full border text-[10px] font-medium ${colorClasses}">Lazer</span>`;
+          }
+          if (t.person) {
+            const pc = PERSON_COLORS[t.person] || 'bg-gray-50 text-gray-600 border-gray-200';
+            const pl = PERSON_LABELS[t.person] || t.person;
+            badgesHTML += `<span class="inline-flex items-center px-2 py-0.5 rounded-full border text-[10px] font-medium ${pc}"><i class="fa-solid fa-user mr-1 text-[9px]"></i>${pl}</span>`;
           }
 
           let pagamentoTexto = '-';
@@ -3992,17 +4108,24 @@
 
         const year = state.wishesYear;
         const cat = state.wishesCategory;
+        const filteredWishes = state.wishes.filter(w =>
+          w.year === year &&
+          (cat === 'all' || w.category === cat)
+        );
 
-        const activeWishes = state.wishes.filter(w =>
-          !w.bought &&
-          w.year === year &&
-          (cat === 'all' || w.category === cat)
-        );
-        const boughtWishes = state.wishes.filter(w =>
-          w.bought &&
-          w.year === year &&
-          (cat === 'all' || w.category === cat)
-        );
+        const activeWishes = filteredWishes.filter(w => !w.bought);
+        const boughtWishes = filteredWishes.filter(w => w.bought);
+
+        const wishTotals = filteredWishes.reduce((acc, wish) => {
+          acc.target += Number(wish.targetValue) || 0;
+          acc.saved += Number(wish.savedValue) || 0;
+          if (wish.bought) acc.bought += Number(wish.targetValue) || 0;
+          return acc;
+        }, { target: 0, saved: 0, bought: 0 });
+
+        document.getElementById('wishTotalAmount').textContent = formatCurrency(wishTotals.target);
+        document.getElementById('wishSavedAmount').textContent = formatCurrency(wishTotals.saved);
+        document.getElementById('wishBoughtAmount').textContent = formatCurrency(wishTotals.bought);
 
         const grid = document.getElementById('wishesGrid');
         grid.innerHTML = activeWishes.length === 0
@@ -4145,6 +4268,97 @@
         });
       }
 
+      function renderPersonBreakdown() {
+        const section = document.getElementById('personBreakdownSection');
+        const tbody = document.getElementById('personBreakdownBody');
+        const tfoot = document.getElementById('personBreakdownFoot');
+        if (!section || !tbody || !tfoot) return;
+
+        const people = PEOPLE;
+
+        // Get transactions for the current view (expenses + investments only)
+        const txs = getFilteredTransactions().filter(t =>
+          t.category === 'fixa' || t.category === 'variavel' || t.category === 'investimento'
+        );
+
+        // Check if any transaction has a person assigned
+        const hasPersonData = txs.some(t => t.person);
+        if (!hasPersonData) {
+          section.classList.add('hidden');
+          return;
+        }
+        section.classList.remove('hidden');
+
+        // Build subcategory → person → total map
+        const allSubCats = new Set();
+        const dataMap = {}; // subcat -> { debora: 0, cristiano: 0, emanuel: 0, '': 0 }
+
+        txs.forEach(t => {
+          const subKey = t.subCategory || '__sem_cat__';
+          allSubCats.add(subKey);
+          if (!dataMap[subKey]) dataMap[subKey] = { debora: 0, cristiano: 0, emanuel: 0, '': 0 };
+          const p = t.person || '';
+          if (p === 'debora' || p === 'cristiano' || p === 'emanuel') {
+            dataMap[subKey][p] += Number(t.value) || 0;
+          } else {
+            dataMap[subKey][''] += Number(t.value) || 0;
+          }
+        });
+
+        // Helper to get label for a subcategory key
+        function getSubLabel(key) {
+          if (key === '__sem_cat__') return '— Sem categoria —';
+          return DESPESA_SUBCATEGORIES[key] || INVEST_SUBCATEGORIES[key] ||
+            (state.customSubCategories.fixa || []).concat(
+              state.customSubCategories.variavel || [],
+              state.customSubCategories.investimento || []
+            ).find(c => c.value === key)?.label || key;
+        }
+
+        // Sort subcategories by total descending
+        const sortedSubs = [...allSubCats].sort((a, b) => {
+          const totalA = people.reduce((s, p) => s + (dataMap[a][p] || 0), 0) + (dataMap[a][''] || 0);
+          const totalB = people.reduce((s, p) => s + (dataMap[b][p] || 0), 0) + (dataMap[b][''] || 0);
+          return totalB - totalA;
+        });
+
+        tbody.innerHTML = '';
+        const footTotals = { debora: 0, cristiano: 0, emanuel: 0, '': 0, total: 0 };
+
+        sortedSubs.forEach((subKey, idx) => {
+          const row = dataMap[subKey];
+          const rowTotal = people.reduce((s, p) => s + (row[p] || 0), 0) + (row[''] || 0);
+          people.forEach(p => { footTotals[p] += row[p] || 0; });
+          footTotals[''] += row[''] || 0;
+          footTotals.total += rowTotal;
+
+          const zebra = idx % 2 === 0 ? 'bg-white' : 'bg-gray-50/50';
+          const tr = document.createElement('tr');
+          tr.className = zebra;
+          tr.innerHTML = `
+            <td class="px-4 py-2 text-xs text-gray-700 font-medium">${getSubLabel(subKey)}</td>
+            <td class="px-4 py-2 text-xs text-right ${row.debora > 0 ? 'text-indigo-700 font-medium' : 'text-gray-300'}">${row.debora > 0 ? formatCurrency(row.debora) : '—'}</td>
+            <td class="px-4 py-2 text-xs text-right ${row.cristiano > 0 ? 'text-violet-700 font-medium' : 'text-gray-300'}">${row.cristiano > 0 ? formatCurrency(row.cristiano) : '—'}</td>
+            <td class="px-4 py-2 text-xs text-right ${row.emanuel > 0 ? 'text-amber-700 font-medium' : 'text-gray-300'}">${row.emanuel > 0 ? formatCurrency(row.emanuel) : '—'}</td>
+            <td class="px-4 py-2 text-xs text-right ${row[''] > 0 ? 'text-gray-500' : 'text-gray-300'}">${row[''] > 0 ? formatCurrency(row['']) : '—'}</td>
+            <td class="px-4 py-2 text-xs text-right font-semibold text-gray-800">${formatCurrency(rowTotal)}</td>
+          `;
+          tbody.appendChild(tr);
+        });
+
+        // Footer totals row
+        tfoot.innerHTML = `
+          <tr class="text-xs font-bold">
+            <td class="px-4 py-2 text-gray-700 uppercase tracking-wide">Total</td>
+            <td class="px-4 py-2 text-right text-indigo-700">${formatCurrency(footTotals.debora)}</td>
+            <td class="px-4 py-2 text-right text-violet-700">${formatCurrency(footTotals.cristiano)}</td>
+            <td class="px-4 py-2 text-right text-amber-700">${formatCurrency(footTotals.emanuel)}</td>
+            <td class="px-4 py-2 text-right text-gray-500">${formatCurrency(footTotals[''])}</td>
+            <td class="px-4 py-2 text-right text-gray-900">${formatCurrency(footTotals.total)}</td>
+          </tr>
+        `;
+      }
+
       function renderDashboard(selectedMonth) {
         // Reseta filtros quando troca de mês
         if (state.selectedMonth !== selectedMonth) {
@@ -4179,6 +4393,7 @@
           renderCardsGrid();
           renderCardsFaturas();
           updateCardFilterVisual();
+          renderPersonBreakdown();
           renderTables();
         }
       }
@@ -4324,7 +4539,8 @@
   repeticoes,
   paymentMethod,
   aportado,
-  extraLazer
+  extraLazer,
+  person
 }) {
   const baseDate = new Date(date);
   if (isNaN(baseDate.getTime())) return;
@@ -4365,7 +4581,8 @@
           groupId: groupId,
           paid: false,
           aportado: false,
-          extraLazer: category !== 'investimento' ? !!extraLazer : false
+          extraLazer: category !== 'investimento' ? !!extraLazer : false,
+          person: person || null
         });
       }
     }
@@ -4389,7 +4606,8 @@
       groupId: null,
       paid: false,
       aportado: category === 'investimento' ? !!aportado : false,
-      extraLazer: category !== 'investimento' ? !!extraLazer : false
+      extraLazer: category !== 'investimento' ? !!extraLazer : false,
+      person: person || null
     });
   }
 
@@ -4422,7 +4640,8 @@
         groupId,
         paid: false,
         aportado: category === 'investimento' ? !!aportado : false,
-        extraLazer: category !== 'investimento' ? !!extraLazer : false
+        extraLazer: category !== 'investimento' ? !!extraLazer : false,
+        person: person || null
       });
     }
   }
@@ -4478,6 +4697,9 @@
         }
 
         if (editTambemLazer) editTambemLazer.checked = !!tx.extraLazer;
+
+        const editPessoaSelect = document.getElementById('editPessoa');
+        if (editPessoaSelect) editPessoaSelect.value = tx.person || '';
 
         const scopeBlock = document.getElementById('editParcelScope');
         const btnSingle = document.getElementById('btnScopeSingle');
@@ -5376,6 +5598,7 @@ if (isParceladoSerie && previewBox && previewList) {
           const value = parseFloat(rawValue.toString().replace(',', '.'));
           const date = document.getElementById('recData').value;
           const subCategory = document.getElementById('recCategoria').value;
+          const person = document.getElementById('recPessoa').value || null;
           if (!description || !date || isNaN(value)) return;
 
           try {
@@ -5388,7 +5611,8 @@ if (isParceladoSerie && previewBox && previewList) {
               isCreditCard: false,
               card: null,
               parcelas: 1,
-              paymentMethod: 'debito_pix'
+              paymentMethod: 'debito_pix',
+              person
             });
 
             showToast('Receita lançada com sucesso', 'success');
@@ -5413,6 +5637,7 @@ if (isParceladoSerie && previewBox && previewList) {
         const subCategory = document.getElementById('despSubCategoria').value;
         const forma = document.getElementById('despFormaPagamento').value;
         const extraLazer = document.getElementById('despTambemLazer').checked;
+        const person = document.getElementById('despPessoa').value || null;
 
           // Decidir se é pagamento via cartão
           const isCreditCard = forma === 'cartao';
@@ -5448,7 +5673,8 @@ if (category === 'fixa') {
               repeticoes,
               paymentMethod: isCreditCard ? 'cartao' : forma, // 'boleto' or 'debito_pix' or 'dinheiro'
               aportado: false, // sempre false vindo do formulário; o status pode ser alterado via tabela
-              extraLazer
+              extraLazer,
+              person
             });
 
             const categoryLabels = {
@@ -5578,6 +5804,7 @@ if (category === 'fixa') {
           const mainCat = document.getElementById('editMainCategory').value;
         const subCat = document.getElementById('editSubCategory').value;
         const extraLazer = document.getElementById('editTambemLazer')?.checked;
+        const editPessoa = document.getElementById('editPessoa')?.value || null;
           if (!desc || !dateStr || isNaN(value)) return;
 
           const isCard = mainCat === 'receita' ? false : document.getElementById('editIsCartao').checked;
@@ -5628,7 +5855,8 @@ if (category === 'fixa') {
                     groupId: newGroupId,
                     paid: false,
                     aportado: false,
-                    extraLazer: mainCat !== 'investimento' ? !!extraLazer : false
+                   extraLazer: mainCat !== 'investimento' ? !!extraLazer : false,
+                   person: editPessoa
                   });
                 }
               } else {
@@ -5657,7 +5885,8 @@ if (category === 'fixa') {
                     groupId: newGroupId,
                     paid: false,
                     aportado: mainCat === 'investimento' ? false : false,
-                    extraLazer: mainCat !== 'investimento' ? !!extraLazer : false
+                    extraLazer: mainCat !== 'investimento' ? !!extraLazer : false,
+                    person: editPessoa
                   });
                 }
               }
@@ -5677,6 +5906,7 @@ if (category === 'fixa') {
                 else t.description = baseDesc;
                 t.category = mainCat; t.subCategory = subCat || null; t.isCreditCard = isCard; t.card = card;
                 t.extraLazer = mainCat !== 'investimento' ? !!extraLazer : false;
+                t.person = editPessoa;
                 if (isCard) {
                   t.paymentMethod = 'cartao';
                 } else if (txClicked.paymentMethod === 'cartao') {
@@ -5703,6 +5933,7 @@ if (category === 'fixa') {
             txClicked.description = desc; txClicked.value = value; txClicked.date = newDate.toISOString();
             txClicked.category = mainCat; txClicked.subCategory = subCat || null; txClicked.isCreditCard = isCard; txClicked.card = card;
             txClicked.extraLazer = mainCat !== 'investimento' ? !!extraLazer : false;
+            txClicked.person = editPessoa;
             // Preserve paymentMethod if not changing to/from credit card
             if (isCard) {
             txClicked.paymentMethod = 'cartao';
