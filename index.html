@@ -4314,14 +4314,15 @@
         document.getElementById('wishSavedAmount').textContent = formatCurrency(wishTotals.saved);
         document.getElementById('wishBoughtAmount').textContent = formatCurrency(wishTotals.bought);
 
-        const personColumns = ['familiar', 'debora', 'emanuel'];
+        const DEFAULT_WISH_COLUMN = 'familiar';
+        const personColumns = [DEFAULT_WISH_COLUMN, 'debora', 'emanuel'];
         const columnBuckets = personColumns.reduce((acc, personId) => {
           acc[personId] = [];
           return acc;
         }, {});
 
         activeWishes.forEach((wish) => {
-          const personKey = personColumns.includes(wish.person) ? wish.person : 'familiar';
+          const personKey = personColumns.includes(wish.person) ? wish.person : DEFAULT_WISH_COLUMN;
           columnBuckets[personKey].push(wish);
         });
 
