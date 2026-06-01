@@ -1372,6 +1372,48 @@
         </button>
       </div>
 
+      <!-- Cards de resumo dos desejos -->
+      <section class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4">
+        <div class="bg-white rounded-xl shadow-sm border border-gray-100 flex flex-col p-4 border-l-4 border-l-yellow-400">
+          <div class="flex items-center justify-between mb-2">
+            <div>
+              <p class="text-xs uppercase tracking-wide text-gray-500">Total dos desejos</p>
+              <p class="text-sm text-gray-900 font-semibold" id="wishTotalAmount">R$ 0,00</p>
+            </div>
+            <div class="w-10 h-10 rounded-full bg-yellow-50 flex items-center justify-center">
+              <i class="fa-solid fa-star text-yellow-500"></i>
+            </div>
+          </div>
+          <p class="text-xs text-gray-500 mt-1">Soma das metas dos desejos filtrados.</p>
+        </div>
+
+        <div class="bg-white rounded-xl shadow-sm border border-gray-100 flex flex-col p-4 border-l-4 border-l-blue-500">
+          <div class="flex items-center justify-between mb-2">
+            <div>
+              <p class="text-xs uppercase tracking-wide text-gray-500">Total guardado</p>
+              <p class="text-sm text-gray-900 font-semibold" id="wishSavedAmount">R$ 0,00</p>
+            </div>
+            <div class="w-10 h-10 rounded-full bg-blue-50 flex items-center justify-center">
+              <i class="fa-solid fa-piggy-bank text-blue-500"></i>
+            </div>
+          </div>
+          <p class="text-xs text-gray-500 mt-1">Valor já juntado para esses desejos.</p>
+        </div>
+
+        <div class="bg-white rounded-xl shadow-sm border border-gray-100 flex flex-col p-4 border-l-4 border-l-emerald-500">
+          <div class="flex items-center justify-between mb-2">
+            <div>
+              <p class="text-xs uppercase tracking-wide text-gray-500">Total já comprado</p>
+              <p class="text-sm text-gray-900 font-semibold" id="wishBoughtAmount">R$ 0,00</p>
+            </div>
+            <div class="w-10 h-10 rounded-full bg-emerald-50 flex items-center justify-center">
+              <i class="fa-solid fa-circle-check text-emerald-500"></i>
+            </div>
+          </div>
+          <p class="text-xs text-gray-500 mt-1">Soma dos desejos marcados como comprados.</p>
+        </div>
+      </section>
+
       <!-- Grid de cards de desejos -->
       <div id="wishesGrid" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
         <!-- Renderizado via JS -->
@@ -4066,17 +4108,30 @@
 
         const year = state.wishesYear;
         const cat = state.wishesCategory;
+        const filteredWishes = state.wishes.filter(w =>
+          w.year === year &&
+          (cat === 'all' || w.category === cat)
+        );
 
-        const activeWishes = state.wishes.filter(w =>
+        const activeWishes = filteredWishes.filter(w =>
           !w.bought &&
-          w.year === year &&
-          (cat === 'all' || w.category === cat)
+          true
         );
-        const boughtWishes = state.wishes.filter(w =>
+        const boughtWishes = filteredWishes.filter(w =>
           w.bought &&
-          w.year === year &&
-          (cat === 'all' || w.category === cat)
+          true
         );
+
+        const wishTotals = filteredWishes.reduce((acc, wish) => {
+          acc.target += Number(wish.targetValue) || 0;
+          acc.saved += Number(wish.savedValue) || 0;
+          if (wish.bought) acc.bought += Number(wish.targetValue) || 0;
+          return acc;
+        }, { target: 0, saved: 0, bought: 0 });
+
+        document.getElementById('wishTotalAmount').textContent = formatCurrency(wishTotals.target);
+        document.getElementById('wishSavedAmount').textContent = formatCurrency(wishTotals.saved);
+        document.getElementById('wishBoughtAmount').textContent = formatCurrency(wishTotals.bought);
 
         const grid = document.getElementById('wishesGrid');
         grid.innerHTML = activeWishes.length === 0
