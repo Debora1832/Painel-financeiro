@@ -2313,7 +2313,8 @@
               paymentMethod: data.paymentMethod || null,
               groupId: data.groupId || null,
               paid: !!data.paid,
-            aportado: !!data.aportado,
+              aportado: !!data.aportado,
+              invoiceConfirmed: !!data.invoiceConfirmed,
               extraLazer: !!data.extraLazer,
               person: data.person || null
             });
@@ -2335,6 +2336,7 @@
                 state.transactions = parsed.map(t => ({
                   ...t,
                   date: normalizeDateValue(t.date),
+                  invoiceConfirmed: !!t.invoiceConfirmed,
                   extraLazer: !!t.extraLazer
                 }));
                 showToast('Sem conexão. Exibindo dados salvos localmente.', 'warning');
@@ -2374,6 +2376,7 @@
                 groupId: data.groupId || null,
                 paid: !!data.paid,
                 aportado: !!data.aportado,
+                invoiceConfirmed: !!data.invoiceConfirmed,
                 extraLazer: !!data.extraLazer,
                 person: data.person || null
               };
@@ -3428,6 +3431,28 @@
         }
       }
 
+      function canConfirmInvoiceLaunch(tx) {
+        return !!(tx && (tx.isCreditCard || tx.paymentMethod === 'cartao'));
+      }
+
+      function buildInvoiceConfirmationCheckbox(tx, size = 'table') {
+        if (!canConfirmInvoiceLaunch(tx)) return '';
+        const checked = !!tx.invoiceConfirmed;
+        const inputSize = size === 'card' ? 'w-4 h-4' : 'w-3.5 h-3.5';
+        const title = checked ? 'Lançamento confirmado na fatura' : 'Confirmar lançamento na fatura';
+        return `
+          <label class="inline-flex items-center shrink-0 cursor-pointer" title="${title}">
+            <input
+              type="checkbox"
+              class="tx-confirm-checkbox ${inputSize} rounded border-gray-300 text-indigo-600 focus:ring-indigo-500"
+              data-id="${tx.id}"
+              aria-label="${title}"
+              ${checked ? 'checked' : ''}
+            >
+          </label>
+        `;
+      }
+
       // Build generic rows (receitas / fixas / variaveis)
       function buildTableRows(list, tbodyId, emptyText) {
         const tbody = document.getElementById(tbodyId);
@@ -3516,9 +3541,17 @@
             statusHtml = `<button class="btn-toggle-paid inline-flex items-center justify-center px-2.5 py-1 rounded-full border ${statusClasses}" data-id="${t.id}" title="${statusLabel}"><i class="fa-solid ${statusIcon} mr-1 text-[10px]"></i><span class="text-[10px] font-medium">${statusLabel}</span></button>`;
           }
 
+          const confirmHtml = buildInvoiceConfirmationCheckbox(t);
+          const descriptionHtml = `
+            <div class="flex items-center gap-2">
+              <span>${escapeHtml(t.description || '-')}</span>
+              ${confirmHtml}
+            </div>
+          `;
+
           tr.innerHTML = `
             <td class="px-4 py-2 text-xs text-gray-700 whitespace-nowrap">${formatDate(t.date)}</td>
-            <td class="px-4 py-2 text-xs text-gray-800">${t.description || '-'}</td>
+            <td class="px-4 py-2 text-xs text-gray-800">${descriptionHtml}</td>
             <td class="px-4 py-2 text-xs text-gray-600"><div class="flex flex-wrap gap-1">${badgesHTML}</div></td>
             <td class="px-4 py-2 text-xs text-gray-600">${pagamentoTexto}</td>
             <td class="px-4 py-2 text-xs text-gray-800 text-right">${formatCurrency(t.value)}</td>
@@ -3560,9 +3593,17 @@
           const icon = aportado ? 'fa-check' : 'fa-hourglass-half';
           const statusHtml = `<button class="btn-toggle-aportado inline-flex items-center justify-center px-2.5 py-1 rounded-full border ${btnClass}" data-id="${t.id}" title="${aportado ? 'Aportado' : 'Não aportado'}"><i class="fa-solid ${icon} mr-1 text-[10px]"></i><span class="text-[10px] font-medium">${aportado ? 'Aportado' : 'Não aportado'}</span></button>`;
 
+          const confirmHtml = buildInvoiceConfirmationCheckbox(t);
+          const descriptionHtml = `
+            <div class="flex items-center gap-2">
+              <span>${escapeHtml(t.description || '-')}</span>
+              ${confirmHtml}
+            </div>
+          `;
+
           tr.innerHTML = `
             <td class="px-4 py-2 text-xs text-gray-700 whitespace-nowrap">${formatDate(t.date)}</td>
-            <td class="px-4 py-2 text-xs text-gray-800">${t.description || '-'}</td>
+            <td class="px-4 py-2 text-xs text-gray-800">${descriptionHtml}</td>
             <td class="px-4 py-2 text-xs text-gray-700">${subLabel}</td>
             <td class="px-4 py-2 text-xs text-gray-800 text-right">${formatCurrency(t.value)}</td>
             <td class="px-4 py-2 text-xs text-center">${statusHtml}</td>
@@ -3634,9 +3675,14 @@
             statusHtml = `<button class="btn-toggle-paid inline-flex items-center justify-center px-3 py-1.5 rounded-full border ${statusClasses}" data-id="${t.id}" title="${statusLabel}"><i class="fa-solid ${statusIcon} mr-1 text-xs"></i><span class="text-xs font-medium">${statusLabel}</span></button>`;
           }
 
+          const confirmHtml = buildInvoiceConfirmationCheckbox(t, 'card');
+
           card.innerHTML = `
             <div class="card-header">
-              <div class="card-title">${t.description || '-'}</div>
+              <div class="flex items-start gap-2 flex-1 min-w-0">
+                <div class="card-title">${escapeHtml(t.description || '-')}</div>
+                ${confirmHtml}
+              </div>
               <div class="card-value">${formatCurrency(t.value)}</div>
             </div>
             <div class="card-body">
@@ -3701,9 +3747,14 @@
           const aportIcon  = t.aportado ? 'fa-thumbs-up' : 'fa-thumbs-down';
           const aportClasses = t.aportado ? 'bg-blue-50 text-blue-600 border-blue-200' : 'bg-gray-50 text-gray-500 border-gray-200';
 
+          const confirmHtml = buildInvoiceConfirmationCheckbox(t, 'card');
+
           card.innerHTML = `
             <div class="card-header">
-              <div class="card-title">${t.description || '-'}</div>
+              <div class="flex items-start gap-2 flex-1 min-w-0">
+                <div class="card-title">${escapeHtml(t.description || '-')}</div>
+                ${confirmHtml}
+              </div>
               <div class="card-value">${formatCurrency(t.value)}</div>
             </div>
             <div class="card-body">
@@ -3768,6 +3819,9 @@
         });
         document.querySelectorAll('.btn-toggle-aportado').forEach((btn) => {
           btn.addEventListener('click', () => toggleAportado(btn.getAttribute('data-id')));
+        });
+        document.querySelectorAll('.tx-confirm-checkbox').forEach((input) => {
+          input.addEventListener('change', () => toggleInvoiceConfirmed(input.getAttribute('data-id'), input.checked));
         });
         
         // Re-initialize table filters after rendering
@@ -4804,6 +4858,30 @@
         );
       }
 
+      async function toggleInvoiceConfirmed(id, confirmed) {
+        const tx = state.transactions.find(t => t.id === id);
+        if (!canConfirmInvoiceLaunch(tx)) return;
+        const previousValue = !!tx.invoiceConfirmed;
+        tx.invoiceConfirmed = !!confirmed;
+
+        renderTables();
+
+        try {
+          await saveTransactions();
+        } catch (error) {
+          console.error('toggleInvoiceConfirmed: Error saving transaction:', error);
+          showToast('Erro ao salvar confirmação. Verifique a conexão.', 'error');
+          tx.invoiceConfirmed = previousValue;
+          renderTables();
+          return;
+        }
+
+        showToast(
+          tx.invoiceConfirmed ? 'Lançamento confirmado na fatura' : 'Confirmação da fatura removida',
+          'success'
+        );
+      }
+
       async function toggleAportado(id) {
         const tx = state.transactions.find(t => t.id === id);
         if (!tx) return;
@@ -4954,6 +5032,7 @@
           groupId: groupId,
           paid: false,
           aportado: false,
+          invoiceConfirmed: false,
           extraLazer: category !== 'investimento' ? !!extraLazer : false,
           person: person || null
         });
@@ -4979,6 +5058,7 @@
       groupId: null,
       paid: false,
       aportado: category === 'investimento' ? !!aportado : false,
+      invoiceConfirmed: false,
       extraLazer: category !== 'investimento' ? !!extraLazer : false,
       person: person || null
     });
@@ -5013,6 +5093,7 @@
         groupId,
         paid: false,
         aportado: category === 'investimento' ? !!aportado : false,
+        invoiceConfirmed: false,
         extraLazer: category !== 'investimento' ? !!extraLazer : false,
         person: person || null
       });
@@ -6494,8 +6575,9 @@ if (category === 'fixa') {
                     groupId: newGroupId,
                     paid: false,
                     aportado: false,
-                   extraLazer: mainCat !== 'investimento' ? !!extraLazer : false,
-                   person: editPessoa
+                    invoiceConfirmed: false,
+                    extraLazer: mainCat !== 'investimento' ? !!extraLazer : false,
+                    person: editPessoa
                   });
                 }
               } else {
@@ -6524,6 +6606,7 @@ if (category === 'fixa') {
                     groupId: newGroupId,
                     paid: false,
                     aportado: mainCat === 'investimento' ? false : false,
+                    invoiceConfirmed: false,
                     extraLazer: mainCat !== 'investimento' ? !!extraLazer : false,
                     person: editPessoa
                   });
@@ -6553,6 +6636,7 @@ if (category === 'fixa') {
                 } else {
                   t.paymentMethod = txClicked.paymentMethod || 'debito_pix';
                 }
+                if (!canConfirmInvoiceLaunch(t)) t.invoiceConfirmed = false;
                 t.value = value;
                 if (state.editingMode === 'all') {
                   const oldDate = new Date(t.date);
@@ -6583,6 +6667,7 @@ if (category === 'fixa') {
             // Keep existing paymentMethod (like 'boleto', 'debito_pix', etc)
             // No change needed - txClicked.paymentMethod stays as is
           }
+          if (!canConfirmInvoiceLaunch(txClicked)) txClicked.invoiceConfirmed = false;
           
           showToast('Lançamento atualizado com sucesso', 'success');
         }
