@@ -6555,10 +6555,14 @@ if (category === 'fixa') {
             
             // Parcelas-count change only applies for 'all' mode on non-fixa series
             if (parcelasChanged && state.editingMode === 'all') {
-              const previousConfirmedByIndex = new Map(
+              const previousStateByIndex = new Map(
                 state.transactions
                   .filter((t) => t.groupId === groupId)
-                  .map((t) => [t.parcelaIndex || 1, !!t.invoiceConfirmed])
+                  .map((t) => [t.parcelaIndex || 1, {
+                    invoiceConfirmed: !!t.invoiceConfirmed,
+                    paid: !!t.paid,
+                    aportado: !!t.aportado
+                  }])
               );
               const rebuiltPaymentMethod = isCard
                 ? 'cartao'
@@ -6575,6 +6579,7 @@ if (category === 'fixa') {
                 for (let i = 0; i < newParcelas; i++) {
                   const d = new Date(newDate);
                   d.setMonth(d.getMonth() + i);
+                  const previousState = previousStateByIndex.get(i + 1) || {};
                   state.transactions.push({
                     id: generateId(),
                     description: baseDesc,
@@ -6588,10 +6593,10 @@ if (category === 'fixa') {
                     parcelaIndex: i + 1,
                     paymentMethod: rebuiltPaymentMethod,
                     groupId: newGroupId,
-                    paid: false,
-                    aportado: false,
+                    paid: !!previousState.paid,
+                    aportado: !!previousState.aportado,
                     invoiceConfirmed: canConfirmInvoiceLaunch({ isCreditCard: isCard, paymentMethod: rebuiltPaymentMethod })
-                      ? !!previousConfirmedByIndex.get(i + 1)
+                      ? !!previousState.invoiceConfirmed
                       : false,
                     extraLazer: mainCat !== 'investimento' ? !!extraLazer : false,
                     person: editPessoa
@@ -6607,6 +6612,7 @@ if (category === 'fixa') {
                   const cents = baseCents + (i < remainder ? 1 : 0);
                   const d = new Date(newDate);
                   d.setMonth(d.getMonth() + i);
+                  const previousState = previousStateByIndex.get(i + 1) || {};
                   
                   state.transactions.push({
                     id: generateId(),
@@ -6621,10 +6627,10 @@ if (category === 'fixa') {
                     parcelaIndex: i + 1,
                     paymentMethod: rebuiltPaymentMethod,
                     groupId: newGroupId,
-                    paid: false,
-                    aportado: mainCat === 'investimento' ? false : false,
+                    paid: !!previousState.paid,
+                    aportado: !!previousState.aportado,
                     invoiceConfirmed: canConfirmInvoiceLaunch({ isCreditCard: isCard, paymentMethod: rebuiltPaymentMethod })
-                      ? !!previousConfirmedByIndex.get(i + 1)
+                      ? !!previousState.invoiceConfirmed
                       : false,
                     extraLazer: mainCat !== 'investimento' ? !!extraLazer : false,
                     person: editPessoa
