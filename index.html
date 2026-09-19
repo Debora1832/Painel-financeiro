@@ -3439,9 +3439,10 @@
         if (!canConfirmInvoiceLaunch(tx)) return '';
         const checked = !!tx.invoiceConfirmed;
         const inputSize = size === 'card' ? 'w-4 h-4' : 'w-3.5 h-3.5';
+        const textSize = size === 'card' ? 'text-[11px]' : 'text-[10px]';
         const title = checked ? 'Lançamento confirmado na fatura' : 'Confirmar lançamento na fatura';
         return `
-          <label class="inline-flex items-center shrink-0 cursor-pointer" title="${title}">
+          <label class="inline-flex items-center gap-1 shrink-0 cursor-pointer" title="${title}">
             <input
               type="checkbox"
               class="tx-confirm-checkbox ${inputSize} rounded border-gray-300 text-indigo-600 focus:ring-indigo-500"
@@ -3449,6 +3450,7 @@
               aria-label="${title}"
               ${checked ? 'checked' : ''}
             >
+            <span class="${textSize} text-gray-400">Fatura</span>
           </label>
         `;
       }
@@ -4869,10 +4871,9 @@
         const previousValue = !!tx.invoiceConfirmed;
         tx.invoiceConfirmed = !!confirmed;
 
-        renderTables();
-
         try {
           await saveTransactions();
+          renderTables();
         } catch (error) {
           console.error('toggleInvoiceConfirmed: Error saving transaction:', error);
           showToast('Erro ao salvar confirmação. Verifique a conexão.', 'error');
