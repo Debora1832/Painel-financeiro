@@ -3541,10 +3541,11 @@
             statusHtml = `<button class="btn-toggle-paid inline-flex items-center justify-center px-2.5 py-1 rounded-full border ${statusClasses}" data-id="${t.id}" title="${statusLabel}"><i class="fa-solid ${statusIcon} mr-1 text-[10px]"></i><span class="text-[10px] font-medium">${statusLabel}</span></button>`;
           }
 
+          const safeDescription = escapeHtml(t.description || '-');
           const confirmHtml = buildInvoiceConfirmationCheckbox(t);
           const descriptionHtml = `
             <div class="flex items-center gap-2">
-              <span>${escapeHtml(t.description || '-')}</span>
+              <span>${safeDescription}</span>
               ${confirmHtml}
             </div>
           `;
@@ -3593,10 +3594,11 @@
           const icon = aportado ? 'fa-check' : 'fa-hourglass-half';
           const statusHtml = `<button class="btn-toggle-aportado inline-flex items-center justify-center px-2.5 py-1 rounded-full border ${btnClass}" data-id="${t.id}" title="${aportado ? 'Aportado' : 'Não aportado'}"><i class="fa-solid ${icon} mr-1 text-[10px]"></i><span class="text-[10px] font-medium">${aportado ? 'Aportado' : 'Não aportado'}</span></button>`;
 
+          const safeDescription = escapeHtml(t.description || '-');
           const confirmHtml = buildInvoiceConfirmationCheckbox(t);
           const descriptionHtml = `
             <div class="flex items-center gap-2">
-              <span>${escapeHtml(t.description || '-')}</span>
+              <span>${safeDescription}</span>
               ${confirmHtml}
             </div>
           `;
@@ -3675,12 +3677,13 @@
             statusHtml = `<button class="btn-toggle-paid inline-flex items-center justify-center px-3 py-1.5 rounded-full border ${statusClasses}" data-id="${t.id}" title="${statusLabel}"><i class="fa-solid ${statusIcon} mr-1 text-xs"></i><span class="text-xs font-medium">${statusLabel}</span></button>`;
           }
 
+          const safeDescription = escapeHtml(t.description || '-');
           const confirmHtml = buildInvoiceConfirmationCheckbox(t, 'card');
 
           card.innerHTML = `
             <div class="card-header">
               <div class="flex items-start gap-2 flex-1 min-w-0">
-                <div class="card-title">${escapeHtml(t.description || '-')}</div>
+                <div class="card-title">${safeDescription}</div>
                 ${confirmHtml}
               </div>
               <div class="card-value">${formatCurrency(t.value)}</div>
@@ -3747,12 +3750,13 @@
           const aportIcon  = t.aportado ? 'fa-thumbs-up' : 'fa-thumbs-down';
           const aportClasses = t.aportado ? 'bg-blue-50 text-blue-600 border-blue-200' : 'bg-gray-50 text-gray-500 border-gray-200';
 
+          const safeDescription = escapeHtml(t.description || '-');
           const confirmHtml = buildInvoiceConfirmationCheckbox(t, 'card');
 
           card.innerHTML = `
             <div class="card-header">
               <div class="flex items-start gap-2 flex-1 min-w-0">
-                <div class="card-title">${escapeHtml(t.description || '-')}</div>
+                <div class="card-title">${safeDescription}</div>
                 ${confirmHtml}
               </div>
               <div class="card-value">${formatCurrency(t.value)}</div>
@@ -4860,6 +4864,7 @@
 
       async function toggleInvoiceConfirmed(id, confirmed) {
         const tx = state.transactions.find(t => t.id === id);
+        if (!tx) return;
         if (!canConfirmInvoiceLaunch(tx)) return;
         const previousValue = !!tx.invoiceConfirmed;
         tx.invoiceConfirmed = !!confirmed;
