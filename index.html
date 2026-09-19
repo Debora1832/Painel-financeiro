@@ -6554,6 +6554,15 @@ if (category === 'fixa') {
             
             // Parcelas-count change only applies for 'all' mode on non-fixa series
             if (parcelasChanged && state.editingMode === 'all') {
+              const previousConfirmedByIndex = new Map(
+                state.transactions
+                  .filter((t) => t.groupId === groupId)
+                  .map((t) => [t.parcelaIndex || 1, !!t.invoiceConfirmed])
+              );
+              const rebuiltPaymentMethod = isCard
+                ? 'cartao'
+                : (txClicked.paymentMethod === 'cartao' ? 'debito_pix' : (txClicked.paymentMethod || 'debito_pix'));
+
               // Delete all installments in the group
               state.transactions = state.transactions.filter((t) => t.groupId !== groupId);
               
@@ -6576,11 +6585,13 @@ if (category === 'fixa') {
                     card: card,
                     parcelas: newParcelas,
                     parcelaIndex: i + 1,
-                    paymentMethod: txClicked.paymentMethod,
+                    paymentMethod: rebuiltPaymentMethod,
                     groupId: newGroupId,
                     paid: false,
                     aportado: false,
-                    invoiceConfirmed: false,
+                    invoiceConfirmed: canConfirmInvoiceLaunch({ isCreditCard: isCard, paymentMethod: rebuiltPaymentMethod })
+                      ? !!previousConfirmedByIndex.get(i + 1)
+                      : false,
                     extraLazer: mainCat !== 'investimento' ? !!extraLazer : false,
                     person: editPessoa
                   });
@@ -6607,11 +6618,13 @@ if (category === 'fixa') {
                     card: card,
                     parcelas: newParcelas,
                     parcelaIndex: i + 1,
-                    paymentMethod: txClicked.paymentMethod,
+                    paymentMethod: rebuiltPaymentMethod,
                     groupId: newGroupId,
                     paid: false,
                     aportado: mainCat === 'investimento' ? false : false,
-                    invoiceConfirmed: false,
+                    invoiceConfirmed: canConfirmInvoiceLaunch({ isCreditCard: isCard, paymentMethod: rebuiltPaymentMethod })
+                      ? !!previousConfirmedByIndex.get(i + 1)
+                      : false,
                     extraLazer: mainCat !== 'investimento' ? !!extraLazer : false,
                     person: editPessoa
                   });
