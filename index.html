@@ -333,7 +333,11 @@
     </div>
 
     <div class="mt-auto px-4 py-4 border-t border-gray-800 text-xs text-gray-500 space-y-2">
-      <p class="sidebar-text flex items-center gap-1.5"><span id="syncDot" class="inline-block w-2 h-2 rounded-full bg-gray-500"></span><span id="syncText">Conectando…</span></p>
+      <button id="btnSyncStatus" type="button" title="Testar conexão com o Firebase" class="w-full flex items-center gap-2 px-2 py-1.5 -mx-2 rounded-lg hover:bg-gray-800 hover:text-gray-200 transition text-left">
+        <span id="syncDot" class="inline-block w-2 h-2 rounded-full shrink-0 bg-sky-400 animate-pulse"></span>
+        <span id="syncText" class="sidebar-text flex-1 truncate">Conectando…</span>
+        <i class="fa-solid fa-wifi text-[10px] opacity-60 sidebar-text"></i>
+      </button>
       <button id="btnRestoreSpain" class="hidden w-full text-left text-[11px] text-red-300 hover:text-red-200 sidebar-text">
         <i class="fa-solid fa-rotate-left mr-1"></i> Reativar Projeto Espanha
       </button>
@@ -1375,6 +1379,47 @@
   </div>
 
   <!-- Gerenciar páginas -->
+  <!-- Teste de conexão com o Firebase -->
+  <div id="connModal" class="fixed inset-0 z-[70] hidden app-modal items-center justify-center">
+    <div class="app-modal-card w-full max-w-lg max-h-[90vh] flex flex-col">
+      <div class="app-modal-header flex items-center justify-between gap-4">
+        <div class="flex items-center gap-3">
+          <span id="connHeaderIcon" class="kpi-icon bg-sky-50 text-sky-600"><i class="fa-solid fa-cloud"></i></span>
+          <div><h2 class="text-base font-semibold text-gray-900">Teste de conexão</h2><p id="connSubtitle" class="text-xs text-gray-500 mt-0.5">Verificando o Firebase (painel-financeiro-spa)…</p></div>
+        </div>
+        <button id="btnConnClose" class="modal-close-btn"><i class="fa-solid fa-xmark"></i></button>
+      </div>
+      <div class="p-5 overflow-y-auto space-y-3">
+        <ul id="connSteps" class="space-y-2"></ul>
+        <div id="connPending" class="hidden rounded-xl border border-amber-200 bg-amber-50 px-3 py-2.5 text-xs text-amber-800 flex items-center justify-between gap-3"></div>
+        <div id="connHelp" class="hidden rounded-xl border border-gray-200 bg-gray-50 px-3 py-3 text-xs text-gray-700 space-y-2"></div>
+        <p id="connMeta" class="text-[11px] text-gray-400"></p>
+      </div>
+      <div class="px-5 py-3 border-t border-gray-100 flex justify-end gap-2">
+        <button id="btnConnClose2" class="btn-ghost">Fechar</button>
+        <button id="btnConnRetry" class="btn-primary bg-indigo-600 hover:bg-indigo-700"><i class="fa-solid fa-rotate"></i> Testar novamente</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Reconciliação: dados que ficaram só no aparelho -->
+  <div id="reconcileModal" class="fixed inset-0 z-[70] hidden app-modal items-center justify-center">
+    <div class="app-modal-card w-full max-w-lg max-h-[90vh] flex flex-col">
+      <div class="app-modal-header flex items-center gap-3">
+        <span class="kpi-icon bg-amber-50 text-amber-600"><i class="fa-solid fa-code-compare"></i></span>
+        <div><h2 class="text-base font-semibold text-gray-900">Dados só neste aparelho</h2><p class="text-xs text-gray-500 mt-0.5">Encontramos informações salvas aqui que não estão na nuvem.</p></div>
+      </div>
+      <div class="p-5 overflow-y-auto space-y-3 text-sm text-gray-700">
+        <ul id="reconcileList" class="space-y-1.5 text-xs"></ul>
+        <p class="text-xs text-gray-500">Enquanto o painel estava “Somente neste aparelho”, essas alterações não foram enviadas. Escolha o que fazer — nada da nuvem é apagado ao enviar.</p>
+      </div>
+      <div class="px-5 py-3 border-t border-gray-100 flex flex-wrap justify-end gap-2">
+        <button id="btnReconcileCloud" class="btn-ghost">Manter só o que está na nuvem</button>
+        <button id="btnReconcileSend" class="btn-primary bg-indigo-600 hover:bg-indigo-700"><i class="fa-solid fa-cloud-arrow-up"></i> Enviar do aparelho para a nuvem</button>
+      </div>
+    </div>
+  </div>
+
   <div id="pagesModal" class="fixed inset-0 z-50 hidden app-modal items-center justify-center">
     <div class="app-modal-card w-full max-w-3xl max-h-[90vh] flex flex-col">
       <div class="app-modal-header flex items-center justify-between gap-4">
@@ -1453,15 +1498,16 @@
     const db = getFirestore(app);
     const auth = getAuth(app);
 
-    // Aguarda o login anônimo ANTES de ler o Firestore (antes a leitura podia
-    // acontecer sem usuário autenticado e cair em "permission-denied").
+    // Login anônimo: tentamos, mas NÃO bloqueamos o app se falhar — muitas regras
+    // do Firestore liberam acesso sem login. O status real vem das leituras/gravações.
     let _authError = null;
+    let _authUser = null;
     const authReady = new Promise((resolve) => {
       let done = false;
       const finish = (u) => { if (!done) { done = true; resolve(u); } };
-      onAuthStateChanged(auth, (user) => { if (user) finish(user); });
+      onAuthStateChanged(auth, (user) => { if (user) { _authUser = user; _authError = null; finish(user); } });
       signInAnonymously(auth).catch((e) => { console.warn('Login anônimo falhou:', e); _authError = e; finish(null); });
-      setTimeout(() => finish(null), 8000);
+      setTimeout(() => finish(null), 6000);
     });
 
     (function () {
@@ -1699,11 +1745,14 @@
           ok: ['bg-emerald-400', 'Sincronizado com a nuvem'],
           saving: ['bg-amber-400', 'Salvando…'],
           local: ['bg-amber-500', 'Somente neste aparelho'],
-          error: ['bg-red-500', 'Erro de sincronização']
+          error: ['bg-red-500', 'Firebase recusou o acesso'],
+          checking: ['bg-sky-400', 'Conectando…']
         };
         const [cls, label] = map[mode] || map.ok;
-        dot.className = `inline-block w-2 h-2 rounded-full ${cls}`;
-        txt.textContent = label;
+        syncInfo.mode = mode;
+        dot.className = `inline-block w-2 h-2 rounded-full shrink-0 ${cls}${mode === 'saving' || mode === 'checking' ? ' animate-pulse' : ''}`;
+        const n = pendingCount();
+        txt.textContent = n && mode !== 'saving' && mode !== 'checking' ? `${label} · ${n} pendente${n > 1 ? 's' : ''}` : label;
       }
 
       function showToast(message, type = 'success', title = '') {
@@ -1726,13 +1775,163 @@
       // =========================================================
       // PERSISTÊNCIA (Firestore + backup local)
       // =========================================================
+      // Lê SEMPRE do servidor. Antes, se o servidor falhasse, caía no cache vazio do SDK
+      // e o app achava que a nuvem estava vazia (podendo sobrescrever o backup local).
       async function fetchCollectionPreferServer(colRef) {
-        try { return await getDocsFromServer(colRef); }
-        catch (e) { console.warn('getDocsFromServer falhou, usando cache:', e); return await getDocs(colRef); }
+        try {
+          const snap = await withTimeout(getDocsFromServer(colRef));
+          noteRemoteOk(false);
+          return snap;
+        } catch (e) { noteRemoteFail(e, false); throw e; }
       }
       function isPermissionError(e) { return e && (e.code === 'permission-denied' || /permission/i.test(e.message || '')); }
       function localSet(key, value) { try { localStorage.setItem(key, JSON.stringify(value)); return true; } catch (_) { return false; } }
       function localGet(key) { try { const raw = localStorage.getItem(key); return raw ? JSON.parse(raw) : null; } catch (_) { return null; } }
+
+      // ---------- Fila de sincronização ----------
+      // Tudo é salvo primeiro no aparelho. O que não chegou à nuvem fica anotado em
+      // PENDING_KEY e é reenviado automaticamente (ao abrir, ao voltar a internet ou no teste de conexão).
+      const PENDING_KEY = 'financeDashboard_pendingSync';
+      const REMOTE_TIMEOUT = 15000;
+      const syncInfo = { mode: 'checking', lastOk: null, lastError: null, lastErrorAt: null, everOk: false };
+      let _syncFailToastAt = 0;
+      function withTimeout(promise, ms = REMOTE_TIMEOUT) {
+        let t;
+        return Promise.race([
+          promise.finally(() => clearTimeout(t)),
+          new Promise((_, rej) => { t = setTimeout(() => rej(Object.assign(new Error('Tempo esgotado ao falar com o Firebase'), { code: 'timeout' })), ms); })
+        ]);
+      }
+      function getPending() { const p = localGet(PENDING_KEY); return p && typeof p === 'object' && !Array.isArray(p) ? p : {}; }
+      function pendingCount() { return Object.values(getPending()).reduce((n, m) => n + Object.keys(m || {}).length, 0); }
+      function markPending(kind, ids, op) { const p = getPending(); p[kind] ||= {}; ids.forEach(id => { p[kind][id] = op; }); localSet(PENDING_KEY, p); }
+      function clearPending(kind, ids, op) {
+        const p = getPending(); if (!p[kind]) return;
+        ids.forEach(id => { if (p[kind][id] === op) delete p[kind][id]; });
+        if (!Object.keys(p[kind]).length) delete p[kind];
+        localSet(PENDING_KEY, p);
+      }
+      function noteRemoteOk(updateStatus = true) {
+        syncInfo.lastOk = new Date(); syncInfo.lastError = null; syncInfo.everOk = true;
+        if (updateStatus) setSync(pendingCount() ? 'local' : 'ok');
+      }
+      function noteRemoteFail(e, toast = true) {
+        console.error('Firebase:', e);
+        syncInfo.lastError = e; syncInfo.lastErrorAt = new Date();
+        setSync(isPermissionError(e) ? 'error' : 'local');
+        if (toast && Date.now() - _syncFailToastAt > 20000) {
+          _syncFailToastAt = Date.now();
+          showToast(isPermissionError(e)
+            ? 'O Firebase recusou a gravação. Clique no status da nuvem (menu lateral) para testar a conexão.'
+            : 'Sem conexão com a nuvem. Salvo neste aparelho — será enviado automaticamente depois.',
+            isPermissionError(e) ? 'error' : 'warning');
+        }
+      }
+      const SETTINGS_DOCS = ['subcategories', 'customTypes', 'people', 'wishCategories', 'pages'];
+      // Monta a gravação de UM documento a partir do estado atual do app.
+      function writeOne(kind, id, op) {
+        const map = { tx: 'transactions', invoices: 'invoicesPaid', cards: 'cards', wishes: 'wishes', pages: 'customPages', spain: 'spainPlan', settings: 'settings' };
+        const col = map[kind];
+        if (!col) return Promise.resolve();
+        const ref = doc(db, col, id);
+        if (op === 'del') return deleteDoc(ref);
+        let data = null;
+        if (kind === 'tx') { const t = state.transactions.find(x => x.id === id); data = t ? serializeTx(t) : null; }
+        else if (kind === 'invoices') data = { paid: !!state.invoicesPaid[id] };
+        else if (kind === 'cards') { const c = state.cards.find(x => x.id === id); data = c ? { label: c.label, limit: c.limit, color: c.color } : null; }
+        else if (kind === 'wishes') { const w = state.wishes.find(x => x.id === id); data = w ? { name: w.name, category: w.category, targetValue: w.targetValue, savedValue: w.savedValue, year: w.year, bought: !!w.bought, person: w.person || null } : null; }
+        else if (kind === 'pages') data = state.customPageData[id] ? normalizePageData(state.customPageData[id]) : null;
+        else if (kind === 'spain') data = state.spainPlan;
+        else if (kind === 'settings') {
+          if (id === 'subcategories') data = state.customSubCategories;
+          if (id === 'customTypes') data = { types: state.customTypes };
+          if (id === 'people') data = { people: normalizePeople(state.people) };
+          if (id === 'wishCategories') data = { categories: normalizeWishCategories(state.wishCategories) };
+          if (id === 'pages') data = state.pagesConfig;
+        }
+        return data ? setDoc(ref, JSON.parse(JSON.stringify(data))) : Promise.resolve();
+      }
+      // Envia para a nuvem sem nunca lançar erro: devolve true/false e deixa pendente se falhar.
+      async function remote(kind, ids, op = 'set') {
+        ids = [...new Set((ids || []).filter(Boolean))];
+        if (!ids.length) return true;
+        markPending(kind, ids, op);
+        setSync('saving');
+        try {
+          await withTimeout(Promise.all(ids.map(id => writeOne(kind, id, op))));
+          clearPending(kind, ids, op);
+          noteRemoteOk();
+          return true;
+        } catch (e) { noteRemoteFail(e); return false; }
+      }
+      // Reaplica sobre os dados da nuvem o que ainda não foi enviado deste aparelho.
+      function mergePendingList(kind, serverList, localList, normalize = (id, x) => ({ ...x, id })) {
+        const pend = getPending()[kind];
+        if (!pend || !Object.keys(pend).length) return serverList;
+        const out = [...serverList];
+        const lm = new Map((localList || []).map(x => [x.id, x]));
+        Object.entries(pend).forEach(([id, op]) => {
+          const i = out.findIndex(x => x.id === id);
+          if (op === 'del') { if (i >= 0) out.splice(i, 1); return; }
+          if (!lm.has(id)) return;
+          const v = normalize(id, lm.get(id));
+          if (i >= 0) out[i] = v; else out.push(v);
+        });
+        return out;
+      }
+      function mergePendingMap(kind, serverMap, localMap) {
+        const pend = getPending()[kind];
+        if (!pend) return serverMap;
+        const out = { ...serverMap };
+        Object.entries(pend).forEach(([id, op]) => {
+          if (op === 'del') delete out[id];
+          else if (localMap && id in localMap) out[id] = localMap[id];
+        });
+        return out;
+      }
+      // Carrega o último estado salvo no aparelho (abre o painel na hora, mesmo sem internet).
+      function loadLocalSnapshot() {
+        const tx = localGet(STORAGE_KEY);
+        if (Array.isArray(tx)) state.transactions = tx.map(t => normalizeTx(t.id, t));
+        const inv = localGet(INVOICE_KEY); if (inv && typeof inv === 'object') state.invoicesPaid = inv;
+        const cards = localGet(CARDS_KEY); state.cards = Array.isArray(cards) && cards.length ? cards : DEFAULT_CARDS.map(c => ({ ...c }));
+        const wishes = localGet(WISHES_KEY); if (Array.isArray(wishes)) state.wishes = wishes.map(w => ({ ...w, person: w.person || null }));
+        const st = localGet(SETTINGS_KEY);
+        if (st) {
+          if (st.customSubCategories) state.customSubCategories = st.customSubCategories;
+          if (st.customTypes) state.customTypes = st.customTypes;
+          if (st.people) state.people = st.people;
+          if (st.wishCategories) state.wishCategories = st.wishCategories;
+          if (st.pagesConfig) state.pagesConfig = normalizePagesConfig(st.pagesConfig);
+        }
+        state.people = normalizePeople(state.people);
+        state.wishCategories = normalizeWishCategories(state.wishCategories);
+        state.customPageData = localGet('financeDashboard_customPages') || {};
+        state.spainPlan = normalizeSpainPlan(localGet(SPAIN_KEY));
+      }
+
+      let _flushing = null;
+      async function flushPending() {
+        if (_flushing) return _flushing;
+        _flushing = (async () => {
+          const p = getPending();
+          let ok = 0, fail = 0;
+          for (const [kind, m] of Object.entries(p)) {
+            const byOp = { set: [], del: [] };
+            Object.entries(m || {}).forEach(([id, op]) => (byOp[op] || byOp.set).push(id));
+            for (const op of ['set', 'del']) {
+              if (!byOp[op].length) continue;
+              try {
+                await withTimeout(Promise.all(byOp[op].map(id => writeOne(kind, id, op))));
+                clearPending(kind, byOp[op], op); ok += byOp[op].length;
+              } catch (e) { fail += byOp[op].length; syncInfo.lastError = e; syncInfo.lastErrorAt = new Date(); }
+            }
+          }
+          if (ok && !fail) noteRemoteOk(); else if (fail) setSync(isPermissionError(syncInfo.lastError) ? 'error' : 'local');
+          return { ok, fail };
+        })();
+        try { return await _flushing; } finally { _flushing = null; }
+      }
 
       function normalizeTx(id, data) {
         return {
@@ -1763,41 +1962,25 @@
           const snap = await fetchCollectionPreferServer(collection(db, 'transactions'));
           const result = [];
           snap.forEach(d => result.push(normalizeTx(d.id, d.data())));
-          state.transactions = result;
+          state.transactions = mergePendingList('tx', result, localGet(STORAGE_KEY), normalizeTx);
           localSet(STORAGE_KEY, state.transactions);
           return true;
         } catch (e) {
           console.error('Erro ao carregar transações', e);
           const local = localGet(STORAGE_KEY);
-          if (Array.isArray(local)) {
-            state.transactions = local.map(t => normalizeTx(t.id, t));
-            showToast(isPermissionError(e) ? 'Sem permissão no Firestore. Exibindo cópia local.' : 'Sem conexão. Exibindo dados salvos localmente.', 'warning');
-          }
+          if (Array.isArray(local)) state.transactions = local.map(t => normalizeTx(t.id, t));
           return false;
         }
       }
 
       // Salva SOMENTE os lançamentos informados (antes regravava a base inteira a cada clique).
-      async function saveTransactions(list = state.transactions) {
+      function saveTransactions(list = state.transactions) {
         localSet(STORAGE_KEY, state.transactions);
-        if (!list.length) return;
-        setSync('saving');
-        try {
-          await Promise.all(list.map(t => setDoc(doc(db, 'transactions', t.id), serializeTx(t))));
-          setSync('ok');
-        } catch (e) {
-          console.error('Erro ao salvar transações', e);
-          setSync(isPermissionError(e) ? 'error' : 'local');
-          showToast(isPermissionError(e) ? 'Sem permissão no Firebase. Verifique as regras do Firestore.' : 'Falha ao sincronizar. Os dados ficaram salvos neste aparelho.', isPermissionError(e) ? 'error' : 'warning');
-          throw e;
-        }
+        return remote('tx', list.map(t => t.id), 'set');
       }
-      async function deleteTransactionDocs(ids) {
+      function deleteTransactionDocs(ids) {
         localSet(STORAGE_KEY, state.transactions);
-        if (!ids.length) return;
-        setSync('saving');
-        try { await Promise.all(ids.map(id => deleteDoc(doc(db, 'transactions', id)))); setSync('ok'); }
-        catch (e) { setSync('error'); throw e; }
+        return remote('tx', [...ids], 'del');
       }
 
       async function loadInvoices() {
@@ -1805,16 +1988,16 @@
           const snap = await fetchCollectionPreferServer(collection(db, 'invoicesPaid'));
           const result = {};
           snap.forEach(d => { result[d.id] = !!d.data().paid; });
-          state.invoicesPaid = result;
+          state.invoicesPaid = mergePendingMap('invoices', result, localGet(INVOICE_KEY));
           localSet(INVOICE_KEY, result);
         } catch (e) {
           console.error('Erro ao carregar faturas', e);
           state.invoicesPaid = localGet(INVOICE_KEY) || {};
         }
       }
-      async function saveInvoice(key) {
+      function saveInvoice(key) {
         localSet(INVOICE_KEY, state.invoicesPaid);
-        await setDoc(doc(db, 'invoicesPaid', key), { paid: !!state.invoicesPaid[key] });
+        return remote('invoices', [key], 'set');
       }
 
       async function loadCards() {
@@ -1822,7 +2005,8 @@
           const snap = await fetchCollectionPreferServer(collection(db, 'cards'));
           const result = [];
           snap.forEach(d => { const c = d.data(); result.push({ id: d.id, label: c.label || d.id, limit: Number(c.limit) || 0, color: c.color || 'sky' }); });
-          if (result.length) state.cards = result;
+          const merged = mergePendingList('cards', result, localGet(CARDS_KEY));
+          if (merged.length) state.cards = merged;
           else { state.cards = DEFAULT_CARDS.map(c => ({ ...c })); await saveCards(); }
           localSet(CARDS_KEY, state.cards);
         } catch (e) {
@@ -1830,10 +2014,11 @@
           state.cards = localGet(CARDS_KEY) || DEFAULT_CARDS.map(c => ({ ...c }));
         }
       }
-      async function saveCards(list = state.cards) {
+      function saveCards(list = state.cards) {
         localSet(CARDS_KEY, state.cards);
-        await Promise.all(list.map(c => setDoc(doc(db, 'cards', c.id), { label: c.label, limit: c.limit, color: c.color })));
+        return remote('cards', list.map(c => c.id), 'set');
       }
+      function deleteCardDoc(id) { localSet(CARDS_KEY, state.cards); return remote('cards', [id], 'del'); }
 
       async function loadWishes() {
         const currentYear = new Date().getFullYear();
@@ -1845,7 +2030,7 @@
             result.push({ id: d.id, name: w.name || '', category: w.category || FALLBACK_WISH_CATEGORY_KEY, targetValue: Number(w.targetValue) || 0,
               savedValue: Number(w.savedValue) || 0, year: Number(w.year) || currentYear, bought: !!w.bought, person: w.person || null });
           });
-          state.wishes = result;
+          state.wishes = mergePendingList('wishes', result, localGet(WISHES_KEY), (id, w) => ({ ...w, id, person: w.person || null }));
           // Desejos não comprados de anos anteriores passam para o ano atual
           const migrated = state.wishes.filter(w => !w.bought && w.year < currentYear);
           migrated.forEach(w => { w.year = currentYear; });
@@ -1856,17 +2041,18 @@
           state.wishes = (localGet(WISHES_KEY) || []).map(w => ({ ...w, person: w.person || null }));
         }
       }
-      async function saveWishes(list = state.wishes) {
+      function saveWishes(list = state.wishes) {
         localSet(WISHES_KEY, state.wishes);
-        await Promise.all(list.map(w => setDoc(doc(db, 'wishes', w.id), {
-          name: w.name, category: w.category, targetValue: w.targetValue, savedValue: w.savedValue, year: w.year, bought: w.bought, person: w.person || null
-        })));
+        return remote('wishes', list.map(w => w.id), 'set');
       }
+      function deleteWishDocs(ids) { localSet(WISHES_KEY, state.wishes); return remote('wishes', ids, 'del'); }
 
       async function loadSettings() {
         try {
           const snap = await fetchCollectionPreferServer(collection(db, 'settings'));
+          const pendSet = getPending().settings || {};
           snap.forEach(d => {
+            if (pendSet[d.id]) return; // alteração local ainda não enviada vence
             const s = d.data();
             if (d.id === 'subcategories') state.customSubCategories = {
               receita: Array.isArray(s.receita) ? s.receita : [], fixa: Array.isArray(s.fixa) ? s.fixa : [],
@@ -1892,15 +2078,10 @@
         state.wishCategories = normalizeWishCategories(state.wishCategories);
         localSet(SETTINGS_KEY, { customSubCategories: state.customSubCategories, customTypes: state.customTypes, people: state.people, wishCategories: state.wishCategories, pagesConfig: state.pagesConfig });
       }
-      async function saveSettings() {
-        const payload = { customSubCategories: state.customSubCategories, customTypes: state.customTypes, people: normalizePeople(state.people), wishCategories: normalizeWishCategories(state.wishCategories) };
+      function saveSettings() {
+        const payload = { customSubCategories: state.customSubCategories, customTypes: state.customTypes, people: normalizePeople(state.people), wishCategories: normalizeWishCategories(state.wishCategories), pagesConfig: state.pagesConfig };
         localSet(SETTINGS_KEY, payload);
-        await Promise.all([
-          setDoc(doc(db, 'settings', 'subcategories'), state.customSubCategories),
-          setDoc(doc(db, 'settings', 'customTypes'), { types: state.customTypes }),
-          setDoc(doc(db, 'settings', 'people'), { people: payload.people }),
-          setDoc(doc(db, 'settings', 'wishCategories'), { categories: payload.wishCategories })
-        ]);
+        return remote('settings', ['subcategories', 'customTypes', 'people', 'wishCategories'], 'set');
       }
 
       // ---------- PÁGINAS PERSONALIZADAS ----------
@@ -1913,10 +2094,10 @@
           }))
         };
       }
-      async function savePagesConfig() {
+      function savePagesConfig() {
         const s = localGet(SETTINGS_KEY) || {};
         localSet(SETTINGS_KEY, { ...s, pagesConfig: state.pagesConfig });
-        await setDoc(doc(db, 'settings', 'pages'), state.pagesConfig);
+        return remote('settings', ['pages'], 'set');
       }
       function normalizePageData(raw) {
         const d = raw && typeof raw === 'object' ? raw : {};
@@ -1933,7 +2114,7 @@
           const snap = await fetchCollectionPreferServer(collection(db, 'customPages'));
           const result = {};
           snap.forEach(d => { result[d.id] = normalizePageData(d.data()); });
-          state.customPageData = result;
+          state.customPageData = mergePendingMap('pages', result, localGet('financeDashboard_customPages'));
           localSet('financeDashboard_customPages', result);
         } catch (e) {
           console.error('Erro ao carregar páginas', e);
@@ -1941,11 +2122,12 @@
         }
       }
       function getPageData(id) { return (state.customPageData[id] ||= normalizePageData(null)); }
-      async function savePageData(id) {
+      function savePageData(id) {
+        getPageData(id);
         localSet('financeDashboard_customPages', state.customPageData);
-        try { setSync('saving'); await setDoc(doc(db, 'customPages', id), getPageData(id)); setSync('ok'); }
-        catch (e) { setSync('local'); showToast('Salvo neste aparelho; falha ao sincronizar.', 'warning'); }
+        return remote('pages', [id], 'set');
       }
+      function deletePageDoc(id) { localSet('financeDashboard_customPages', state.customPageData); return remote('pages', [id], 'del'); }
 
       // ---------- PROJETO ESPANHA ----------
       const SPAIN_PHASES = ['Antes da mudança', 'Viagem', 'Chegada', 'Primeiros meses'];
@@ -2005,7 +2187,8 @@
           const snap = await fetchCollectionPreferServer(collection(db, 'spainPlan'));
           let loaded = null;
           snap.forEach(d => { if (d.id === 'main') loaded = d.data(); });
-          state.spainPlan = normalizeSpainPlan(loaded || localGet(SPAIN_KEY));
+          const pendSpain = getPending().spain;
+          state.spainPlan = normalizeSpainPlan(pendSpain && pendSpain.main ? localGet(SPAIN_KEY) : (loaded || localGet(SPAIN_KEY)));
         } catch (e) {
           console.error('Erro ao carregar Projeto Espanha', e);
           state.spainPlan = normalizeSpainPlan(localGet(SPAIN_KEY));
@@ -2015,19 +2198,11 @@
       async function saveSpainPlan(showSuccess = false) {
         state.spainPlan = normalizeSpainPlan(state.spainPlan);
         localSet(SPAIN_KEY, state.spainPlan);
-        try {
-          setSync('saving');
-          await setDoc(doc(db, 'spainPlan', 'main'), state.spainPlan);
-          setSync('ok');
-          if (showSuccess) showToast('Projeto Espanha salvo!', 'success');
-        } catch (e) {
-          console.error('Erro ao salvar Projeto Espanha', e);
-          setSync('local');
-          if (showSuccess) showToast('Salvo neste aparelho. Não foi possível sincronizar com a nuvem.', 'warning');
-        }
+        const ok = await remote('spain', ['main'], 'set');
+        if (showSuccess) showToast(ok ? 'Projeto Espanha salvo!' : 'Salvo neste aparelho. Será enviado à nuvem quando a conexão voltar.', ok ? 'success' : 'warning');
+        return ok;
       }
       async function clearSpainPlanData() {
-        try { await deleteDoc(doc(db, 'spainPlan', 'main')); } catch (e) { console.warn(e); }
         try { localStorage.removeItem(SPAIN_KEY); } catch (_) {}
         state.spainPlan = { ...defaultSpainPlan(), active: false };
         await saveSpainPlan();
@@ -3870,10 +4045,8 @@
       // =========================================================
       // CRUD DE LANÇAMENTOS
       // =========================================================
-      async function persistChange(changed, rollback) {
-        try { await saveTransactions(changed); return true; }
-        catch (_) { if (rollback) { rollback(); renderDashboard(); } return false; }
-      }
+      // A alteração NUNCA é desfeita: fica salva no aparelho e, se a nuvem falhar, entra na fila de envio.
+      async function persistChange(changed) { return saveTransactions(changed); }
 
       async function togglePaid(id) {
         const tx = state.transactions.find(t => t.id === id); if (!tx) return;
@@ -3897,8 +4070,7 @@
         const key = keyInvoice(getYearForSelectedMonth(), state.selectedMonth, card);
         const prev = !!state.invoicesPaid[key];
         state.invoicesPaid[key] = !prev; renderDashboard();
-        try { await saveInvoice(key); showToast(prev ? 'Fatura marcada como em aberto' : 'Fatura marcada como paga'); }
-        catch (e) { state.invoicesPaid[key] = prev; renderDashboard(); showToast('Erro ao salvar fatura. Verifique a conexão.', 'error'); }
+        if (await saveInvoice(key)) showToast(prev ? 'Fatura marcada como em aberto' : 'Fatura marcada como paga');
       }
 
       function buildSeries({ description, value, date, category, subCategory, isCreditCard, card, paymentMethod, extraLazer, person, goal, count, split, previous, paid }) {
@@ -3931,7 +4103,7 @@
         state.transactions.push(...created);
         refreshYearFilterOptions();
         renderDashboard();
-        await saveTransactions(created).catch(() => {});
+        await saveTransactions(created);
         return created;
       }
 
@@ -4008,7 +4180,6 @@
         const goal = main === 'investimento' && document.getElementById('editSpainGoal').checked ? 'spain' : null;
         const newDate = parseInputDate(dateStr);
         const payment = isCard ? 'cartao' : (tx.paymentMethod === 'cartao' || !tx.paymentMethod ? 'debito_pix' : tx.paymentMethod);
-        const snapshot = state.transactions.map(t => ({ ...t }));
         let toSave = [], toDelete = [];
 
         const apply = (t, withValue) => {
@@ -4055,11 +4226,9 @@
         closeEditModal();
         refreshYearFilterOptions();
         renderDashboard();
-        try {
-          await saveTransactions(toSave);
-          await deleteTransactionDocs(toDelete);
-          showToast(toSave.length > 1 ? `${toSave.length} lançamentos atualizados` : 'Lançamento atualizado');
-        } catch (_) { state.transactions = snapshot; renderDashboard(); }
+        const ok1 = await saveTransactions(toSave);
+        const ok2 = await deleteTransactionDocs(toDelete);
+        if (ok1 && ok2) showToast(toSave.length > 1 ? `${toSave.length} lançamentos atualizados` : 'Lançamento atualizado');
       }
 
       // ---------- Modal de exclusão ----------
@@ -4101,12 +4270,10 @@
         const targets = getDeleteTargets();
         if (!targets.length) { closeDeleteModal(); return; }
         const ids = new Set(targets.map(t => t.id));
-        const snapshot = [...state.transactions];
         state.transactions = state.transactions.filter(t => !ids.has(t.id));
         closeDeleteModal();
         renderDashboard();
-        try { await deleteTransactionDocs([...ids]); showToast(ids.size > 1 ? `${ids.size} lançamentos excluídos` : 'Lançamento excluído'); }
-        catch (e) { state.transactions = snapshot; renderDashboard(); showToast('Erro ao excluir. Nada foi removido.', 'error'); }
+        if (await deleteTransactionDocs([...ids])) showToast(ids.size > 1 ? `${ids.size} lançamentos excluídos` : 'Lançamento excluído');
       }
 
       // =========================================================
@@ -4328,7 +4495,7 @@
           if (e.key !== 'Escape') return;
           closePersonBreakdownModal(); closeEditModal(); closeDeleteModal();
           // fecha só o pop-up do topo (configurações pode estar aberto sobre o de lançamento)
-          const top = ['settingsModal', 'cpItemModal', 'pagesModal', 'wishSavedModal', 'wishModal', 'cardsModal', 'entryModal', 'exitModal', 'spainParamsModal', 'spainPlanModal', 'spainCostModal', 'spainMsModal', 'spainDocModal', 'spainSaleModal'].find(id => document.getElementById(id).classList.contains('flex'));
+          const top = ['connModal', 'settingsModal', 'cpItemModal', 'pagesModal', 'wishSavedModal', 'wishModal', 'cardsModal', 'entryModal', 'exitModal', 'spainParamsModal', 'spainPlanModal', 'spainCostModal', 'spainMsModal', 'spainDocModal', 'spainSaleModal'].find(id => document.getElementById(id).classList.contains('flex'));
           if (top) closeModal(top);
         });
 
@@ -4379,7 +4546,7 @@
               : '<p class="text-xs text-gray-400 py-3">Nenhuma página criada ainda. Use o formulário ao lado.</p>');
         };
         const persist = async (msg) => {
-          try { await savePagesConfig(); if (msg) showToast(msg); } catch (_) { showToast('Salvo neste aparelho; falha ao sincronizar.', 'warning'); }
+          if (await savePagesConfig() && msg) showToast(msg);
           renderList(); renderDashboard();
         };
         document.getElementById('btnManagePages').addEventListener('click', () => { resetForm(); renderList(); openModal('pagesModal'); });
@@ -4410,7 +4577,7 @@
             if (!confirm('Excluir a página Desejos e TODOS os desejos cadastrados? Isso não pode ser desfeito.')) return;
             const ids = state.wishes.map(w => w.id);
             state.wishes = []; localSet(WISHES_KEY, []);
-            try { await Promise.all(ids.map(wid => deleteDoc(doc(db, 'wishes', wid)))); } catch (_) {}
+            await deleteWishDocs(ids);
             state.pagesConfig.wishesVisible = false;
             return persist('Página Desejos excluída.');
           }
@@ -4430,8 +4597,7 @@
           if (act === 'delete') {
             if (!confirm(`Excluir a página "${list[idx].title}" e todos os itens dela?`)) return;
             list.splice(idx, 1); delete state.customPageData[id];
-            localSet('financeDashboard_customPages', state.customPageData);
-            try { await deleteDoc(doc(db, 'customPages', id)); } catch (_) {}
+            await deletePageDoc(id);
             return persist('Página excluída.');
           }
         });
@@ -4539,8 +4705,7 @@
           } else {
             if (!confirm(`Excluir o cartão "${card.label}"? Os lançamentos existentes não serão apagados.`)) return;
             state.cards = state.cards.filter(c => c.id !== card.id);
-            try { await deleteDoc(doc(db, 'cards', card.id)); } catch (_) {}
-            localSet(CARDS_KEY, state.cards);
+            await deleteCardDoc(card.id);
             populateCardSelects(); renderList(); renderDashboard(); showToast('Cartão removido.');
           }
         });
@@ -4553,8 +4718,7 @@
           let card;
           if (editId) { card = state.cards.find(c => c.id === editId); Object.assign(card, { label, limit, color }); }
           else { card = { id: `${slugifyLabel(label)}_${Date.now().toString(36)}`, label, limit, color }; state.cards.push(card); }
-          try { await saveCards([card]); showToast(editId ? 'Cartão atualizado!' : 'Cartão adicionado!'); }
-          catch (_) { showToast('Salvo localmente; falha ao sincronizar.', 'warning'); }
+          if (await saveCards([card])) showToast(editId ? 'Cartão atualizado!' : 'Cartão adicionado!');
           populateCardSelects(); renderList(); resetForm(); renderDashboard();
         });
       }
@@ -4595,7 +4759,7 @@
           populateAllPersonSelects(); populateWishCategorySelect(); populateDespCategoria(); populateDespesaSubcategorias(); populateReceitaCategoria(); renderDashboard();
         }
         async function persist(msg) {
-          try { await saveSettings(); showToast(msg); } catch (_) { showToast('Salvo localmente; falha ao sincronizar.', 'warning'); }
+          if (await saveSettings()) showToast(msg);
           refreshAll();
         }
         const rowHtml = (label, attrs, editable = true) => `<div class="flex items-center justify-between px-3 py-2 rounded-lg bg-gray-50 border border-gray-100">
@@ -4714,7 +4878,7 @@
           if (editId) { w = state.wishes.find(x => x.id === editId); Object.assign(w, data); }
           else { w = { id: generateId('wish'), bought: false, ...data }; state.wishes.push(w); }
           closeModal('wishModal'); renderWishesView();
-          try { await saveWishes([w]); showToast(editId ? 'Desejo atualizado!' : 'Desejo adicionado!'); } catch (_) { showToast('Salvo localmente; falha ao sincronizar.', 'warning'); }
+          if (await saveWishes([w])) showToast(editId ? 'Desejo atualizado!' : 'Desejo adicionado!');
         });
         document.getElementById('wishesView').addEventListener('click', async (e) => {
           const cat = e.target.closest('.wish-cat-btn');
@@ -4729,11 +4893,11 @@
             document.getElementById('wishSavedModalDesc').textContent = `Total já guardado para: ${w.name}`;
             return openModal('wishSavedModal');
           }
-          if (act === 'bought') { w.bought = true; renderWishesView(); try { await saveWishes([w]); showToast('Desejo realizado! 🎉'); } catch (_) {} return; }
+          if (act === 'bought') { w.bought = true; renderWishesView(); if (await saveWishes([w])) showToast('Desejo realizado! 🎉'); return; }
           if (act === 'delete') {
             if (!confirm(`Excluir "${w.name}"?`)) return;
             state.wishes = state.wishes.filter(x => x.id !== w.id); renderWishesView();
-            try { await deleteDoc(doc(db, 'wishes', w.id)); localSet(WISHES_KEY, state.wishes); showToast('Desejo excluído.'); } catch (_) { showToast('Erro ao excluir no servidor.', 'error'); }
+            if (await deleteWishDocs([w.id])) showToast('Desejo excluído.');
           }
         });
         document.getElementById('btnCloseWishSavedModal').addEventListener('click', () => closeModal('wishSavedModal'));
@@ -4742,7 +4906,7 @@
           const w = state.wishes.find(x => x.id === document.getElementById('wishSavedId').value);
           closeModal('wishSavedModal'); if (!w) return;
           w.savedValue = parseFloat(document.getElementById('wishSavedAmountInput').value) || 0; renderWishesView();
-          try { await saveWishes([w]); showToast('Valor guardado atualizado!'); } catch (_) {}
+          if (await saveWishes([w])) showToast('Valor guardado atualizado!');
         });
         document.getElementById('wishYearFilter').addEventListener('change', (e) => { state.wishesYear = parseInt(e.target.value, 10); renderWishesView(); });
       }
@@ -4973,23 +5137,244 @@
       }
 
       // =========================================================
-      // INICIALIZAÇÃO
+      // CONEXÃO COM A NUVEM: teste, sincronização e reconciliação
       // =========================================================
-      async function init() {
-        state.collapsedTables = localGet(UI_KEY)?.collapsedTables || {};
-        state.spainPlan = normalizeSpainPlan(localGet(SPAIN_KEY));
-        buildMonthNav();
-        buildTablePanels();
-        document.getElementById('recData').value = todayInput();
-        document.getElementById('despData').value = todayInput();
-        setupEvents();
+      const SYNC_V2_FLAG = 'financeDashboard_syncV2';
+      const FIRESTORE_RULES = `rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+    match /{document=**} {
+      allow read, write: if request.auth != null;
+    }
+  }
+}`;
+      function errCode(e) { return e ? (e.code || e.name || 'erro') : ''; }
+      function errLabel(e) {
+        const c = errCode(e);
+        const map = {
+          'permission-denied': 'Permissão negada pelas regras do Firestore',
+          'unavailable': 'Servidor do Firestore inacessível (internet, firewall ou bloqueador)',
+          'timeout': 'Sem resposta do Firebase em 15 s',
+          'auth/admin-restricted-operation': 'Login anônimo está DESATIVADO no Firebase',
+          'auth/operation-not-allowed': 'Login anônimo está DESATIVADO no Firebase',
+          'auth/network-request-failed': 'Falha de rede ao autenticar',
+          'auth/api-key-not-valid.-please-pass-a-valid-api-key.': 'Chave da API inválida',
+          'auth/unauthorized-domain': 'Este domínio não está autorizado no Firebase'
+        };
+        return map[c] || (e?.message || String(e));
+      }
 
-        await authReady;
-        if (_authError) { setSync('local'); showToast('Falha na autenticação do Firebase. Os dados serão salvos só neste aparelho.', 'warning'); }
+      let _connRunning = false;
+      async function runConnectionTest() {
+        if (_connRunning) return; _connRunning = true;
+        const list = document.getElementById('connSteps');
+        const steps = [
+          { id: 'net', label: 'Internet' },
+          { id: 'auth', label: 'Login anônimo (Firebase Auth)' },
+          { id: 'read', label: 'Leitura de lançamentos (Firestore)' },
+          { id: 'write', label: 'Gravação de teste (Firestore)' },
+          { id: 'extra', label: 'Projeto Espanha e páginas' }
+        ];
+        const res = {};
+        const icon = { run: 'fa-circle-notch fa-spin text-sky-500', ok: 'fa-circle-check text-emerald-500', warn: 'fa-triangle-exclamation text-amber-500', fail: 'fa-circle-xmark text-red-500', wait: 'fa-circle text-gray-200' };
+        const draw = () => {
+          list.innerHTML = steps.map(s => {
+            const r = res[s.id] || { st: 'wait', msg: 'Aguardando…' };
+            return `<li class="flex items-start gap-3 rounded-xl border ${r.st === 'fail' ? 'border-red-100 bg-red-50/50' : r.st === 'warn' ? 'border-amber-100 bg-amber-50/50' : 'border-gray-100 bg-white'} px-3 py-2.5">
+              <i class="fa-solid ${icon[r.st]} mt-0.5 w-4 text-center"></i>
+              <div class="min-w-0 flex-1"><p class="text-sm font-medium text-gray-800">${s.label}</p><p class="text-xs text-gray-500 break-words">${escapeHtml(r.msg)}</p></div></li>`;
+          }).join('');
+        };
+        const set = (id, st, msg) => { res[id] = { st, msg }; draw(); };
+        document.getElementById('connHelp').classList.add('hidden');
+        document.getElementById('connSubtitle').textContent = 'Verificando o Firebase (painel-financeiro-spa)…';
+        document.getElementById('btnConnRetry').disabled = true;
+        setSync('checking');
+        draw();
+        const t0 = performance.now();
 
+        // 1) Internet
+        set('net', navigator.onLine ? 'ok' : 'fail', navigator.onLine ? 'Aparelho online' : 'Aparelho sem internet');
+
+        // 2) Login anônimo (tenta de novo se tiver falhado)
+        set('auth', 'run', 'Autenticando…');
+        let authErr = null;
+        if (!auth.currentUser) {
+          try { await withTimeout(signInAnonymously(auth), 10000); } catch (e) { authErr = e; _authError = e; }
+        }
+        if (auth.currentUser) set('auth', 'ok', `Conectado (usuário ${auth.currentUser.uid.slice(0, 8)}…)`);
+        else set('auth', 'warn', `${errLabel(authErr || _authError)} [${errCode(authErr || _authError)}] — o app tenta continuar sem login`);
+
+        // 3) Leitura
+        set('read', 'run', 'Lendo a coleção “transactions”…');
+        let readErr = null;
+        try {
+          const ts = performance.now();
+          const snap = await withTimeout(getDocsFromServer(collection(db, 'transactions')));
+          set('read', 'ok', `${snap.size} lançamento(s) na nuvem · ${Math.round(performance.now() - ts)} ms`);
+        } catch (e) { readErr = e; set('read', 'fail', `${errLabel(e)} [${errCode(e)}]`); }
+
+        // 4) Gravação
+        set('write', 'run', 'Gravando settings/_connectionTest…');
+        let writeErr = null;
+        try {
+          await withTimeout(setDoc(doc(db, 'settings', '_connectionTest'), { at: new Date().toISOString(), device: navigator.userAgent.slice(0, 120) }));
+          set('write', 'ok', 'Gravação confirmada pelo servidor');
+        } catch (e) { writeErr = e; set('write', 'fail', `${errLabel(e)} [${errCode(e)}]`); }
+
+        // 5) Coleções novas
+        set('extra', 'run', 'Lendo “spainPlan” e “customPages”…');
+        try {
+          await withTimeout(Promise.all([getDocsFromServer(collection(db, 'spainPlan')), getDocsFromServer(collection(db, 'customPages'))]));
+          set('extra', 'ok', 'Acesso liberado');
+        } catch (e) { set('extra', readErr ? 'fail' : 'warn', `${errLabel(e)} [${errCode(e)}]`); }
+
+        const cloudOk = !readErr && !writeErr;
+        if (cloudOk) {
+          syncInfo.everOk = true; syncInfo.lastOk = new Date(); syncInfo.lastError = null;
+          if (!syncInfo.loadedFromCloud) await syncFromCloud();
+          else await flushPending();
+          setSync(pendingCount() ? 'local' : 'ok');
+        } else {
+          syncInfo.lastError = readErr || writeErr; syncInfo.lastErrorAt = new Date();
+          setSync(isPermissionError(readErr || writeErr) ? 'error' : 'local');
+        }
+
+        // Cabeçalho + ajuda
+        const hdr = document.getElementById('connHeaderIcon');
+        hdr.className = `kpi-icon ${cloudOk ? 'bg-emerald-50 text-emerald-600' : 'bg-red-50 text-red-600'}`;
+        hdr.innerHTML = `<i class="fa-solid ${cloudOk ? 'fa-cloud' : 'fa-cloud-bolt'}"></i>`;
+        document.getElementById('connSubtitle').textContent = cloudOk ? 'Tudo certo: seus dados estão sendo salvos na nuvem.' : 'A nuvem não está respondendo. Os dados continuam salvos neste aparelho.';
+        const help = document.getElementById('connHelp');
+        const tips = [];
+        const anyErr = readErr || writeErr;
+        const authOff = ['auth/admin-restricted-operation', 'auth/operation-not-allowed'].includes(errCode(_authError));
+        if (anyErr && isPermissionError(anyErr)) {
+          if (!auth.currentUser) tips.push(`<p><b>1.</b> No <a class="text-indigo-600 underline" href="https://console.firebase.google.com/project/painel-financeiro-spa/authentication/providers" target="_blank" rel="noopener">Firebase Console → Authentication → Sign-in method</a>, ative o provedor <b>Anônimo</b>${authOff ? ' (ele está desativado agora)' : ''}.</p>`);
+          tips.push(`<p><b>${auth.currentUser ? '1' : '2'}.</b> Em <a class="text-indigo-600 underline" href="https://console.firebase.google.com/project/painel-financeiro-spa/firestore/rules" target="_blank" rel="noopener">Firestore → Regras</a>, use regras que liberem todas as coleções (inclusive <code>spainPlan</code> e <code>customPages</code>) e clique em <b>Publicar</b>:</p>
+            <pre class="bg-white border border-gray-200 rounded-lg p-2 text-[11px] overflow-x-auto">${escapeHtml(FIRESTORE_RULES)}</pre>
+            <button id="btnCopyRules" class="btn-ghost !py-1"><i class="fa-regular fa-copy"></i> Copiar regras</button>`);
+        } else if (anyErr) {
+          tips.push('<p>Verifique a internet. Se estiver numa rede de empresa, VPN ou com bloqueador de anúncios, libere <code>firestore.googleapis.com</code> e <code>identitytoolkit.googleapis.com</code>.</p>');
+        } else if (!auth.currentUser && authOff) {
+          tips.push('<p>A nuvem funciona, mas o login anônimo está desativado. Funciona hoje porque suas regras estão abertas — ative o provedor <b>Anônimo</b> no Firebase para poder fechar as regras com segurança.</p>');
+        }
+        help.innerHTML = tips.join('');
+        help.classList.toggle('hidden', !tips.length);
+        document.getElementById('btnCopyRules')?.addEventListener('click', () => { navigator.clipboard?.writeText(FIRESTORE_RULES).then(() => showToast('Regras copiadas!')); });
+
+        renderConnPending();
+        document.getElementById('connMeta').textContent = `Projeto: painel-financeiro-spa · teste em ${Math.round(performance.now() - t0)} ms · ${new Date().toLocaleString('pt-BR')}`;
+        document.getElementById('btnConnRetry').disabled = false;
+        _connRunning = false;
+        return cloudOk;
+      }
+      function renderConnPending() {
+        const box = document.getElementById('connPending');
+        const n = pendingCount();
+        box.classList.toggle('hidden', !n);
+        box.classList.toggle('flex', !!n);
+        if (!n) return;
+        box.innerHTML = `<span><i class="fa-solid fa-clock-rotate-left mr-1"></i><b>${n}</b> alteração(ões) aguardando envio para a nuvem.</span>
+          <button id="btnConnFlush" class="btn-primary bg-amber-500 hover:bg-amber-600 !py-1 !px-3">Enviar agora</button>`;
+        document.getElementById('btnConnFlush').addEventListener('click', async () => {
+          const r = await flushPending();
+          renderConnPending();
+          showToast(r.fail ? `${r.fail} alteração(ões) ainda não foram enviadas.` : `${r.ok} alteração(ões) enviadas para a nuvem!`, r.fail ? 'warning' : 'success');
+        });
+      }
+      function openConnectionTest() { openModal('connModal'); return runConnectionTest(); }
+
+      // Compara o backup do aparelho com a nuvem (uma única vez por aparelho, após esta atualização).
+      function findLocalOnly(snap) {
+        const out = { tx: [], wishes: [], invoices: [], pages: [], spain: false };
+        const pend = getPending();
+        const srvTx = new Map(state.transactions.map(t => [t.id, JSON.stringify(serializeTx(t))]));
+        (snap.tx || []).forEach(t => {
+          if (!t?.id || pend.tx?.[t.id]) return;
+          const local = normalizeTx(t.id, t);
+          const srv = srvTx.get(t.id);
+          if (srv === undefined) out.tx.push({ t: local, kind: 'novo' });
+          else if (srv !== JSON.stringify(serializeTx(local))) out.tx.push({ t: local, kind: 'alterado' });
+        });
+        const srvW = new Map(state.wishes.map(w => [w.id, w]));
+        (snap.wishes || []).forEach(w => {
+          if (!w?.id || pend.wishes?.[w.id]) return;
+          const s = srvW.get(w.id);
+          if (!s || ['name', 'targetValue', 'savedValue', 'bought', 'year'].some(k => String(s[k]) !== String(w[k]))) out.wishes.push(w);
+        });
+        Object.entries(snap.invoices || {}).forEach(([k, v]) => { if (!!state.invoicesPaid[k] !== !!v && !pend.invoices?.[k]) out.invoices.push([k, !!v]); });
+        Object.entries(snap.pages || {}).forEach(([id, d]) => {
+          if (pend.pages?.[id]) return;
+          if (JSON.stringify(normalizePageData(d)) !== JSON.stringify(normalizePageData(state.customPageData[id]))) out.pages.push([id, d]);
+        });
+        if (snap.spain && !pend.spain?.main && JSON.stringify(normalizeSpainPlan(snap.spain)) !== JSON.stringify(normalizeSpainPlan(state.spainPlan))) out.spain = true;
+        out.total = out.tx.length + out.wishes.length + out.invoices.length + out.pages.length + (out.spain ? 1 : 0);
+        return out;
+      }
+      function askReconcile(diff, snap) {
+        const li = (icon, txt) => `<li class="flex items-center gap-2 rounded-lg bg-gray-50 border border-gray-100 px-3 py-2"><i class="fa-solid ${icon} text-gray-400 w-4 text-center"></i>${txt}</li>`;
+        const items = [];
+        const nNew = diff.tx.filter(x => x.kind === 'novo').length, nChg = diff.tx.length - nNew;
+        if (diff.tx.length) items.push(li('fa-receipt', `<b>${diff.tx.length}</b> lançamento(s) — ${nNew} novo(s), ${nChg} alterado(s) (pago, conferido, valor…)`));
+        if (diff.invoices.length) items.push(li('fa-credit-card', `<b>${diff.invoices.length}</b> status de fatura`));
+        if (diff.wishes.length) items.push(li('fa-gift', `<b>${diff.wishes.length}</b> desejo(s)`));
+        if (diff.pages.length) items.push(li('fa-table-columns', `<b>${diff.pages.length}</b> página(s) personalizada(s)`));
+        if (diff.spain) items.push(li('fa-plane', 'Projeto Espanha (custos, vendas, documentos ou parâmetros)'));
+        const ex = diff.tx.slice(0, 4).map(x => `${escapeHtml(x.t.description)} · ${formatCurrency(x.t.value)}`).join(' · ');
+        if (ex) items.push(`<li class="text-[11px] text-gray-400 px-1">Ex.: ${ex}${diff.tx.length > 4 ? '…' : ''}</li>`);
+        items.push('<li class="text-[11px] text-amber-700 px-1 pt-1"><i class="fa-solid fa-circle-info mr-1"></i>Se você usa o painel em outro aparelho e apagou/alterou coisas por lá, prefira manter a nuvem.</li>');
+        document.getElementById('reconcileList').innerHTML = items.join('');
+        openModal('reconcileModal');
+        return new Promise((resolve) => {
+          const done = async (send) => {
+            closeModal('reconcileModal');
+            document.getElementById('btnReconcileSend').onclick = document.getElementById('btnReconcileCloud').onclick = null;
+            if (send) {
+              diff.tx.forEach(({ t }) => { const i = state.transactions.findIndex(x => x.id === t.id); if (i >= 0) state.transactions[i] = t; else state.transactions.push(t); });
+              diff.wishes.forEach(w => { const i = state.wishes.findIndex(x => x.id === w.id); if (i >= 0) state.wishes[i] = { ...w }; else state.wishes.push({ ...w }); });
+              diff.invoices.forEach(([k, v]) => { state.invoicesPaid[k] = v; });
+              diff.pages.forEach(([id, d]) => { state.customPageData[id] = normalizePageData(d); });
+              if (diff.spain) state.spainPlan = normalizeSpainPlan(snap.spain);
+              localSet(STORAGE_KEY, state.transactions); localSet(WISHES_KEY, state.wishes); localSet(INVOICE_KEY, state.invoicesPaid);
+              localSet('financeDashboard_customPages', state.customPageData); localSet(SPAIN_KEY, state.spainPlan);
+              const r = await Promise.all([
+                remote('tx', diff.tx.map(x => x.t.id)), remote('wishes', diff.wishes.map(w => w.id)),
+                remote('invoices', diff.invoices.map(([k]) => k)), remote('pages', diff.pages.map(([id]) => id)),
+                diff.spain ? remote('spain', ['main']) : true
+              ]);
+              showToast(r.every(Boolean) ? 'Dados do aparelho enviados para a nuvem!' : 'Parte não foi enviada; ficou na fila e será reenviada.', r.every(Boolean) ? 'success' : 'warning');
+            } else showToast('Mantidos os dados da nuvem.');
+            localSet(SYNC_V2_FLAG, true);
+            resolve(send);
+          };
+          document.getElementById('btnReconcileSend').onclick = () => done(true);
+          document.getElementById('btnReconcileCloud').onclick = () => done(false);
+        });
+      }
+
+      // Envia o que ficou pendente e depois baixa tudo da nuvem (mesclando o que ainda não subiu).
+      async function syncFromCloud() {
+        const snap = {
+          tx: localGet(STORAGE_KEY), wishes: localGet(WISHES_KEY), invoices: localGet(INVOICE_KEY),
+          pages: localGet('financeDashboard_customPages'), spain: localGet(SPAIN_KEY)
+        };
+        setSync('checking');
+        await flushPending();
         const [txOk] = await Promise.all([loadTransactions(), loadCards(), loadSettings(), loadInvoices(), loadWishes(), loadSpainPlan(), loadCustomPages()]);
-        if (!_authError) setSync(txOk ? 'ok' : 'local');
-
+        syncInfo.loadedFromCloud = txOk;
+        if (txOk) {
+          setSync(pendingCount() ? 'local' : 'ok');
+          if (!localGet(SYNC_V2_FLAG)) {
+            const diff = findLocalOnly(snap);
+            if (diff.total) { refreshAfterLoad(); await askReconcile(diff, snap); }
+            else localSet(SYNC_V2_FLAG, true);
+          }
+        } else setSync(isPermissionError(syncInfo.lastError) ? 'error' : 'local');
+        refreshAfterLoad();
+        return txOk;
+      }
+      function refreshAfterLoad() {
         populateCardSelects();
         populateAllPersonSelects();
         populateWishCategorySelect();
@@ -4998,7 +5383,48 @@
         populateReceitaCategoria();
         updateDespesaFormVisibility();
         refreshYearFilterOptions();
-        renderDashboard(new Date().getMonth());
+        renderDashboard(state.selectedMonth ?? new Date().getMonth());
+      }
+      function setupConnectionEvents() {
+        document.getElementById('btnSyncStatus').addEventListener('click', openConnectionTest);
+        ['btnConnClose', 'btnConnClose2'].forEach(id => document.getElementById(id).addEventListener('click', () => closeModal('connModal')));
+        document.getElementById('btnConnRetry').addEventListener('click', runConnectionTest);
+        document.getElementById('connModal').addEventListener('mousedown', (e) => { if (e.target.id === 'connModal') closeModal('connModal'); });
+        // Reenvia sozinho quando a internet volta ou quando o app volta para a tela
+        window.addEventListener('online', async () => {
+          if (!syncInfo.loadedFromCloud) await syncFromCloud();
+          else if (pendingCount()) { const r = await flushPending(); if (r.ok && !r.fail) showToast(`${r.ok} alteração(ões) enviadas para a nuvem.`); }
+        });
+        window.addEventListener('offline', () => setSync('local'));
+        document.addEventListener('visibilitychange', () => { if (document.visibilityState === 'visible' && pendingCount() && navigator.onLine) flushPending(); });
+      }
+
+      // =========================================================
+      // INICIALIZAÇÃO
+      // =========================================================
+      async function init() {
+        state.collapsedTables = localGet(UI_KEY)?.collapsedTables || {};
+        // 1) Abre na hora com o que está salvo no aparelho
+        loadLocalSnapshot();
+        buildMonthNav();
+        buildTablePanels();
+        document.getElementById('recData').value = todayInput();
+        document.getElementById('despData').value = todayInput();
+        setupEvents();
+        setupConnectionEvents();
+        setSync('checking');
+        refreshAfterLoad();
+
+        // 2) Login (não bloqueia se falhar) + envio do pendente + download da nuvem
+        await authReady;
+        const ok = await syncFromCloud();
+        if (ok) {
+          const n = state.transactions.length;
+          showToast(`Conectado à nuvem · ${n} lançamento${n === 1 ? '' : 's'} sincronizado${n === 1 ? '' : 's'}`, 'success', 'Firebase');
+        } else {
+          // 3) Não conectou: abre o teste de conexão explicando o motivo
+          openConnectionTest();
+        }
       }
 
       if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', init);
