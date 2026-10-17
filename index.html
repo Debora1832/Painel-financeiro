@@ -2181,8 +2181,47 @@
           milestones: (Array.isArray(d.milestones) ? d.milestones : []).map(m => ({
             id: m.id || generateId('ms'), title: m.title || '', phase: SPAIN_PHASES.includes(m.phase) ? m.phase : SPAIN_PHASES[0], due: m.due || '', done: !!m.done
           })),
-          notes: d.notes || ''
+          notes: d.notes || '',
+          seedApplied: d.seedApplied || ''
         };
+      }
+      // Mescla um plano no Projeto Espanha: parâmetros substituem; custos, documentos, etapas e vendas são ACRESCENTADOS
+      // (itens iguais já existentes são ignorados). Nada é apagado. Retorna quantos itens foram adicionados.
+      function mergeSpainPlanData(cur, inc) {
+        const peopleByLower = {};
+        spainDocPeople().forEach(l => { peopleByLower[String(l).toLowerCase()] = l; });
+        const person = (n) => peopleByLower[String(n || 'Família').toLowerCase()] || n || 'Família';
+        ['targetDate', 'targetFund', 'manualReserve', 'euroRate', 'linkMode', 'livingCostEur', 'runwayMonths', 'contingencyPct', 'spreadPct', 'yieldPct']
+          .forEach(k => { if (inc[k] !== undefined && inc[k] !== null && inc[k] !== '') cur[k] = inc[k]; });
+        const norm = (v) => String(v || '').trim().toLowerCase();
+        let added = 0;
+        const merge = (key, list, sig) => {
+          if (!Array.isArray(list)) return;
+          const have = new Set((cur[key] || []).map(sig));
+          list.forEach(item => {
+            const it = { ...item }; delete it.id;
+            if (key === 'documents') it.person = person(it.person);
+            if (have.has(sig(it))) return;
+            (cur[key] ||= []).push(it); have.add(sig(it)); added++;
+          });
+        };
+        merge('costs', inc.costs, c => norm(c.name) + '|' + norm(c.phase));
+        merge('documents', inc.documents, d => norm(d.name) + '|' + norm(d.person));
+        merge('milestones', inc.milestones, m => norm(m.title));
+        merge('sales', inc.sales, x => norm(x.name));
+        if (inc.notes && !String(cur.notes || '').includes(String(inc.notes).trim())) cur.notes = (cur.notes ? cur.notes.trim() + '\n\n' : '') + String(inc.notes).trim();
+        cur.active = true;
+        return added;
+      }
+      // Plano Zaragoza 2028 já embutido: aplicado uma única vez (marcado em seedApplied).
+      const SPAIN_SEED_ID = 'zaragoza-2028-v1';
+      const SPAIN_SEED_PLAN = {"targetDate": "2028-05-15", "livingCostEur": 2560, "runwayMonths": 8, "contingencyPct": 10, "euroRate": 5.7, "costs": [{"name": "Caução do aluguel (até 3 meses)", "phase": "Chegada", "category": "Caução", "currency": "EUR", "estimated": 3300, "due": "2028-05-31", "status": "planejado", "notes": "Apartamento 3 quartos em Zaragoza, €950–1.300/mês"}, {"name": "Móveis, eletros e enxoval do bebê", "phase": "Chegada", "category": "Móveis / Casa", "currency": "EUR", "estimated": 3000, "due": "2028-06-30", "status": "planejado", "notes": "Estimativa; refazer na viagem de 2027"}, {"name": "Passagens (Débora, Cristiano e Emanuel)", "phase": "Viagem", "category": "Passagens", "currency": "EUR", "estimated": 2400, "due": "2028-03-31", "status": "planejado", "notes": "Estimativa"}, {"name": "Documentação: apostilas, traduções, taxas de visto, advogado", "phase": "Antes da mudança", "category": "Documentação", "currency": "EUR", "estimated": 2000, "due": "2028-02-28", "status": "planejado", "notes": "Inclui 3 taxas de visto de €80"}, {"name": "Mensalidade da FP do Cristiano", "phase": "Primeiros meses", "category": "Escola / Filho", "currency": "EUR", "estimated": 0, "due": "2028-09-15", "status": "planejado", "notes": "Gratuita em centro público ou concertado; centro privado teria custo"}], "documents": [{"person": "Cristiano", "name": "Passaporte válido (mín. 1 ano além da viagem)", "status": "nao_iniciado", "due": "2027-10-31", "estimated": 0, "paid": 0, "link": "", "notes": "Não aceitam passaporte emitido há mais de 10 anos"}, {"person": "Cristiano", "name": "Certidão de nascimento de inteiro teor — apostilada e traduzida", "status": "nao_iniciado", "due": "2027-12-31", "estimated": 0, "paid": 0, "link": "", "notes": ""}, {"person": "Cristiano", "name": "Atestado médico — apostilado e traduzido", "status": "nao_iniciado", "due": "2028-01-31", "estimated": 0, "paid": 0, "link": "", "notes": "Exigido para estadia acima de 180 dias"}, {"person": "Cristiano", "name": "Seguro saúde de seguradora autorizada na Espanha", "status": "nao_iniciado", "due": "2027-12-15", "estimated": 0, "paid": 0, "link": "", "notes": "Cobrir os mesmos riscos do sistema público"}, {"person": "Cristiano", "name": "Formulário de visto nacional + foto", "status": "nao_iniciado", "due": "2028-01-31", "estimated": 0, "paid": 0, "link": "", "notes": ""}, {"person": "Cristiano", "name": "Taxa do visto (€80)", "status": "nao_iniciado", "due": "2028-02-28", "estimated": 0, "paid": 0, "link": "", "notes": ""}, {"person": "Débora", "name": "Passaporte válido (mín. 1 ano além da viagem)", "status": "nao_iniciado", "due": "2027-10-31", "estimated": 0, "paid": 0, "link": "", "notes": "Não aceitam passaporte emitido há mais de 10 anos"}, {"person": "Débora", "name": "Certidão de nascimento de inteiro teor — apostilada e traduzida", "status": "nao_iniciado", "due": "2027-12-31", "estimated": 0, "paid": 0, "link": "", "notes": ""}, {"person": "Débora", "name": "Atestado médico — apostilado e traduzido", "status": "nao_iniciado", "due": "2028-01-31", "estimated": 0, "paid": 0, "link": "", "notes": "Exigido para estadia acima de 180 dias"}, {"person": "Débora", "name": "Seguro saúde de seguradora autorizada na Espanha com cobertura de parto", "status": "nao_iniciado", "due": "2027-12-15", "estimated": 0, "paid": 0, "link": "", "notes": "Contratar antes da gravidez"}, {"person": "Débora", "name": "Formulário de visto nacional + foto", "status": "nao_iniciado", "due": "2028-01-31", "estimated": 0, "paid": 0, "link": "", "notes": ""}, {"person": "Débora", "name": "Taxa do visto (€80)", "status": "nao_iniciado", "due": "2028-02-28", "estimated": 0, "paid": 0, "link": "", "notes": ""}, {"person": "Emanuel", "name": "Passaporte válido (mín. 1 ano além da viagem)", "status": "nao_iniciado", "due": "2027-10-31", "estimated": 0, "paid": 0, "link": "", "notes": "Não aceitam passaporte emitido há mais de 10 anos"}, {"person": "Emanuel", "name": "Certidão de nascimento de inteiro teor — apostilada e traduzida", "status": "nao_iniciado", "due": "2027-12-31", "estimated": 0, "paid": 0, "link": "", "notes": ""}, {"person": "Emanuel", "name": "Atestado médico — apostilado e traduzido", "status": "nao_iniciado", "due": "2028-01-31", "estimated": 0, "paid": 0, "link": "", "notes": "Exigido para estadia acima de 180 dias"}, {"person": "Emanuel", "name": "Seguro saúde de seguradora autorizada na Espanha", "status": "nao_iniciado", "due": "2027-12-15", "estimated": 0, "paid": 0, "link": "", "notes": "Cobrir os mesmos riscos do sistema público"}, {"person": "Emanuel", "name": "Formulário de visto nacional + foto", "status": "nao_iniciado", "due": "2028-01-31", "estimated": 0, "paid": 0, "link": "", "notes": ""}, {"person": "Emanuel", "name": "Taxa do visto (€80)", "status": "nao_iniciado", "due": "2028-02-28", "estimated": 0, "paid": 0, "link": "", "notes": ""}, {"person": "Cristiano", "name": "Antecedentes criminais (Polícia Federal) — apostilado e traduzido", "status": "nao_iniciado", "due": "2028-01-31", "estimated": 0, "paid": 0, "link": "", "notes": "Emitir perto do pedido do visto"}, {"person": "Débora", "name": "Antecedentes criminais (Polícia Federal) — apostilado e traduzido", "status": "nao_iniciado", "due": "2028-01-31", "estimated": 0, "paid": 0, "link": "", "notes": "Emitir perto do pedido do visto"}, {"person": "Cristiano", "name": "Carta de admissão da FP (Instalações Elétricas e Automáticas)", "status": "nao_iniciado", "due": "2028-01-31", "estimated": 0, "paid": 0, "link": "", "notes": ""}, {"person": "Cristiano", "name": "Homologação dos estudos brasileiros na Espanha", "status": "nao_iniciado", "due": "2027-12-31", "estimated": 0, "paid": 0, "link": "", "notes": "Exigida para entrar na FP; demora meses"}, {"person": "Débora", "name": "Exames e relatório do pré-natal traduzidos", "status": "nao_iniciado", "due": "2028-05-01", "estimated": 0, "paid": 0, "link": "", "notes": ""}, {"person": "Emanuel", "name": "Carteira de vacinação traduzida", "status": "nao_iniciado", "due": "2028-04-30", "estimated": 0, "paid": 0, "link": "", "notes": "Para a matrícula escolar"}, {"person": "Família", "name": "Certidão de casamento — apostilada e traduzida", "status": "nao_iniciado", "due": "2027-12-31", "estimated": 0, "paid": 0, "link": "", "notes": ""}, {"person": "Família", "name": "Comprovação de meios: €1.350/mês (extratos)", "status": "nao_iniciado", "due": "2028-01-31", "estimated": 0, "paid": 0, "link": "", "notes": "Cristiano 100% IPREM + Débora 75% + Emanuel 50%"}, {"person": "Família", "name": "Comprovante de residência no Brasil (jurisdição do consulado)", "status": "nao_iniciado", "due": "2028-01-31", "estimated": 0, "paid": 0, "link": "", "notes": ""}], "milestones": [{"phase": "Antes da mudança", "title": "Cristiano começar curso de espanhol", "due": "2026-12-31", "done": false}, {"phase": "Antes da mudança", "title": "Consulta com advogado de imigração espanhol", "due": "2027-03-31", "done": false}, {"phase": "Antes da mudança", "title": "Pedir homologação dos estudos do Cristiano na Espanha", "due": "2027-06-30", "done": false}, {"phase": "Antes da mudança", "title": "Viagem de reconhecimento a Zaragoza e escolha do bairro", "due": "2027-09-30", "done": false}, {"phase": "Antes da mudança", "title": "Contatar centros de FP (Corona de Aragón, Emilio Jimeno, Salesianos) sobre carta de admissão", "due": "2027-10-31", "done": false}, {"phase": "Antes da mudança", "title": "Contratar seguro saúde com cobertura de parto, antes da gravidez", "due": "2027-12-15", "done": false}, {"phase": "Antes da mudança", "title": "Juntar certidões, apostilar e traduzir", "due": "2027-12-31", "done": false}, {"phase": "Antes da mudança", "title": "Pedir visto de estudante (Cristiano) e de familiares (Débora e Emanuel)", "due": "2028-02-28", "done": false}, {"phase": "Antes da mudança", "title": "Vender carro, TV e móveis", "due": "2028-04-30", "done": false}, {"phase": "Viagem", "title": "Comprar passagens", "due": "2028-03-31", "done": false}, {"phase": "Viagem", "title": "Levar documentos originais e prontuário do pré-natal traduzido", "due": "2028-05-15", "done": false}, {"phase": "Chegada", "title": "Empadronamiento em Zaragoza", "due": "2028-05-31", "done": false}, {"phase": "Chegada", "title": "Transferir o pré-natal para o seguro em Zaragoza", "due": "2028-05-31", "done": false}, {"phase": "Chegada", "title": "Pedir o TIE de cada um (até 1 mês após a entrada)", "due": "2028-06-15", "done": false}, {"phase": "Chegada", "title": "Abrir conta bancária espanhola", "due": "2028-06-15", "done": false}, {"phase": "Chegada", "title": "Pedir vaga fora de prazo para o Emanuel", "due": "2028-06-30", "done": false}, {"phase": "Primeiros meses", "title": "Cristiano começa a FP de Instalações Elétricas e Automáticas", "due": "2028-09-15", "done": false}, {"phase": "Primeiros meses", "title": "Trocar a CNH pela carteira espanhola", "due": "2028-11-15", "done": false}, {"phase": "Primeiros meses", "title": "Registrar o nascimento do bebê no Registro Civil", "due": "2028-11-30", "done": false}, {"phase": "Primeiros meses", "title": "Pedir nacionalidade do bebê por simples presunção", "due": "2028-12-31", "done": false}, {"phase": "Primeiros meses", "title": "Vaga na escola infantil do Governo de Aragão para o bebê", "due": "2029-03-31", "done": false}, {"phase": "Primeiros meses", "title": "Pedir residência de familiar de espanhol para Débora e Cristiano", "due": "2029-04-30", "done": false}], "sales": [], "notes": "Estratégia: Cristiano entra com visto de estudante (FP de Instalações Elétricas e Automáticas em Zaragoza); Débora e Emanuel vão como dependentes. O bebê nasce em Zaragoza (out–nov/2028) e pede a nacionalidade por simples presunção; com ela, Débora e Cristiano pedem a residência de familiar de espanhol (5 anos, com trabalho). Custo de vida estimado: €2.560/mês. Reserva para 6–8 meses sem renda: €28.700–34.300."};
+      async function applySpainSeed() {
+        if (!state.spainPlan || state.spainPlan.seedApplied === SPAIN_SEED_ID) return;
+        const added = mergeSpainPlanData(state.spainPlan, SPAIN_SEED_PLAN);
+        state.spainPlan.seedApplied = SPAIN_SEED_ID;
+        await saveSpainPlan();
+        showToast(`Plano Zaragoza 2028 carregado no Projeto Espanha (${added} itens).`, 'success');
       }
       async function loadSpainPlan() {
         try {
@@ -4949,29 +4988,7 @@
           const inc = data && typeof data === 'object' ? (data.plan && typeof data.plan === 'object' ? data.plan : data) : null;
           if (!inc) { showToast('Arquivo sem dados do Projeto Espanha.', 'error'); return; }
           const cur = P();
-          const peopleByLower = {};
-          spainDocPeople().forEach(l => { peopleByLower[String(l).toLowerCase()] = l; });
-          const person = (n) => peopleByLower[String(n || 'Família').toLowerCase()] || n || 'Família';
-          ['targetDate', 'targetFund', 'manualReserve', 'euroRate', 'linkMode', 'livingCostEur', 'runwayMonths', 'contingencyPct', 'spreadPct', 'yieldPct']
-            .forEach(k => { if (inc[k] !== undefined && inc[k] !== null && inc[k] !== '') cur[k] = inc[k]; });
-          const norm = (v) => String(v || '').trim().toLowerCase();
-          let added = 0;
-          const merge = (key, list, sig) => {
-            if (!Array.isArray(list)) return;
-            const have = new Set((cur[key] || []).map(sig));
-            list.forEach(item => {
-              const it = { ...item }; delete it.id;
-              if (key === 'documents') it.person = person(it.person);
-              if (have.has(sig(it))) return;
-              (cur[key] ||= []).push(it); have.add(sig(it)); added++;
-            });
-          };
-          merge('costs', inc.costs, c => norm(c.name) + '|' + norm(c.phase));
-          merge('documents', inc.documents, d => norm(d.name) + '|' + norm(d.person));
-          merge('milestones', inc.milestones, m => norm(m.title));
-          merge('sales', inc.sales, x => norm(x.name));
-          if (inc.notes && !String(cur.notes || '').includes(String(inc.notes).trim())) cur.notes = (cur.notes ? cur.notes.trim() + '\n\n' : '') + String(inc.notes).trim();
-          cur.active = true;
+          const added = mergeSpainPlanData(cur, inc);
           await saveSpainPlan();
           renderSpainView(false);
           showToast(`Plano importado: parâmetros atualizados e ${added} item(ns) adicionados.`, 'success');
@@ -5403,6 +5420,7 @@ service cloud.firestore {
         await flushPending();
         const [txOk] = await Promise.all([loadTransactions(), loadCards(), loadSettings(), loadInvoices(), loadWishes(), loadSpainPlan(), loadCustomPages()]);
         syncInfo.loadedFromCloud = txOk;
+        await applySpainSeed();
         if (txOk) {
           setSync(pendingCount() ? 'local' : 'ok');
           if (!localGet(SYNC_V2_FLAG)) {
