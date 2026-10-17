@@ -236,6 +236,62 @@
     {
       "title": "Centros com Mecanizado em Zaragoza (Educaweb)",
       "url": "https://www.educaweb.com/notas-corte/ciclos-formativos-grado-medio/fabricacion-mecanica/tecnico-mecanizado/zaragoza/?c=9193"
+    },
+    {
+      "title": "Trabalhar até 30 h com visto de estudante em 2026 (TuVisadoOnline)",
+      "url": "https://www.tuvisadoonline.com/blog/trabajar-visado-estudiante-espana-2026-30-horas"
+    },
+    {
+      "title": "Instrução SEM 3/2025: quem trabalha 30 h automaticamente (Máchelin Díaz)",
+      "url": "https://machelindiaz.com/tienen-permiso-de-trabajo-los-estudiantes-automatica-para-todos-instruccion-sem-3-2025/"
     }
-  ]
+  ],
+  "jobs": {
+    "title": "Empregos para o Cristiano (até 30 h/semana)",
+    "summary": "Com a autorização de estudante, o Cristiano pode trabalhar até 30 h por semana sem pedir outra autorização: a empresa só faz o contrato e a alta na Seguridade Social. Nas férias do curso pode fazer jornada completa. As vagas abaixo são buscas prontas; as ofertas de hoje servem de referência, as de 2028 aparecem perto da chegada.",
+    "rules": [
+      "Limite de 30 h semanais durante as aulas; o horário do trabalho não pode coincidir com o das aulas (FP de manhã → trabalho à tarde).",
+      "A regra cita “formação profissional”; vale confirmar com o advogado que inclui FP de grau médio.",
+      "Precisa do NIE/TIE para assinar o contrato e ter a alta na Seguridade Social.",
+      "Salário mínimo proporcional: cerca de €915/mês em 14 pagas para 30 h (referência 2026).",
+      "Na FP Dual de Aragão, o 2º ano pode ser feito em empresa com contrato: perguntar ao centro."
+    ],
+    "searches": [
+      {
+        "title": "InfoJobs — CNC em Zaragoza",
+        "url": "https://www.infojobs.net/ofertas-trabajo/zaragoza/cnc-s",
+        "notes": "Filtrar por “jornada parcial”."
+      },
+      {
+        "title": "Jooble — Torneiro CNC em Zaragoza",
+        "url": "https://es.jooble.org/trabajo-tornero-cnc/Zaragoza",
+        "notes": "Agregador; vale criar alerta."
+      },
+      {
+        "title": "Jooble — Torneiro fresador em Zaragoza",
+        "url": "https://es.jooble.org/trabajo-tornero-fresador/Zaragoza",
+        "notes": ""
+      },
+      {
+        "title": "Indeed — Eletricista em Zaragoza",
+        "url": "https://es.indeed.com/q-electricista-l-zaragoza,-zaragoza-provincia-empleos.html",
+        "notes": "Filtrar por “media jornada”."
+      },
+      {
+        "title": "Randstad — Técnico eletricista em Zaragoza",
+        "url": "https://www.randstad.es/candidatos/ofertas-empleo/p-zaragoza/jb-tecnico-electricista/",
+        "notes": "Agência de trabalho temporário; costuma ter turnos parciais."
+      },
+      {
+        "title": "Milanuncios — Ajudante de eletricista em Zaragoza",
+        "url": "https://www.milanuncios.com/ofertas-de-empleo-en-zaragoza/ayudante-electricista.htm",
+        "notes": "Pequenas empresas e instaladoras."
+      },
+      {
+        "title": "INAEM — Serviço público de emprego de Aragão",
+        "url": "https://inaem.aragon.es",
+        "notes": "Inscrever-se como candidato ao chegar."
+      }
+    ]
+  }
 }
