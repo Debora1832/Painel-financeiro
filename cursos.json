@@ -1,110 +1,108 @@
 {
-  "title": "Cursos do Cristiano — FP em Zaragoza",
+  "title": "Estudos do Cristiano — FP de grau superior em Zaragoza",
   "updatedAt": "2026-10-17",
-  "summary": "Curso-alvo: FP de Grau Médio \"Técnico en Instalaciones Eléctricas y Automáticas\" (2 anos, 2.000 h, presencial). Início previsto em setembro de 2028. As datas abaixo são as do processo 2026/27; o calendário de 2028/29 sai por volta de junho de 2028.",
+  "summary": "Curso-alvo: FP de GRAU SUPERIOR (2 anos, 2.000 h, presencial, turno diurno), porque é ensino superior e permite levar Débora e Emanuel como familiares. Opções que combinam com o Cristiano: Sistemas Electrotécnicos y Automatizados, Automatización y Robótica Industrial, Mecatrónica Industrial e Programación de la Producción en Fabricación Mecánica (CNC). Início previsto em setembro de 2028. As datas abaixo são do processo 2026/27; o de 2028/29 sai por volta de junho de 2028.",
   "alerts": [
-    "Importante: pela página oficial do Ministério (atualizada nov/2025), familiares só podem acompanhar estudante de ensino superior. FP de grau médio não está nessa lista. Débora e Emanuel podem não conseguir visto de acompanhante. Confirmar com o advogado.",
-    "Alternativa a avaliar: FP de grau superior conta como ensino superior e permite levar a família. Exige ensino médio homologado como Bachillerato.",
-    "O visto deve ser pedido no consulado pelo menos 2 meses antes do início das aulas. Pede comprovante de admissão e de pagamento da matrícula.",
-    "A carta de admissão em centro público ou concertado só sai no fim de julho, depois das listas definitivas. Isso não permite pedir o visto antes da chegada em maio: decidir com o advogado entre um centro privado com carta antecipada ou outra data de chegada.",
-    "Com estudos feitos no Brasil, é preciso pedir o cálculo da nota média (e-mail giraragon@aragon.es) no período da admissão e ter a homologação em andamento."
+    "Decisão: trocar FP de grau médio por grau superior. Pela página oficial do Ministério, familiares só acompanham estudante de ensino superior; FP de grau superior entra, grau médio não.",
+    "Para entrar no grau superior é preciso o ensino médio brasileiro completo (3º ano) homologado como título de Bachiller. Começar a juntar documentos já e pedir no início de 2027.",
+    "A carta de admissão em centro público ou concertado só sai no fim de julho; isso não permite pedir o visto antes da chegada em maio. Decidir com o advogado."
   ],
   "options": [
     {
-      "center": "CPIFP Corona de Aragón",
-      "course": "Instalaciones Eléctricas y Automáticas (grau médio)",
+      "center": "CIFP Corona de Aragón",
+      "course": "Sistemas Electrotécnicos y Automatizados (grau superior)",
       "type": "Público",
       "city": "Zaragoza",
       "cost": "Gratuito",
-      "status": "Oferta o curso; vagas por nota/sorteio",
-      "url": "https://www.educaweb.com/notas-corte/ciclos-formativos-grado-medio/electricidad-electronica/tecnico-instalaciones-electricas-automaticas/zaragoza/?c=9193"
+      "status": "Oferta o curso; entra no processo oficial de admissão",
+      "url": "https://forofp.es/fp/grado-superior/electricidad-y-electronica-0/presencial/zaragoza"
     },
     {
-      "center": "Colegio Salesiano Nuestra Señora del Pilar",
-      "course": "Instalaciones Eléctricas y Automáticas (grau médio)",
+      "center": "IES José Manuel Blecua",
+      "course": "Sistemas Electrotécnicos y Automatizados (grau superior)",
+      "type": "Público",
+      "city": "Zaragoza",
+      "cost": "Gratuito",
+      "status": "Oferta o curso; entra no processo oficial de admissão",
+      "url": "https://forofp.es/fp/grado-superior/electricidad-y-electronica-0/presencial/zaragoza"
+    },
+    {
+      "center": "Colegio Salesiano Ntra. Sra. del Pilar",
+      "course": "Sistemas Electrotécnicos y Automatizados (grau superior)",
       "type": "Concertado",
       "city": "Zaragoza",
       "cost": "Gratuito",
-      "status": "Oferta o curso; entra no processo oficial",
-      "url": "https://www.educaweb.com/notas-corte/ciclos-formativos-grado-medio/electricidad-electronica/tecnico-instalaciones-electricas-automaticas/zaragoza/?c=55861"
+      "status": "Oferta o curso; entra no processo oficial de admissão",
+      "url": "https://forofp.es/fp/grado-superior/electricidad-y-electronica-0/presencial/zaragoza"
     },
     {
-      "center": "Colegio Santo Domingo de Silos",
-      "course": "Instalaciones Eléctricas y Automáticas (grau médio)",
+      "center": "IES Gallicum",
+      "course": "Sistemas Electrotécnicos y Automatizados (grau superior)",
+      "type": "Público",
+      "city": "Zuera (≈25 km)",
+      "cost": "Gratuito",
+      "status": "Oferta o curso; entra no processo oficial de admissão",
+      "url": "https://forofp.es/fp/grado-superior/electricidad-y-electronica-0/presencial/zaragoza"
+    },
+    {
+      "center": "IES Virgen del Pilar",
+      "course": "Automatización y Robótica Industrial (grau superior)",
+      "type": "Público",
+      "city": "Zaragoza",
+      "cost": "Gratuito",
+      "status": "Oferta o curso; entra no processo oficial de admissão",
+      "url": "https://forofp.es/fp/grado-superior/electricidad-y-electronica-0/presencial/zaragoza"
+    },
+    {
+      "center": "CIFP La Salle-Santo Ángel",
+      "course": "Automatización y Robótica Industrial (grau superior)",
       "type": "Concertado",
       "city": "Zaragoza",
       "cost": "Gratuito",
-      "status": "Oferta o curso; entra no processo oficial",
-      "url": "https://www.educaweb.com/notas-corte/ciclos-formativos-grado-medio/electricidad-electronica/tecnico-instalaciones-electricas-automaticas/zaragoza/?c=55859"
+      "status": "Oferta o curso; entra no processo oficial de admissão",
+      "url": "https://forofp.es/fp/grado-superior/electricidad-y-electronica-0/presencial/zaragoza"
     },
     {
-      "center": "Centro de FP Santa Agatoclia",
-      "course": "Instalaciones Eléctricas y Automáticas (grau médio)",
-      "type": "A confirmar",
+      "center": "Colegio Salesiano Ntra. Sra. del Pilar",
+      "course": "Automatización y Robótica Industrial (grau superior)",
+      "type": "Concertado",
       "city": "Zaragoza",
-      "cost": "A confirmar",
-      "status": "Perguntar se emite carta de admissão antecipada",
-      "url": "https://www.educaweb.com/notas-corte/ciclos-formativos-grado-medio/electricidad-electronica/tecnico-instalaciones-electricas-automaticas/zaragoza/?c=57151"
-    },
-    {
-      "center": "CFPE Academia Marco",
-      "course": "Instalaciones Eléctricas y Automáticas (grau médio)",
-      "type": "A confirmar",
-      "city": "Zaragoza",
-      "cost": "A confirmar",
-      "status": "Perguntar se emite carta de admissão antecipada",
-      "url": "https://www.educaweb.com/notas-corte/ciclos-formativos-grado-medio/electricidad-electronica/tecnico-instalaciones-electricas-automaticas/zaragoza/?c=55762"
-    },
-    {
-      "center": "IES Emilio Jimeno",
-      "course": "Instalaciones Eléctricas y Automáticas (grau médio)",
-      "type": "Público",
-      "city": "Calatayud (≈85 km)",
       "cost": "Gratuito",
-      "status": "Longe de Zaragoza; só como reserva",
-      "url": "https://www.educaweb.com/notas-corte/ciclos-formativos-grado-medio/electricidad-electronica/tecnico-instalaciones-electricas-automaticas/zaragoza/?c=9213"
+      "status": "Oferta o curso; entra no processo oficial de admissão",
+      "url": "https://forofp.es/fp/grado-superior/electricidad-y-electronica-0/presencial/zaragoza"
     },
     {
       "center": "CPIFP Corona de Aragón",
-      "course": "Mecanizado (grau médio) — alternativa CNC",
+      "course": "Programación de la Producción en Fabricación Mecánica (grau superior) — CNC",
       "type": "Público",
       "city": "Zaragoza",
       "cost": "Gratuito",
-      "status": "Oferta o curso; vagas por nota/sorteio",
-      "url": "https://www.educaweb.com/notas-corte/ciclos-formativos-grado-medio/fabricacion-mecanica/tecnico-mecanizado/zaragoza/?c=9193"
+      "status": "Oferta o curso (2.000 h); ligado à experiência com CNC",
+      "url": "https://www.fpe.org.es/programacion-de-la-produccion-en-fabricacion-mecanica-en-zaragoza---cpifp-corona-de-aragon.php"
     },
     {
-      "center": "IES La Puebla de Alfindén",
-      "course": "Mecanizado (grau médio) — alternativa CNC",
-      "type": "Público",
-      "city": "La Puebla de Alfindén (arredores)",
+      "center": "Centro San Valero",
+      "course": "Programación de la Producción en Fabricación Mecánica (grau superior) — CNC",
+      "type": "Concertado",
+      "city": "Zaragoza",
       "cost": "Gratuito",
-      "status": "Oferta o curso; confirmar modalidade",
-      "url": "https://www.educaweb.com/notas-corte/ciclos-formativos-grado-medio/fabricacion-mecanica/tecnico-mecanizado/zaragoza/?c=9193"
+      "status": "Consta na lista do curso; confirmar localidade e oferta",
+      "url": "https://www.educaweb.com/notas-corte/ciclos-formativos-grado-superior/fabricacion-mecanica/tecnico-superior-programacion-produccion-fabricacion-mecanica/"
     },
     {
-      "center": "Colegio Salesiano Nuestra Señora del Pilar",
-      "course": "Mecanizado (grau médio) — alternativa CNC",
+      "center": "A pesquisar",
+      "course": "Mecatrónica Industrial (grau superior)",
       "type": "A confirmar",
       "city": "Zaragoza",
       "cost": "A confirmar",
-      "status": "Oferta o curso; confirmar se é concertado",
-      "url": "https://www.educaweb.com/notas-corte/ciclos-formativos-grado-medio/fabricacion-mecanica/tecnico-mecanizado/zaragoza/?c=9193"
-    },
-    {
-      "center": "La Salle Santo Ángel",
-      "course": "Mecanizado (grau médio) — alternativa CNC",
-      "type": "A confirmar",
-      "city": "Zaragoza",
-      "cost": "A confirmar",
-      "status": "Perguntar se emite carta de admissão antecipada",
-      "url": "https://www.educaweb.com/notas-corte/ciclos-formativos-grado-medio/fabricacion-mecanica/tecnico-mecanizado/zaragoza/?c=9193"
+      "status": "Confirmar centros na próxima atualização",
+      "url": "https://www.educaweb.com/notas-corte/ciclos-formativos-grado-superior/instalacion-mantenimiento/tecnico-superior-mecatronica-industrial/zaragoza/"
     }
   ],
   "deadlines": [
     {
       "when": "jan–mar/2027",
-      "what": "Pedir a homologação do ensino médio do Cristiano (demora meses).",
+      "what": "Pedir a homologação do ensino médio do Cristiano como título de Bachiller (demora meses).",
       "url": "https://www.educacionfpydeportes.gob.es/servicios-al-ciudadano/catalogo/general/22/2214991/ficha/2214991.html"
     },
     {
@@ -164,8 +162,8 @@
       "notes": "Identificação na solicitação e na matrícula."
     },
     {
-      "name": "Homologação do ensino médio, ou comprovante do pedido",
-      "notes": "Confirmar com o centro se aceitam o pedido em andamento.",
+      "name": "Homologação do ensino médio como título de Bachiller, ou comprovante do pedido",
+      "notes": "Exigida para entrar no grau superior. Alternativa: prova de acesso. Confirmar com o centro se aceitam o pedido em andamento.",
       "url": "https://www.educacionfpydeportes.gob.es/servicios-al-ciudadano/catalogo/general/22/2214991/ficha/2214991.html"
     },
     {
@@ -244,6 +242,18 @@
     {
       "title": "Instrução SEM 3/2025: quem trabalha 30 h automaticamente (Máchelin Díaz)",
       "url": "https://machelindiaz.com/tienen-permiso-de-trabajo-los-estudiantes-automatica-para-todos-instruccion-sem-3-2025/"
+    },
+    {
+      "title": "Ciclos de grau superior de eletricidade em Zaragoza (ForoFP)",
+      "url": "https://forofp.es/fp/grado-superior/electricidad-y-electronica-0/presencial/zaragoza"
+    },
+    {
+      "title": "Programação da produção (CNC) no CPIFP Corona de Aragón (FPE)",
+      "url": "https://www.fpe.org.es/programacion-de-la-produccion-en-fabricacion-mecanica-en-zaragoza---cpifp-corona-de-aragon.php"
+    },
+    {
+      "title": "Familiares só em estudos superiores (Asesores Jurídicos Barcelona)",
+      "url": "https://www.asesoresjuridicosbarcelona.com/post/estancia-de-larga-duraci%C3%B3n-para-estudios-superiores-o-educaci%C3%B3n-secundaria"
     }
   ],
   "jobs": {
@@ -251,7 +261,7 @@
     "summary": "Com a autorização de estudante, o Cristiano pode trabalhar até 30 h por semana sem pedir outra autorização: a empresa só faz o contrato e a alta na Seguridade Social. Nas férias do curso pode fazer jornada completa. As vagas abaixo são buscas prontas; as ofertas de hoje servem de referência, as de 2028 aparecem perto da chegada.",
     "rules": [
       "Limite de 30 h semanais durante as aulas; o horário do trabalho não pode coincidir com o das aulas (FP de manhã → trabalho à tarde).",
-      "A regra cita “formação profissional”; vale confirmar com o advogado que inclui FP de grau médio.",
+      "A regra cita “formação profissional”; no grau superior (ensino superior) a permissão automática de 30 h é mais clara.",
       "Precisa do NIE/TIE para assinar o contrato e ter a alta na Seguridade Social.",
       "Salário mínimo proporcional: cerca de €915/mês em 14 pagas para 30 h (referência 2026).",
       "Na FP Dual de Aragão, o 2º ano pode ser feito em empresa com contrato: perguntar ao centro."
