@@ -682,6 +682,8 @@
           <div class="flex xl:flex-col gap-2">
             <button id="btnSpainOpenParams" class="px-3 py-2 rounded-lg bg-white text-red-700 hover:bg-white/90 text-xs font-bold"><i class="fa-solid fa-sliders mr-1"></i> Ajustar plano</button>
             <button id="btnSpainExport" class="px-3 py-2 rounded-lg bg-white/15 hover:bg-white/25 text-xs font-semibold border border-white/20"><i class="fa-solid fa-file-export mr-1"></i> Exportar</button>
+            <button id="btnSpainImport" class="px-3 py-2 rounded-lg bg-white/15 hover:bg-white/25 text-xs font-semibold border border-white/20" title="Importar plano de um arquivo .json"><i class="fa-solid fa-file-import mr-1"></i> Importar</button>
+            <input id="spainImportFile" type="file" accept=".json,application/json" class="hidden">
           </div>
         </div>
       </section>
@@ -4936,6 +4938,44 @@
           const a = document.createElement('a'); a.href = url; a.download = `projeto_espanha_${todayInput()}.json`; document.body.appendChild(a); a.click(); a.remove(); URL.revokeObjectURL(url);
         });
 
+        // Importar plano (.json): parâmetros substituem os atuais; custos, documentos, etapas e vendas
+        // são ACRESCENTADOS (itens iguais já existentes são ignorados). Nada é apagado.
+        document.getElementById('btnSpainImport').addEventListener('click', () => document.getElementById('spainImportFile').click());
+        document.getElementById('spainImportFile').addEventListener('change', async (e) => {
+          const file = e.target.files && e.target.files[0]; e.target.value = '';
+          if (!file) return;
+          let data;
+          try { data = JSON.parse(await file.text()); } catch (_) { showToast('Arquivo inválido: não é um JSON.', 'error'); return; }
+          const inc = data && typeof data === 'object' ? (data.plan && typeof data.plan === 'object' ? data.plan : data) : null;
+          if (!inc) { showToast('Arquivo sem dados do Projeto Espanha.', 'error'); return; }
+          const cur = P();
+          const peopleByLower = {};
+          spainDocPeople().forEach(l => { peopleByLower[String(l).toLowerCase()] = l; });
+          const person = (n) => peopleByLower[String(n || 'Família').toLowerCase()] || n || 'Família';
+          ['targetDate', 'targetFund', 'manualReserve', 'euroRate', 'linkMode', 'livingCostEur', 'runwayMonths', 'contingencyPct', 'spreadPct', 'yieldPct']
+            .forEach(k => { if (inc[k] !== undefined && inc[k] !== null && inc[k] !== '') cur[k] = inc[k]; });
+          const norm = (v) => String(v || '').trim().toLowerCase();
+          let added = 0;
+          const merge = (key, list, sig) => {
+            if (!Array.isArray(list)) return;
+            const have = new Set((cur[key] || []).map(sig));
+            list.forEach(item => {
+              const it = { ...item }; delete it.id;
+              if (key === 'documents') it.person = person(it.person);
+              if (have.has(sig(it))) return;
+              (cur[key] ||= []).push(it); have.add(sig(it)); added++;
+            });
+          };
+          merge('costs', inc.costs, c => norm(c.name) + '|' + norm(c.phase));
+          merge('documents', inc.documents, d => norm(d.name) + '|' + norm(d.person));
+          merge('milestones', inc.milestones, m => norm(m.title));
+          merge('sales', inc.sales, x => norm(x.name));
+          if (inc.notes && !String(cur.notes || '').includes(String(inc.notes).trim())) cur.notes = (cur.notes ? cur.notes.trim() + '\n\n' : '') + String(inc.notes).trim();
+          cur.active = true;
+          await saveSpainPlan();
+          renderSpainView(false);
+          showToast(`Plano importado: parâmetros atualizados e ${added} item(ns) adicionados.`, 'success');
+        });
         document.getElementById('btnSpainSaveConfig').addEventListener('click', async () => {
           Object.assign(P(), {
             targetDate: document.getElementById('spainTargetDate').value || P().targetDate,
