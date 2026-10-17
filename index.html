@@ -177,7 +177,7 @@
     main.flex-1{padding:28px 32px 40px!important;max-width:1720px;margin:0 auto;width:100%}
     main>header{background:rgba(255,255,255,.78);backdrop-filter:blur(12px);border:1px solid rgba(226,232,240,.9);border-radius:18px;padding:18px 20px;position:sticky;top:12px;z-index:30}
     #viewTitle{font-size:1.35rem;font-weight:750;letter-spacing:-.025em}
-    #monthlyView,#annualView,#wishesView,#spainView,#studiesView{margin-top:22px!important}
+    #monthlyView,#annualView,#wishesView,#spainView{margin-top:22px!important}
     .bg-white.rounded-xl,.bg-white.rounded-lg{border-color:var(--ui-line)!important;box-shadow:var(--ui-shadow)!important;border-radius:var(--ui-radius)!important}
     form.bg-white{padding:20px!important}
     form label{font-weight:650;color:#465269}
@@ -286,7 +286,7 @@
       #sidebar:not(.mobile-open)>div:first-child{padding:12px 8px;flex-direction:column;gap:8px}
       main>header{position:relative;top:0;border-radius:14px;padding:14px 15px}
       #viewTitle{font-size:1.15rem}
-      #monthlyView,#annualView,#wishesView,#spainView,#studiesView{margin-top:14px!important}
+      #monthlyView,#annualView,#wishesView,#spainView{margin-top:14px!important}
     }
   </style>
 </head>
@@ -320,9 +320,6 @@
       <button id="btnSpain" class="nav-btn w-full flex items-center gap-2.5 text-sm px-3 py-2">
         <i class="fa-solid fa-plane-departure text-red-400 w-4 sidebar-icon"></i><span class="sidebar-text">Projeto Espanha</span>
         <span id="navSpainPct" class="ml-auto text-[10px] font-semibold px-1.5 py-0.5 rounded-md bg-red-500/15 text-red-300 sidebar-text">0%</span>
-      </button>
-      <button id="btnStudies" class="nav-btn w-full flex items-center gap-2.5 text-sm px-3 py-2">
-        <i class="fa-solid fa-graduation-cap text-indigo-300 w-4 sidebar-icon"></i><span class="sidebar-text">Estudos</span>
       </button>
       <div id="customNav" class="space-y-1"></div>
       <button id="btnManagePages" class="w-full flex items-center gap-2.5 text-xs px-3 py-1.5 text-gray-400 hover:text-white" title="Criar, renomear, ocultar ou excluir páginas">
@@ -723,6 +720,7 @@
         <button data-es-tab="timeline"><i class="fa-solid fa-list-check"></i> Cronograma <span id="esTabTimeline" class="es-tab-count"></span></button>
         <button data-es-tab="docs"><i class="fa-solid fa-passport"></i> Documentos <span id="esTabDocs" class="es-tab-count"></span></button>
         <button data-es-tab="sales"><i class="fa-solid fa-tags"></i> Vendas <span id="esTabSales" class="es-tab-count"></span></button>
+        <button data-es-tab="studies"><i class="fa-solid fa-graduation-cap"></i> Estudos</button>
         <button data-es-tab="notes"><i class="fa-solid fa-note-sticky"></i> Anotações</button>
       </nav>
 
@@ -837,17 +835,8 @@
         </section>
       </div>
 
-      <!-- Anotações -->
-      <div data-es-panel="notes" class="hidden">
-        <section class="es-card p-4">
-          <textarea id="spainNotes" rows="12" class="w-full border border-gray-200 px-3 py-2 text-sm" placeholder="Cidades, empregos, contatos, decisões, próximos passos..."></textarea>
-          <div class="flex items-center justify-between mt-2"><span id="spainNotesStatus" class="text-[11px] text-gray-400">As anotações ficam salvas no projeto.</span><button id="btnSpainSaveNotes" class="px-3 py-2 rounded-lg bg-sky-600 hover:bg-sky-700 text-white text-xs font-semibold">Salvar anotações</button></div>
-        </section>
-      </div>
-    </div>
-
-      <!-- ================= ESTUDOS (dados em cursos.json, atualizados semanalmente) ================= -->
-    <div id="studiesView" class="space-y-4 hidden">
+      <!-- Estudos (dados em cursos.json, atualizados semanalmente) -->
+      <div data-es-panel="studies" class="hidden space-y-4">
         <section class="es-card p-4">
           <div class="flex flex-wrap items-center justify-between gap-2 mb-1">
             <h3 class="text-sm font-semibold text-gray-900"><i class="fa-solid fa-graduation-cap text-indigo-500 mr-1"></i> <span id="esCoursesTitle">Cursos</span></h3>
@@ -860,9 +849,18 @@
         <section class="es-card p-4"><h4 class="text-xs font-semibold uppercase tracking-wider text-gray-500 mb-2">Prazos da admissão</h4><div class="overflow-x-auto"><table class="w-full text-xs"><thead><tr class="text-left text-gray-400"><th class="py-1 pr-3">Quando</th><th class="py-1">O que acontece</th></tr></thead><tbody id="esCoursesDeadlines"></tbody></table></div></section>
         <section class="es-card p-4"><h4 class="text-xs font-semibold uppercase tracking-wider text-gray-500 mb-2">Documentos para a matrícula</h4><ul id="esCoursesDocs" class="space-y-1.5 text-xs text-gray-700"></ul></section>
         <section class="es-card p-4"><h4 class="text-xs font-semibold uppercase tracking-wider text-gray-500 mb-2">Fontes</h4><ul id="esCoursesSources" class="space-y-1 text-xs"></ul></section>
+      </div>
+
+      <!-- Anotações -->
+      <div data-es-panel="notes" class="hidden">
+        <section class="es-card p-4">
+          <textarea id="spainNotes" rows="12" class="w-full border border-gray-200 px-3 py-2 text-sm" placeholder="Cidades, empregos, contatos, decisões, próximos passos..."></textarea>
+          <div class="flex items-center justify-between mt-2"><span id="spainNotesStatus" class="text-[11px] text-gray-400">As anotações ficam salvas no projeto.</span><button id="btnSpainSaveNotes" class="px-3 py-2 rounded-lg bg-sky-600 hover:bg-sky-700 text-white text-xs font-semibold">Salvar anotações</button></div>
+        </section>
+      </div>
     </div>
 
-    <!-- ================= PÁGINA PERSONALIZADA ================= -->
+      <!-- ================= PÁGINA PERSONALIZADA ================= -->
     <div id="customPageView" class="space-y-5 hidden">
       <section id="cpHero" class="rounded-[20px] text-white p-5 md:p-6" style="background:#4f46e5">
         <div class="flex flex-col lg:flex-row lg:items-center gap-5">
@@ -2349,7 +2347,6 @@
         document.getElementById('btnAnnual').classList.toggle('active', state.selectedMonth === null);
         document.getElementById('btnDesejos').classList.toggle('active', state.selectedMonth === 'wishes');
         document.getElementById('btnSpain').classList.toggle('active', state.selectedMonth === 'spain');
-        document.getElementById('btnStudies').classList.toggle('active', state.selectedMonth === 'studies');
         document.querySelectorAll('[data-page-id]').forEach(b => b.classList.toggle('active', state.selectedMonth === `page:${b.dataset.pageId}`));
         // Resultado do mês ao lado do nome (verde/vermelho) para leitura rápida
         for (let m = 0; m < 12; m++) {
@@ -2370,7 +2367,6 @@
         const yearTxt = state.selectedYear === 'all' ? 'todos os anos' : state.selectedYear;
         document.getElementById('headerLegend').style.visibility = typeof state.selectedMonth === 'number' || state.selectedMonth === null ? 'visible' : 'hidden';
         if (state.selectedMonth === 'wishes') { t.textContent = 'Desejos'; s.textContent = 'Objetivos de compra por pessoa, categoria e ano.'; }
-        else if (state.selectedMonth === 'studies') { t.textContent = 'Estudos'; s.textContent = 'Cursos do Cristiano em Zaragoza: centros, prazos e documentos. Atualizado toda semana.'; }
         else if (state.selectedMonth === 'spain') { t.textContent = 'Projeto Espanha'; s.textContent = 'Planejamento completo da mudança: dinheiro, custos, cronograma e documentos.'; }
         else if (typeof state.selectedMonth === 'string' && state.selectedMonth.startsWith('page:')) {
           const pg = state.pagesConfig.custom.find(x => `page:${x.id}` === state.selectedMonth);
@@ -3727,6 +3723,7 @@
         set('esTabTimeline', p.milestones.length ? `${m.msDone}/${m.msTotal}` : '');
         set('esTabDocs', p.documents.length ? `${m.docsDone}/${m.docsTotal}` : '');
         set('esTabSales', m.salesCount ? `${m.soldCount}/${m.salesCount}` : '');
+        if (tab === 'studies') renderSpainCourses();
 
         renderSpainPlan(m, tab === 'overview');
         if (tab === 'overview') { renderSpainPhaseBudget(m); renderSpainNextSteps(); }
@@ -4049,10 +4046,9 @@
           return renderDashboard(new Date().getMonth());
         }
         renderCustomNav();
-        const views = { monthlyView: typeof selectedMonth === 'number', annualView: selectedMonth === null, wishesView: selectedMonth === 'wishes', spainView: selectedMonth === 'spain', studiesView: selectedMonth === 'studies', customPageView: !!pageId };
+        const views = { monthlyView: typeof selectedMonth === 'number', annualView: selectedMonth === null, wishesView: selectedMonth === 'wishes', spainView: selectedMonth === 'spain', customPageView: !!pageId };
         Object.entries(views).forEach(([id, show]) => document.getElementById(id).classList.toggle('hidden', !show));
         if (selectedMonth === 'spain') renderSpainView();
-        else if (selectedMonth === 'studies') renderSpainCourses();
         else if (selectedMonth === 'wishes') renderWishesView();
         else if (pageId) renderCustomPage(pageId);
         else if (selectedMonth === null) renderAnnualView();
@@ -4399,7 +4395,6 @@
           const b = e.target.closest('[data-page-id]'); if (b) renderDashboard(`page:${b.dataset.pageId}`);
         });
         document.getElementById('btnSpain').addEventListener('click', () => renderDashboard('spain'));
-        document.getElementById('btnStudies').addEventListener('click', () => renderDashboard('studies'));
         document.getElementById('spainMonthBanner').addEventListener('click', () => renderDashboard('spain'));
         document.getElementById('yearFilter').addEventListener('change', (e) => {
           state.selectedYear = e.target.value === 'all' ? 'all' : parseInt(e.target.value, 10); state.annualFocus = null; renderDashboard();
