@@ -3,8 +3,10 @@
   "updatedAt": "2026-10-17",
   "summary": "Curso-alvo: FP de Grau Médio \"Técnico en Instalaciones Eléctricas y Automáticas\" (2 anos, 2.000 h, presencial). Início previsto em setembro de 2028. As datas abaixo são as do processo 2026/27; o calendário de 2028/29 sai por volta de junho de 2028.",
   "alerts": [
+    "Importante: pela página oficial do Ministério (atualizada nov/2025), familiares só podem acompanhar estudante de ensino superior. FP de grau médio não está nessa lista. Débora e Emanuel podem não conseguir visto de acompanhante. Confirmar com o advogado.",
+    "Alternativa a avaliar: FP de grau superior conta como ensino superior e permite levar a família. Exige ensino médio homologado como Bachillerato.",
+    "O visto deve ser pedido no consulado pelo menos 2 meses antes do início das aulas. Pede comprovante de admissão e de pagamento da matrícula.",
     "A carta de admissão em centro público ou concertado só sai no fim de julho, depois das listas definitivas. Isso não permite pedir o visto antes da chegada em maio: decidir com o advogado entre um centro privado com carta antecipada ou outra data de chegada.",
-    "Correção: o IES Emilio Jimeno fica em Calatayud (cerca de 85 km de Zaragoza), não em Zaragoza.",
     "Com estudos feitos no Brasil, é preciso pedir o cálculo da nota média (e-mail giraragon@aragon.es) no período da admissão e ter a homologação em andamento."
   ],
   "options": [
@@ -61,6 +63,42 @@
       "cost": "Gratuito",
       "status": "Longe de Zaragoza; só como reserva",
       "url": "https://www.educaweb.com/notas-corte/ciclos-formativos-grado-medio/electricidad-electronica/tecnico-instalaciones-electricas-automaticas/zaragoza/?c=9213"
+    },
+    {
+      "center": "CPIFP Corona de Aragón",
+      "course": "Mecanizado (grau médio) — alternativa CNC",
+      "type": "Público",
+      "city": "Zaragoza",
+      "cost": "Gratuito",
+      "status": "Oferta o curso; vagas por nota/sorteio",
+      "url": "https://www.educaweb.com/notas-corte/ciclos-formativos-grado-medio/fabricacion-mecanica/tecnico-mecanizado/zaragoza/?c=9193"
+    },
+    {
+      "center": "IES La Puebla de Alfindén",
+      "course": "Mecanizado (grau médio) — alternativa CNC",
+      "type": "Público",
+      "city": "La Puebla de Alfindén (arredores)",
+      "cost": "Gratuito",
+      "status": "Oferta o curso; confirmar modalidade",
+      "url": "https://www.educaweb.com/notas-corte/ciclos-formativos-grado-medio/fabricacion-mecanica/tecnico-mecanizado/zaragoza/?c=9193"
+    },
+    {
+      "center": "Colegio Salesiano Nuestra Señora del Pilar",
+      "course": "Mecanizado (grau médio) — alternativa CNC",
+      "type": "A confirmar",
+      "city": "Zaragoza",
+      "cost": "A confirmar",
+      "status": "Oferta o curso; confirmar se é concertado",
+      "url": "https://www.educaweb.com/notas-corte/ciclos-formativos-grado-medio/fabricacion-mecanica/tecnico-mecanizado/zaragoza/?c=9193"
+    },
+    {
+      "center": "La Salle Santo Ángel",
+      "course": "Mecanizado (grau médio) — alternativa CNC",
+      "type": "A confirmar",
+      "city": "Zaragoza",
+      "cost": "A confirmar",
+      "status": "Perguntar se emite carta de admissão antecipada",
+      "url": "https://www.educaweb.com/notas-corte/ciclos-formativos-grado-medio/fabricacion-mecanica/tecnico-mecanizado/zaragoza/?c=9193"
     }
   ],
   "deadlines": [
@@ -68,6 +106,11 @@
       "when": "jan–mar/2027",
       "what": "Pedir a homologação do ensino médio do Cristiano (demora meses).",
       "url": "https://www.educacionfpydeportes.gob.es/servicios-al-ciudadano/catalogo/general/22/2214991/ficha/2214991.html"
+    },
+    {
+      "when": "até 2 meses antes das aulas",
+      "what": "Pedir o visto de estudante no Consulado da Espanha em São Paulo (para set/2028, até o início de julho).",
+      "url": "https://www.inclusion.gob.es/web/migraciones/w/estancia-por-estudios"
     },
     {
       "when": "jun–jul/2028",
@@ -143,6 +186,26 @@
       "name": "Certificado de empadronamiento em Zaragoza",
       "notes": "Comprovar endereço.",
       "url": "https://www.zaragoza.es/sede/servicio/tramite/3317"
+    },
+    {
+      "name": "Carta de admissão e comprovante de pagamento da matrícula",
+      "notes": "Curso presencial, mínimo de 20 h/semana. Deve ter datas, custo e horário.",
+      "url": "https://www.exteriores.gob.es/Consulados/SAOPAULO/es/ServiciosConsulares/Documents/Requisitos%20Visados%20estudios.pdf"
+    },
+    {
+      "name": "Comprovação de meios: 100% do IPREM por mês",
+      "notes": "Extratos dos últimos 3 meses, carimbados, mostrando a origem do dinheiro.",
+      "url": "https://www.inclusion.gob.es/web/migraciones/w/estancia-por-estudios"
+    },
+    {
+      "name": "Seguro saúde sem carência nem copagamento",
+      "notes": "Seguradora autorizada na Espanha. Seguro viagem não vale.",
+      "url": "https://www.exteriores.gob.es/Consulados/SAOPAULO/es/ServiciosConsulares/Documents/Requisitos%20Visados%20estudios.pdf"
+    },
+    {
+      "name": "Antecedentes criminais (Polícia Federal) e atestado médico, apostilados",
+      "notes": "Exigidos para estadias acima de 180 dias. Atestado vale 90 dias.",
+      "url": "https://www.exteriores.gob.es/Consulados/SAOPAULO/es/ServiciosConsulares/Documents/Requisitos%20Visados%20estudios.pdf"
     }
   ],
   "sources": [
@@ -161,6 +224,18 @@
     {
       "title": "Homologação de estudos estrangeiros para FP (Ministério de Educação)",
       "url": "https://www.educacionfpydeportes.gob.es/servicios-al-ciudadano/catalogo/general/22/2214991/ficha/2214991.html"
+    },
+    {
+      "title": "Estancia por estudios (Ministério de Inclusão e Migrações)",
+      "url": "https://www.inclusion.gob.es/web/migraciones/w/estancia-por-estudios"
+    },
+    {
+      "title": "Requisitos do visto de estudos (Consulado da Espanha em São Paulo)",
+      "url": "https://www.exteriores.gob.es/Consulados/SAOPAULO/es/ServiciosConsulares/Documents/Requisitos%20Visados%20estudios.pdf"
+    },
+    {
+      "title": "Centros com Mecanizado em Zaragoza (Educaweb)",
+      "url": "https://www.educaweb.com/notas-corte/ciclos-formativos-grado-medio/fabricacion-mecanica/tecnico-mecanizado/zaragoza/?c=9193"
     }
   ]
 }
