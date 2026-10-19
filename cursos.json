@@ -1,11 +1,13 @@
 {
   "title": "Estudos do Cristiano — FP de grau superior em Zaragoza",
-  "updatedAt": "2026-10-17",
+  "updatedAt": "2026-10-19",
   "summary": "Curso-alvo: FP de GRAU SUPERIOR (2 anos, 2.000 h, presencial, turno diurno), porque é ensino superior e permite levar Débora e Emanuel como familiares. Opções que combinam com o Cristiano: Sistemas Electrotécnicos y Automatizados, Automatización y Robótica Industrial, Mecatrónica Industrial e Programación de la Producción en Fabricación Mecánica (CNC). Início previsto em setembro de 2028. As datas abaixo são do processo 2026/27; o de 2028/29 sai por volta de junho de 2028.",
   "alerts": [
     "Decisão: trocar FP de grau médio por grau superior. Pela página oficial do Ministério, familiares só acompanham estudante de ensino superior; FP de grau superior entra, grau médio não.",
     "Para entrar no grau superior é preciso o ensino médio brasileiro completo (3º ano) homologado como título de Bachiller. Começar a juntar documentos já e pedir no início de 2027.",
-    "A carta de admissão em centro público ou concertado só sai no fim de julho; isso não permite pedir o visto antes da chegada em maio. Decidir com o advogado."
+    "A carta de admissão em centro público ou concertado só sai no fim de julho; isso não permite pedir o visto antes da chegada em maio. Decidir com o advogado.",
+    "Novo: Mecatrónica Industrial confirmada em Zaragoza (Corona de Aragón, Virgen del Pilar, Arsenio Jimeno) — várias turmas são à tarde, o que deixa a manhã livre para trabalhar. San Valero tem Mecatrónica privada (paga) com Dual na BSH.",
+    "Pela Instrução SEM 3/2025, os familiares de estudante de ensino superior podem pedir a autorização já na Espanha, se estiverem em situação regular (ex.: dentro dos 90 dias de turista). Levar ao advogado."
   ],
   "options": [
     {
@@ -86,17 +88,62 @@
       "type": "Concertado",
       "city": "Zaragoza",
       "cost": "Gratuito",
-      "status": "Consta na lista do curso; confirmar localidade e oferta",
-      "url": "https://www.educaweb.com/notas-corte/ciclos-formativos-grado-superior/fabricacion-mecanica/tecnico-superior-programacion-produccion-fabricacion-mecanica/"
+      "status": "Confirmado: presencial, concertado, em Zaragoza (Violeta Parra, 9). 2º ano pode ter Dual intensiva.",
+      "url": "https://www.sanvalero.es/fp-ciclos-formativos-grado-superior"
     },
     {
-      "center": "A pesquisar",
+      "center": "IES Corona de Aragón",
       "course": "Mecatrónica Industrial (grau superior)",
-      "type": "A confirmar",
+      "type": "Público",
       "city": "Zaragoza",
-      "cost": "A confirmar",
-      "status": "Confirmar centros na próxima atualização",
-      "url": "https://www.educaweb.com/notas-corte/ciclos-formativos-grado-superior/instalacion-mantenimiento/tecnico-superior-mecatronica-industrial/zaragoza/"
+      "cost": "Gratuito",
+      "status": "Oferta o curso; tem turma vespertina (tarde) e outra sem turno indicado",
+      "url": "https://www.educaweb.com/notas-corte/ciclos-formativos-grado-superior/instalacion-mantenimiento/tecnico-superior-mecatronica-industrial/zaragoza/?va=92"
+    },
+    {
+      "center": "IES Virgen del Pilar",
+      "course": "Mecatrónica Industrial (grau superior)",
+      "type": "Público",
+      "city": "Zaragoza",
+      "cost": "Gratuito",
+      "status": "Oferta o curso no turno vespertino (tarde)",
+      "url": "https://www.educaweb.com/notas-corte/ciclos-formativos-grado-superior/instalacion-mantenimiento/tecnico-superior-mecatronica-industrial/zaragoza/?va=92"
+    },
+    {
+      "center": "Centro de Estudios Arsenio Jimeno",
+      "course": "Mecatrónica Industrial (grau superior)",
+      "type": "Concertado",
+      "city": "Zaragoza",
+      "cost": "Gratuito",
+      "status": "Oferta o curso no turno vespertino (tarde)",
+      "url": "https://www.educaweb.com/notas-corte/ciclos-formativos-grado-superior/instalacion-mantenimiento/tecnico-superior-mecatronica-industrial/zaragoza/?va=92"
+    },
+    {
+      "center": "IES La Puebla de Alfindén",
+      "course": "Mecatrónica Industrial (grau superior)",
+      "type": "Público",
+      "city": "La Puebla de Alfindén (≈15 km)",
+      "cost": "Gratuito",
+      "status": "Oferta o curso; turno não informado",
+      "url": "https://www.educaweb.com/notas-corte/ciclos-formativos-grado-superior/instalacion-mantenimiento/tecnico-superior-mecatronica-industrial/zaragoza/?va=92"
+    },
+    {
+      "center": "Centro San Valero",
+      "course": "Mecatrónica Industrial (grau superior) — Dual com BSH",
+      "type": "Privado",
+      "city": "Zaragoza",
+      "cost": "Pago (preço não publicado)",
+      "status": "Dual com contrato de formação; aulas no centro e prática nas fábricas da BSH. Perguntar preço e se emitem carta para visto.",
+      "url": "https://www.sanvalero.es/oferta-educativa/formacion-profesional-dual/mecatronica-industrial"
+    },
+    {
+      "center": "Centro San Valero",
+      "course": "Automatización y Robótica Industrial (grau superior)",
+      "type": "Concertado",
+      "city": "Zaragoza",
+      "cost": "Gratuito",
+      "status": "Oferta presencial (concertado); versão online é privada",
+      "url": "https://www.sanvalero.es/fp-ciclos-formativos-grado-superior"
     }
   ],
   "deadlines": [
@@ -254,6 +301,18 @@
     {
       "title": "Familiares só em estudos superiores (Asesores Jurídicos Barcelona)",
       "url": "https://www.asesoresjuridicosbarcelona.com/post/estancia-de-larga-duraci%C3%B3n-para-estudios-superiores-o-educaci%C3%B3n-secundaria"
+    },
+    {
+      "title": "Centros com Mecatrónica Industrial em Zaragoza (Educaweb)",
+      "url": "https://www.educaweb.com/notas-corte/ciclos-formativos-grado-superior/instalacion-mantenimiento/tecnico-superior-mecatronica-industrial/zaragoza/?va=92"
+    },
+    {
+      "title": "Ciclos de grau superior do Centro San Valero",
+      "url": "https://www.sanvalero.es/fp-ciclos-formativos-grado-superior"
+    },
+    {
+      "title": "Familiares de estudante podem pedir desde a Espanha — SEM 3/2025 (Máchelin Díaz)",
+      "url": "https://machelindiaz.com/pueden-los-familiares-de-estudiantes-solicitar-su-estancia-desde-espana-sem-3-2025/"
     }
   ],
   "jobs": {
@@ -271,6 +330,11 @@
         "title": "InfoJobs — CNC em Zaragoza",
         "url": "https://www.infojobs.net/ofertas-trabajo/zaragoza/cnc-s",
         "notes": "Filtrar por “jornada parcial”."
+      },
+      {
+        "title": "Indeed — CNC em Zaragoza",
+        "url": "https://es.indeed.com/q-cnc-l-zaragoza,-zaragoza-provincia-empleos.html",
+        "notes": "Em 19/10/2026: 15 vagas (fresador, torneiro, operador CNC), nenhuma de meio período."
       },
       {
         "title": "Jooble — Torneiro CNC em Zaragoza",
