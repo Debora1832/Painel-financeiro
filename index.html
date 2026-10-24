@@ -482,7 +482,7 @@
           <h2 class="section-title"><i class="fa-solid fa-credit-card text-indigo-500"></i> Faturas dos cartões</h2>
           <button id="btnManageCards" class="btn-ghost"><i class="fa-solid fa-gear text-[11px]"></i> Gerenciar cartões</button>
         </div>
-        <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+        <div class="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-4">
           <div class="bg-white rounded-xl border border-gray-100 p-4">
             <div class="flex items-start justify-between">
               <div><p class="kpi-label">Total de faturas no período</p><p class="kpi-value" id="totalFaturas">R$ 0,00</p></div>
@@ -500,6 +500,16 @@
               <div class="es-bar"><span id="totalCreditoBar" class="bg-emerald-400" style="width:0%"></span></div>
               <div class="flex items-center justify-between text-[10px] text-gray-400"><span id="totalCreditoPct">0% do limite</span><span id="totalCreditoLimite">Limite: R$ 0,00</span></div>
             </div>
+          </div>
+          <div class="bg-white rounded-xl border border-gray-100 p-4">
+            <div class="flex items-start justify-between">
+              <div>
+                <p class="kpi-label">Parcelas do mês</p>
+                <p class="kpi-value text-violet-700" id="totalParcelasMes">R$ 0,00</p>
+              </div>
+              <span class="kpi-icon bg-violet-50 text-violet-500"><i class="fa-solid fa-layer-group"></i></span>
+            </div>
+            <p class="text-[11px] text-gray-500 mt-2">Total das parcelas do mês em cartão ou boleto, sem despesas fixas.</p>
           </div>
         </div>
         <div id="cardsGrid"></div>
@@ -2522,6 +2532,15 @@
           if (t.card in periodTotals) { periodTotals[t.card] += v; counts[t.card]++; if (t.invoiceConfirmed) checked[t.card] = (checked[t.card] || 0) + 1; }
         });
         document.getElementById('totalFaturas').textContent = formatCurrency(totalFaturas);
+        // Parcelas efetivamente lançadas no mês selecionado, sem somar fixas recorrentes.
+        // Considera as parcelas de cartão e boleto, sem duplicar o saldo ou o total das faturas.
+        const totalParcelasMes = getFilteredTransactions()
+          .filter(t => t.category !== 'fixa'
+            && t.category === 'variavel'
+            && Number(t.parcelas) > 1
+            && (t.isCreditCard || t.paymentMethod === 'boleto'))
+          .reduce((sum, t) => sum + (Number(t.value) || 0), 0);
+        document.getElementById('totalParcelasMes').textContent = formatCurrency(totalParcelasMes);
 
         // Limite comprometido: tudo no cartão ainda não pago (parcelas futuras incluídas;
         // despesas fixas futuras não, pois ainda não foram cobradas).
