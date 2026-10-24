@@ -501,7 +501,7 @@
               <div class="flex items-center justify-between text-[10px] text-gray-400"><span id="totalCreditoPct">0% do limite</span><span id="totalCreditoLimite">Limite: R$ 0,00</span></div>
             </div>
           </div>
-          <div class="bg-white rounded-xl border border-gray-100 p-4">
+          <div id="cardParcelasMes" class="summary-card bg-white rounded-xl border border-gray-100 p-4 cursor-pointer" title="Filtrar lançamentos de parcelas de cartão de crédito">
             <div class="flex items-start justify-between">
               <div>
                 <p class="kpi-label">Parcelas do mês</p>
@@ -1625,6 +1625,7 @@
         editingId: null, editingMode: 'single', editingGroupId: null,
         deletingId: null, deletingGroupId: null, deletingMode: 'single',
         selectedCard: null, selectedCategory: null,
+        selectedInstallments: false,
         wishes: [], wishesYear: new Date().getFullYear(), wishesCategory: 'all',
         spainPlan: null,
         spainCostPhase: 'all',
@@ -2299,10 +2300,14 @@
         if (isNaN(d.getTime()) || d.getMonth() !== month) return false;
         return year === 'all' || d.getFullYear() === year;
       }
+      function isCardInstallmentTx(t) {
+        return t.category === 'variavel' && Number(t.parcelas) > 1 && !!t.isCreditCard;
+      }
       function getFilteredTransactions() {
         if (typeof state.selectedMonth !== 'number') return [];
         return state.transactions.filter((t) => {
           if (!txInMonth(t, state.selectedMonth, state.selectedYear)) return false;
+          if (state.selectedInstallments) return isCardInstallmentTx(t);
           if (state.selectedCard !== null) return !!(t.isCreditCard && t.card === state.selectedCard);
           if (state.selectedCategory !== null) return t.category === state.selectedCategory;
           return true;
@@ -2535,10 +2540,7 @@
         // Parcelas efetivamente lançadas no mês selecionado, sem somar fixas recorrentes.
         // Considera somente parcelas de cartão de crédito, sem duplicar o saldo ou o total das faturas.
         const totalParcelasMes = getFilteredTransactions()
-          .filter(t => t.category !== 'fixa'
-            && t.category === 'variavel'
-            && Number(t.parcelas) > 1
-            && t.isCreditCard)
+          .filter(isCardInstallmentTx)
           .reduce((sum, t) => sum + (Number(t.value) || 0), 0);
         document.getElementById('totalParcelasMes').textContent = formatCurrency(totalParcelasMes);
 
@@ -2608,13 +2610,18 @@
           const el = document.getElementById(`cardContainer-${card.id}`);
           if (el) ['ring-2', 'ring-indigo-500', 'ring-offset-2'].forEach(c => el.classList.toggle(c, state.selectedCard === card.id));
         });
+        const parcelCard = document.getElementById('cardParcelasMes');
+        if (parcelCard) ['ring-2', 'ring-indigo-500', 'ring-offset-2'].forEach(c => parcelCard.classList.toggle(c, state.selectedInstallments));
         const ind = document.getElementById('cardFilterIndicator');
-        const has = state.selectedCard !== null || state.selectedCategory !== null;
+        const has = state.selectedCard !== null || state.selectedCategory !== null || state.selectedInstallments;
         ind.classList.toggle('hidden', !has);
         if (!has) return;
         const icon = document.getElementById('filterIndicatorIcon');
         const text = document.getElementById('filterIndicatorText');
-        if (state.selectedCard) {
+        if (state.selectedInstallments) {
+          icon.className = 'fa-solid fa-layer-group text-indigo-500';
+          text.innerHTML = 'Filtrando por <strong>parcelas de cartão de crédito</strong>';
+        } else if (state.selectedCard) {
           icon.className = 'fa-solid fa-credit-card text-indigo-500';
           text.innerHTML = `Filtrando pelo cartão <strong>${escapeHtml(getCardLabels()[state.selectedCard] || state.selectedCard)}</strong>`;
         } else {
@@ -4064,7 +4071,7 @@
       // DASHBOARD
       // =========================================================
       function renderDashboard(selectedMonth = state.selectedMonth) {
-        if (state.selectedMonth !== selectedMonth) { state.selectedCard = null; state.selectedCategory = null; }
+        if (state.selectedMonth !== selectedMonth) { state.selectedCard = null; state.selectedCategory = null; state.selectedInstallments = false; }
         state.selectedMonth = selectedMonth;
         renderHeader();
         renderSidebarHighlight();
@@ -4468,7 +4475,7 @@
           }
           if (el.matches('[data-card-filter]')) {
             const id = el.dataset.cardFilter;
-            state.selectedCategory = null; state.selectedCard = state.selectedCard === id ? null : id;
+            state.selectedCategory = null; state.selectedInstallments = false; state.selectedCard = state.selectedCard === id ? null : id;
             return applyPageFilter();
           }
         });
@@ -4481,14 +4488,21 @@
 
         function applyPageFilter() {
           renderMonthly();
-          if (state.selectedCard !== null || state.selectedCategory !== null) document.getElementById('cardFilterIndicator').scrollIntoView({ behavior: 'smooth', block: 'center' });
+          if (state.selectedCard !== null || state.selectedCategory !== null || state.selectedInstallments) document.getElementById('cardFilterIndicator').scrollIntoView({ behavior: 'smooth', block: 'center' });
         }
         ['receita', 'investimento', 'fixa', 'variavel'].forEach(cat => {
           document.getElementById(`summaryCard-${cat}`).addEventListener('click', () => {
-            state.selectedCard = null; state.selectedCategory = state.selectedCategory === cat ? null : cat; applyPageFilter();
+            state.selectedInstallments = false; state.selectedCard = null; state.selectedCategory = state.selectedCategory === cat ? null : cat; applyPageFilter();
           });
         });
-        document.getElementById('btnClearCardFilter').addEventListener('click', () => { state.selectedCard = null; state.selectedCategory = null; applyPageFilter(); });
+        document.getElementById('cardParcelasMes').addEventListener('click', () => {
+          const next = !state.selectedInstallments;
+          state.selectedCard = null;
+          state.selectedCategory = null;
+          state.selectedInstallments = next;
+          applyPageFilter();
+        });
+        document.getElementById('btnClearCardFilter').addEventListener('click', () => { state.selectedCard = null; state.selectedCategory = null; state.selectedInstallments = false; applyPageFilter(); });
 
         // Formulários de lançamento
         document.getElementById('despCategoria').addEventListener('change', () => { populateDespesaSubcategorias(); updateDespesaFormVisibility(); });
