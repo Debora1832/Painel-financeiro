@@ -505,11 +505,11 @@
             <div class="flex items-start justify-between">
               <div>
                 <p class="kpi-label">Parcelas do mês</p>
-                <p class="kpi-value text-violet-700" id="totalParcelasMes">R$ 0,00</p>
+                <p class="kpi-value" id="totalParcelasMes">R$ 0,00</p>
               </div>
-              <span class="kpi-icon bg-violet-50 text-violet-500"><i class="fa-solid fa-layer-group"></i></span>
+              <span class="kpi-icon bg-gray-50 text-gray-700"><i class="fa-solid fa-layer-group"></i></span>
             </div>
-            <p class="text-[11px] text-gray-500 mt-2">Total das parcelas do mês em cartão ou boleto, sem despesas fixas.</p>
+            <p class="text-[11px] text-gray-500 mt-2">Soma das parcelas de cartão de crédito no mês, sem despesas fixas.</p>
           </div>
         </div>
         <div id="cardsGrid"></div>
@@ -2533,12 +2533,12 @@
         });
         document.getElementById('totalFaturas').textContent = formatCurrency(totalFaturas);
         // Parcelas efetivamente lançadas no mês selecionado, sem somar fixas recorrentes.
-        // Considera as parcelas de cartão e boleto, sem duplicar o saldo ou o total das faturas.
+        // Considera somente parcelas de cartão de crédito, sem duplicar o saldo ou o total das faturas.
         const totalParcelasMes = getFilteredTransactions()
           .filter(t => t.category !== 'fixa'
             && t.category === 'variavel'
             && Number(t.parcelas) > 1
-            && (t.isCreditCard || t.paymentMethod === 'boleto'))
+            && t.isCreditCard)
           .reduce((sum, t) => sum + (Number(t.value) || 0), 0);
         document.getElementById('totalParcelasMes').textContent = formatCurrency(totalParcelasMes);
 
