@@ -1849,12 +1849,30 @@
           new Promise((_, rej) => { t = setTimeout(() => rej(Object.assign(new Error('Tempo esgotado ao falar com o Firebase'), { code: 'timeout' })), ms); })
         ]);
       }
-      function getPending() { const p = localGet(PENDING_KEY); return p && typeof p === 'object' && !Array.isArray(p) ? p : {}; }
+      // Cada pendência guarda quando foi feita: { op: 'set' | 'del', at: timestamp }.
+      // Pendência antiga (mais de 24 h) ou sem data (formato antigo) é DESCARTADA, para que um
+      // aparelho que ficou dias sem sincronizar não regrave dados velhos por cima da nuvem.
+      const PENDING_MAX_AGE = 24 * 60 * 60 * 1000;
+      let _stalePendingDropped = 0;
+      const pendOp = v => (typeof v === 'string' ? v : v?.op);
+      function getPending() {
+        const p = localGet(PENDING_KEY);
+        if (!p || typeof p !== 'object' || Array.isArray(p)) return {};
+        let dropped = 0; const now = Date.now();
+        Object.keys(p).forEach(kind => {
+          Object.entries(p[kind] || {}).forEach(([id, v]) => {
+            if (typeof v !== 'object' || !v || !v.at || now - v.at > PENDING_MAX_AGE) { delete p[kind][id]; dropped++; }
+          });
+          if (!Object.keys(p[kind] || {}).length) delete p[kind];
+        });
+        if (dropped) { _stalePendingDropped += dropped; localSet(PENDING_KEY, p); console.warn(`Sincronização: ${dropped} alteração(ões) antiga(s) deste aparelho descartada(s); a nuvem prevalece.`); }
+        return p;
+      }
       function pendingCount() { return Object.values(getPending()).reduce((n, m) => n + Object.keys(m || {}).length, 0); }
-      function markPending(kind, ids, op) { const p = getPending(); p[kind] ||= {}; ids.forEach(id => { p[kind][id] = op; }); localSet(PENDING_KEY, p); }
+      function markPending(kind, ids, op) { const p = getPending(); p[kind] ||= {}; const at = Date.now(); ids.forEach(id => { p[kind][id] = { op, at }; }); localSet(PENDING_KEY, p); }
       function clearPending(kind, ids, op) {
         const p = getPending(); if (!p[kind]) return;
-        ids.forEach(id => { if (p[kind][id] === op) delete p[kind][id]; });
+        ids.forEach(id => { if (pendOp(p[kind][id]) === op) delete p[kind][id]; });
         if (!Object.keys(p[kind]).length) delete p[kind];
         localSet(PENDING_KEY, p);
       }
@@ -1917,7 +1935,8 @@
         if (!pend || !Object.keys(pend).length) return serverList;
         const out = [...serverList];
         const lm = new Map((localList || []).map(x => [x.id, x]));
-        Object.entries(pend).forEach(([id, op]) => {
+        Object.entries(pend).forEach(([id, pv]) => {
+          const op = pendOp(pv);
           const i = out.findIndex(x => x.id === id);
           if (op === 'del') { if (i >= 0) out.splice(i, 1); return; }
           if (!lm.has(id)) return;
@@ -1930,7 +1949,8 @@
         const pend = getPending()[kind];
         if (!pend) return serverMap;
         const out = { ...serverMap };
-        Object.entries(pend).forEach(([id, op]) => {
+        Object.entries(pend).forEach(([id, v]) => {
+          const op = pendOp(v);
           if (op === 'del') delete out[id];
           else if (localMap && id in localMap) out[id] = localMap[id];
         });
@@ -1965,7 +1985,7 @@
           let ok = 0, fail = 0;
           for (const [kind, m] of Object.entries(p)) {
             const byOp = { set: [], del: [] };
-            Object.entries(m || {}).forEach(([id, op]) => (byOp[op] || byOp.set).push(id));
+            Object.entries(m || {}).forEach(([id, v]) => (byOp[pendOp(v)] || byOp.set).push(id));
             for (const op of ['set', 'del']) {
               if (!byOp[op].length) continue;
               try {
