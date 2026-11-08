@@ -735,6 +735,7 @@
         <button data-es-tab="timeline"><i class="fa-solid fa-list-check"></i> Cronograma <span id="esTabTimeline" class="es-tab-count"></span></button>
         <button data-es-tab="docs"><i class="fa-solid fa-passport"></i> Documentos <span id="esTabDocs" class="es-tab-count"></span></button>
         <button data-es-tab="sales"><i class="fa-solid fa-tags"></i> Vendas <span id="esTabSales" class="es-tab-count"></span></button>
+        <button data-es-tab="savings"><i class="fa-solid fa-piggy-bank"></i> Poupança <span id="esTabSavings" class="es-tab-count"></span></button>
         <button data-es-tab="studies"><i class="fa-solid fa-graduation-cap"></i> Estudos</button>
         <button data-es-tab="notes"><i class="fa-solid fa-note-sticky"></i> Anotações</button>
       </nav>
@@ -845,6 +846,32 @@
             <table class="min-w-[760px] text-xs es-table">
               <thead><tr><th class="text-left">Item</th><th class="text-right">Previsto</th><th class="text-right">Vendido por</th><th class="text-left">Mês</th><th class="text-center">Status</th><th></th></tr></thead>
               <tbody id="esSalesBody"></tbody>
+            </table>
+          </div>
+        </section>
+      </div>
+
+      <!-- Poupança: planejado x guardado, rendimento CDI e quanto falta -->
+      <div data-es-panel="savings" class="hidden space-y-4">
+        <section id="esSavStats" class="grid grid-cols-2 xl:grid-cols-6 gap-3"></section>
+        <section id="esSavVerdict"></section>
+        <section class="es-card overflow-hidden">
+          <div class="es-section-head">
+            <h3><i class="fa-solid fa-table-list text-emerald-600"></i> Planilha mês a mês</h3>
+            <div class="flex flex-wrap items-center gap-2">
+              <label class="text-[11px] text-gray-500 flex items-center gap-1.5">Plano padrão/mês
+                <input id="esSavDefault" type="number" min="0" step="50" class="w-28 border border-gray-200 rounded-lg px-2 py-1 text-xs text-right"></label>
+              <button id="btnEsSavCsv" class="btn-ghost !py-1"><i class="fa-solid fa-file-csv text-[11px]"></i> CSV</button>
+            </div>
+          </div>
+          <p class="px-4 pt-3 text-[11px] text-gray-500"><i class="fa-solid fa-circle-info text-emerald-500 mr-1"></i>
+            <strong>Planejado</strong>: o investimento lançado no mês; sem lançamento, vale o plano padrão. Clique no valor para mudar só aquele mês.
+            <strong>Guardado</strong>: investimentos marcados como aportados. <strong>Rendimento CDI</strong>: <span id="esSavRate"></span> ao mês sobre o saldo (estimado).</p>
+          <div class="overflow-x-auto">
+            <table class="min-w-[880px] w-full text-xs es-table">
+              <thead><tr><th class="text-left">Mês</th><th class="text-right">Planejado</th><th class="text-right">Guardado</th><th class="text-center">Bateu?</th><th class="text-right">Vendas</th><th class="text-right">Rendimento CDI</th><th class="text-right">Saldo</th><th class="text-right">Falta p/ meta</th></tr></thead>
+              <tbody id="esSavBody"></tbody>
+              <tfoot id="esSavFoot"></tfoot>
             </table>
           </div>
         </section>
@@ -2250,6 +2277,10 @@
             id: m.id || generateId('ms'), title: m.title || '', phase: SPAIN_PHASES.includes(m.phase) ? m.phase : SPAIN_PHASES[0], due: m.due || '', done: !!m.done
           })),
           notes: d.notes || '',
+          // Poupança: plano padrão por mês e ajustes de meses específicos ({ 'AAAA-MM': valor })
+          saveDefault: num(d.saveDefault, 0),
+          savePlan: Object.fromEntries(Object.entries(d.savePlan && typeof d.savePlan === 'object' ? d.savePlan : {})
+            .filter(([k, v]) => /^\d{4}-\d{2}$/.test(k) && v !== '' && v !== null && !isNaN(Number(v))).map(([k, v]) => [k, Number(v)])),
           seedApplied: d.seedApplied || ''
         };
       }
@@ -3814,6 +3845,9 @@
         set('esTabDocs', p.documents.length ? `${m.docsDone}/${m.docsTotal}` : '');
         set('esTabSales', m.salesCount ? `${m.soldCount}/${m.salesCount}` : '');
         if (tab === 'studies') renderSpainCourses();
+        const sav = getSpainSavings(m);
+        set('esTabSavings', sav.closedCount ? `${sav.okCount}/${sav.closedCount}` : '');
+        if (tab === 'savings') renderSpainSavings(m, sav);
 
         renderSpainPlan(m, tab === 'overview');
         if (tab === 'overview') { renderSpainPhaseBudget(m); renderSpainNextSteps(); }
@@ -3822,6 +3856,97 @@
         renderSpainDocs(m);
         renderSpainSales(m);
         if (fetchRate) refreshSpainEuroRate(false);
+      }
+
+      // ---------- Aba Poupança: planejado x guardado, rendimento CDI, saldo e quanto falta ----------
+      const spainKeyStr = k => `${Math.floor(k / 12)}-${String(k % 12 + 1).padStart(2, '0')}`;
+      function getSpainSavings(m = getSpainMetrics()) {
+        const p = state.spainPlan;
+        const real = {}, launched = {};
+        m.contribs.forEach(t => { const k = monthKey(t.date); real[k] = (real[k] || 0) + (Number(t.value) || 0); });
+        getSpainContributionTx(true).forEach(t => { const k = monthKey(t.date); launched[k] = (launched[k] || 0) + (Number(t.value) || 0); });
+        const def = p.saveDefault > 0 ? p.saveDefault : Math.ceil((m.monthlyNeeded || 0) / 50) * 50;
+        const keys = [...Object.keys(real), ...Object.keys(launched)].map(Number).filter(k => k <= m.nowK);
+        const startK = Math.max(m.nowK - 24, Math.min(m.nowK, ...keys));
+        const endK = Math.max(m.targetK, m.nowK);
+        const before = Object.entries(real).filter(([k]) => +k < startK).reduce((s, [, v]) => s + v, 0);
+        let bal = (Number(p.manualReserve) || 0) + m.paidTotal + m.soldTotal + before;
+        let planBal = bal;
+        const rows = [];
+        let okCount = 0, closedCount = 0, plannedToDate = 0, savedToDate = 0, interestToDate = 0, interestTotal = 0, balNow = bal, planBalNow = bal;
+        for (let k = startK; k <= endK && rows.length < 72; k++) {
+          const key = spainKeyStr(k);
+          const hasAdj = key in p.savePlan;
+          const planned = hasAdj ? p.savePlan[key] : (launched[k] > 0 ? launched[k] : def);
+          const source = hasAdj ? 'ajuste' : (launched[k] > 0 ? 'lançado' : 'padrão');
+          const saved = real[k] || 0;
+          const past = k < m.nowK, cur = k === m.nowK;
+          const used = past ? saved : Math.max(saved, planned);
+          const sale = k > m.nowK ? (m.salesByMonth[k] || 0) : 0;
+          const interest = bal * m.r;
+          bal += interest + used + sale;
+          planBal += planBal * m.r + planned + sale;
+          interestTotal += interest;
+          let status = 'futuro';
+          if (past) { closedCount++; if (saved >= planned - 0.5) { okCount++; status = 'ok'; } else status = 'abaixo'; }
+          else if (cur) status = saved >= planned - 0.5 ? 'ok' : 'andamento';
+          // "Até agora": meses fechados; o mês atual só entra quando já tem aporte
+          if (past || (cur && saved > 0)) { plannedToDate += planned; savedToDate += saved; }
+          if (past || cur) { interestToDate += interest; balNow = bal; planBalNow = planBal; }
+          rows.push({ k, key, planned, source, saved, used, sale, interest, bal, planBal, falta: Math.max(0, m.target - bal), status, past, cur, isTarget: k === m.targetK });
+        }
+        const finalBal = rows.length ? rows[rows.length - 1].bal : bal;
+        const finalPlanBal = rows.length ? rows[rows.length - 1].planBal : planBal;
+        return { rows, def, okCount, closedCount, plannedToDate, savedToDate, interestToDate, interestTotal, balNow, planBalNow, finalBal, finalPlanBal,
+          gapAtTarget: m.target - finalBal, faltaNow: Math.max(0, m.target - balNow) };
+      }
+      function renderSpainSavings(m = getSpainMetrics(), s = getSpainSavings(m)) {
+        const p = state.spainPlan;
+        const el = id => document.getElementById(id);
+        const defInput = el('esSavDefault');
+        if (document.activeElement !== defInput) { defInput.value = p.saveDefault > 0 ? p.saveDefault : ''; defInput.placeholder = String(s.def); }
+        el('esSavRate').textContent = formatPct(p.yieldPct, 2);
+        const diffToDate = s.savedToDate - s.plannedToDate;
+        el('esSavStats').innerHTML = [
+          ['Precisa juntar', formatCurrency(m.target), 'text-gray-900', 'meta total do projeto'],
+          ['Guardado até agora', formatCurrency(s.savedToDate), 'text-emerald-700', `planejado ${formatCurrency(s.plannedToDate)}`],
+          ['Diferença do plano', `${diffToDate >= 0 ? '+' : '−'}${formatCurrency(Math.abs(diffToDate))}`, diffToDate >= 0 ? 'text-emerald-700' : 'text-red-600', s.closedCount ? `${s.okCount} de ${s.closedCount} meses bateram` : 'sem meses fechados ainda'],
+          ['Rendimento CDI', formatCurrency(s.interestToDate), 'text-emerald-600', `até a mudança: ${formatCurrency(s.interestTotal)}`],
+          ['Falta hoje', formatCurrency(s.faltaNow), 'text-red-600', `saldo estimado ${formatCurrency(s.balNow)}`],
+          [s.gapAtTarget <= 0 ? 'Sobra na mudança' : 'Falta na mudança', formatCurrency(Math.abs(s.gapAtTarget)), s.gapAtTarget <= 0 ? 'text-emerald-700' : 'text-red-600', `saldo previsto ${formatCurrency(s.finalBal)}`]
+        ].map(([l, v, c, sub]) => `<div class="mini-stat !bg-white"><p>${l}</p><strong class="${c}">${v}</strong><span class="block text-[10px] text-gray-400 mt-0.5">${sub}</span></div>`).join('');
+        const dateLbl = m.targetDate.toLocaleDateString('pt-BR', { month: 'long', year: 'numeric' });
+        const ok = s.gapAtTarget <= 0;
+        el('esSavVerdict').innerHTML = `<div class="rounded-xl border ${ok ? 'bg-emerald-50 border-emerald-100 text-emerald-900' : 'bg-red-50 border-red-100 text-red-900'} p-3 text-xs flex items-start gap-2.5">
+          <i class="fa-solid ${ok ? 'fa-circle-check' : 'fa-triangle-exclamation'} mt-0.5"></i><div>
+          <p class="font-semibold">${ok ? `Seguindo o plano, vocês chegam em ${dateLbl} com ${formatCurrency(s.finalBal)}, ${formatCurrency(-s.gapAtTarget)} acima da meta.`
+            : `Seguindo o plano, vocês chegam em ${dateLbl} com ${formatCurrency(s.finalBal)}. Faltariam ${formatCurrency(s.gapAtTarget)}.`}</p>
+          <p class="mt-0.5 opacity-90">${s.closedCount ? `Até agora foram guardados ${formatCurrency(s.savedToDate)} de ${formatCurrency(s.plannedToDate)} planejados (${s.plannedToDate > 0 ? formatPct(s.savedToDate / s.plannedToDate * 100) : '—'}). ` : ''}Para fechar a meta exata, o necessário é ${formatCurrency(m.monthlyNeeded)}/mês daqui em diante, já contando o CDI e as vendas.</p></div></div>`;
+        const st = { ok: ['<i class="fa-solid fa-check"></i> Bateu', 'bg-emerald-100 text-emerald-700'], abaixo: ['<i class="fa-solid fa-xmark"></i> Abaixo', 'bg-red-100 text-red-700'], andamento: ['Em andamento', 'bg-amber-100 text-amber-700'], futuro: ['Previsto', 'bg-gray-100 text-gray-500'] };
+        el('esSavBody').innerHTML = s.rows.map(r => {
+          const diff = r.saved - r.planned;
+          const badge = `<span class="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-semibold ${st[r.status][1]}">${st[r.status][0]}</span>${r.status === 'abaixo' ? `<span class="block text-[10px] text-red-500 mt-0.5 tabular">−${formatCurrency(-diff)}</span>` : r.status === 'ok' && diff > 0.5 ? `<span class="block text-[10px] text-emerald-600 mt-0.5 tabular">+${formatCurrency(diff)}</span>` : ''}`;
+          return `<tr class="${r.cur ? 'bg-indigo-50/60' : r.isTarget ? 'bg-red-50/60' : ''}">
+            <td class="text-gray-700 font-medium whitespace-nowrap">${monthKeyLabel(r.k)}${r.cur ? ' <span class="text-[10px] text-indigo-500">hoje</span>' : r.isTarget ? ' <i class="fa-solid fa-plane text-red-400 text-[10px]"></i>' : ''}</td>
+            <td class="text-right"><input type="number" min="0" step="50" data-es-save-month="${r.key}" value="${Math.round(r.planned * 100) / 100}" title="Planejado (${r.source}). Apague para voltar ao padrão." class="w-24 text-right tabular bg-transparent border border-transparent hover:border-gray-200 focus:border-indigo-300 rounded px-1.5 py-0.5 ${r.source === 'ajuste' ? 'text-indigo-700 font-semibold' : 'text-gray-700'}"><span class="block text-[9px] text-gray-400">${r.source}</span></td>
+            <td class="text-right tabular ${r.saved ? 'text-emerald-700 font-semibold' : 'text-gray-300'}">${r.saved ? formatCurrency(r.saved) : '—'}</td>
+            <td class="text-center">${badge}</td>
+            <td class="text-right tabular ${r.sale ? 'text-sky-700' : 'text-gray-300'}">${r.sale ? '+' + formatCurrency(r.sale) : '—'}</td>
+            <td class="text-right tabular ${r.interest > 0.005 ? 'text-emerald-600' : 'text-gray-300'}">${r.interest > 0.005 ? '+' + formatCurrency(r.interest) : '—'}</td>
+            <td class="text-right tabular ${r.past || r.cur ? 'text-gray-900 font-semibold' : 'text-gray-500 italic'}">${formatCurrency(r.bal)}</td>
+            <td class="text-right tabular ${r.falta > 0 ? 'text-red-600' : 'text-emerald-600 font-semibold'}">${r.falta > 0 ? formatCurrency(r.falta) : 'Meta ✓'}</td></tr>`;
+        }).join('') || '<tr><td colspan="8" class="text-center text-gray-400 py-6">Defina a data-alvo do projeto para montar a planilha.</td></tr>';
+        const tp = s.rows.reduce((a, r) => a + r.planned, 0), ts = s.rows.reduce((a, r) => a + r.saved, 0), tv = s.rows.reduce((a, r) => a + r.sale, 0);
+        el('esSavFoot').innerHTML = s.rows.length ? `<tr class="bg-gray-50 font-semibold text-gray-800"><td class="px-4 py-2.5">Total</td><td class="px-4 py-2.5 text-right tabular">${formatCurrency(tp)}</td><td class="px-4 py-2.5 text-right tabular text-emerald-700">${formatCurrency(ts)}</td><td></td><td class="px-4 py-2.5 text-right tabular text-sky-700">${tv ? '+' + formatCurrency(tv) : '—'}</td><td class="px-4 py-2.5 text-right tabular text-emerald-600">+${formatCurrency(s.interestTotal)}</td><td class="px-4 py-2.5 text-right tabular">${formatCurrency(s.finalBal)}</td><td class="px-4 py-2.5 text-right tabular ${s.gapAtTarget > 0 ? 'text-red-600' : 'text-emerald-600'}">${s.gapAtTarget > 0 ? formatCurrency(s.gapAtTarget) : 'Meta ✓'}</td></tr>` : '';
+      }
+      function exportSpainSavingsCsv() {
+        const s = getSpainSavings();
+        const n = v => (Math.round(v * 100) / 100).toFixed(2).replace('.', ',');
+        const lab = { ok: 'Bateu', abaixo: 'Abaixo', andamento: 'Em andamento', futuro: 'Previsto' };
+        const lines = ['Mês;Planejado;Origem do plano;Guardado;Situação;Vendas;Rendimento CDI;Saldo;Falta p/ meta',
+          ...s.rows.map(r => [monthKeyLabel(r.k), n(r.planned), r.source, n(r.saved), lab[r.status], n(r.sale), n(r.interest), n(r.bal), n(r.falta)].join(';'))];
+        const url = URL.createObjectURL(new Blob(['﻿' + lines.join('\n')], { type: 'text/csv;charset=utf-8;' }));
+        const a = document.createElement('a'); a.href = url; a.download = 'projeto_espanha_poupanca.csv'; document.body.appendChild(a); a.click(); a.remove(); URL.revokeObjectURL(url);
       }
 
       function fillSpainParams() {
@@ -5172,6 +5297,18 @@
           state.spainTab = b.dataset.esTab; renderSpainView(false);
         });
         document.getElementById('btnSpainRefreshEuro').addEventListener('click', () => refreshSpainEuroRate(true));
+        // Poupança: plano padrão e ajustes de mês
+        document.getElementById('esSavDefault').addEventListener('change', async (e) => {
+          const v = Number(e.target.value); P().saveDefault = v > 0 ? v : 0;
+          await saveSpainPlan(false); renderSpainView(false);
+        });
+        document.getElementById('esSavBody').addEventListener('change', async (e) => {
+          const inp = e.target.closest('[data-es-save-month]'); if (!inp) return;
+          const key = inp.dataset.esSaveMonth;
+          if (inp.value === '' || isNaN(Number(inp.value))) delete P().savePlan[key]; else P().savePlan[key] = Number(inp.value);
+          await saveSpainPlan(false); renderSpainView(false);
+        });
+        document.getElementById('btnEsSavCsv').addEventListener('click', exportSpainSavingsCsv);
         document.getElementById('btnSpainSaveNotes').addEventListener('click', async () => { P().notes = document.getElementById('spainNotes').value; await saveSpainPlan(true); });
 
         // Custos
